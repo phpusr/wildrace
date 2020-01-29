@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase
+from django.utils import timezone
 
 from app import models
 
@@ -32,3 +33,31 @@ class ModelTests(TestCase):
         db_config = models.Config.objects.get()
 
         self.assertEquals(config, db_config)
+
+
+def create_profile():
+    return models.Profile.objects.create(
+        join_date=timezone.now(),
+        last_sync=timezone.now(),
+        first_name='Ivan',
+        last_name='Fuckoff',
+        sex=models.Profile.Sex.UNKNOWN
+    )
+
+
+class ProfileTests(TestCase):
+    def setUp(self):
+        self.profile = create_profile()
+
+    def test_profile_first_and_last_name(self):
+        self.assertEquals(self.profile.first_and_last_name, 'Ivan Fuckoff')
+
+    def test_vk_link(self):
+        self.assertEquals(self.profile.vk_link, 'https://vk.com/id1')
+
+    def test_vk_link_for_post(self):
+        self.assertEquals(self.profile.get_vk_link_for_post(is_development_env=True), 'Ivan Fuckoff')
+        self.assertEquals(self.profile.get_vk_link_for_post(is_development_env=False), '@id1 (Ivan Fuckoff)')
+
+    def test_profile_str(self):
+        self.assertEquals(str(self.profile), 'Ivan Fuckoff')

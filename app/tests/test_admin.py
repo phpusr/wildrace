@@ -3,7 +3,7 @@ from django.test import TestCase, Client
 from django.urls import reverse
 from rest_framework import status
 
-from app.tests.test_model import create_config
+from app.tests.test_model import create_config, create_profile
 
 
 class AdminSiteTests(TestCase):
@@ -30,3 +30,11 @@ class AdminSiteTests(TestCase):
 
         self.assertEquals(res.status_code, status.HTTP_200_OK)
         self.assertContains(res, str(config))
+
+    def test_profile_exists(self):
+        """Test that profile page exists"""
+        profile = create_profile()
+        res = self.client.get(reverse('admin:app_profile_change', args=[profile.id]))
+
+        self.assertEquals(res.status_code, status.HTTP_200_OK)
+        self.assertContains(res, str(profile))
