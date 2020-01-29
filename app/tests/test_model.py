@@ -6,8 +6,8 @@ from app import models
 
 def create_config():
     return models.Config.objects.create(
-        sync_posts=True, sync_seconds=600, group_id=101326589, group_short_link='https://vk.com/group', commenting=True,
-        comment_access_token='token123', comment_from_group=True, publish_stat=True
+        sync_posts=True, sync_seconds=600, group_id=101326589, group_short_link='https://vk.com/group',
+        commenting=True, comment_access_token='token123', comment_from_group=True, publish_stat=True
     )
 
 
@@ -24,7 +24,7 @@ class ModelTests(TestCase):
     def test_config_negative_group_id(self):
         """Test that config return negative value for group ID"""
         config = create_config()
-        self.assertEquals(config.negative_group_id, -500)
+        self.assertEquals(config.negative_group_id, -101326589)
 
     def test_config_manager_works(self):
         """Test that config manager works"""
