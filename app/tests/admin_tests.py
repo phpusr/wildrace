@@ -3,6 +3,8 @@ from django.test import TestCase, Client
 from django.urls import reverse
 from rest_framework import status
 
+from app.tests.model_tests import create_config
+
 
 class AdminSiteTests(TestCase):
     def setUp(self):
@@ -20,3 +22,11 @@ class AdminSiteTests(TestCase):
         res = self.client.get(reverse('admin:app_user_change', args=[self.admin_user.id]))
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertContains(res, self.admin_user.username)
+
+    def test_config_exists(self):
+        """Test that config page exists"""
+        config = create_config()
+        res = self.client.get(reverse('admin:app_config_change', args=[config.id]))
+
+        self.assertEquals(res.status_code, status.HTTP_200_OK)
+        self.assertContains(res, str(config))
