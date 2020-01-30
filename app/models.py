@@ -2,8 +2,6 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.conf import settings
 
-from app.fields import PhotoURLField
-
 
 class User(AbstractUser):
     pass
@@ -71,39 +69,39 @@ class Profile(models.Model):
 
     has_photo = models.BooleanField(blank=True, null=True)
 
-    photo_50 = PhotoURLField()
+    photo_50 = models.URLField(blank=True)
     """
     url квадратной фотографии пользователя, имеющей ширину 50 пикселей.
     В случае отсутствия у пользователя фотографии возвращается http://vk.com/images/camera_c.gif
     """
 
-    photo_100 = PhotoURLField()
+    photo_100 = models.URLField(blank=True)
     """
     url квадратной фотографии пользователя, имеющей ширину 100 пикселей.
     В случае отсутствия у пользователя фотографии возвращается http://vk.com/images/camera_b.gif
     """
 
-    photo_200 = PhotoURLField()
+    photo_200 = models.URLField(blank=True)
     """
     url квадратной фотографии пользователя, имеющей ширину 200 пикселей.
     Если фотография была загружена давно, изображения с такими размерами может не быть,
     в этом случае ответ не будет содержать этого поля
     """
 
-    photo_200_orig = PhotoURLField()
+    photo_200_orig = models.URLField(blank=True)
     """
     url фотографии пользователя, имеющей ширину 200 пикселей.
     В случае отсутствия у пользователя фотографии возвращается http://vk.com/images/camera_a.gif
     """
 
-    photo_400_orig = PhotoURLField()
+    photo_400_orig = models.URLField(blank=True)
     """
     url квадратной фотографии пользователя с максимальной шириной.
     Может быть возвращена фотография, имеющая ширину как 200, так и 100 пикселей.
     В случае отсутствия у пользователя фотографии возвращается http://vk.com/images/camera_b.gif
     """
 
-    photo_max_orig = PhotoURLField()
+    photo_max_orig = models.URLField(blank=True)
     """
     url фотографии пользователя максимального размера.
     Может быть возвращена фотография, имеющая ширину как 400, так и 200 пикселей.

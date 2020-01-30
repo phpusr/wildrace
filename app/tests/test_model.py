@@ -53,11 +53,12 @@ class ProfileTests(TestCase):
         self.assertEquals(self.profile.first_and_last_name, 'Ivan Fuckoff')
 
     def test_vk_link(self):
-        self.assertEquals(self.profile.vk_link, 'https://vk.com/id1')
+        self.assertEquals(self.profile.vk_link, f'https://vk.com/id{self.profile.id}')
 
     def test_vk_link_for_post(self):
         self.assertEquals(self.profile.get_vk_link_for_post(is_development_env=True), 'Ivan Fuckoff')
-        self.assertEquals(self.profile.get_vk_link_for_post(is_development_env=False), '@id1 (Ivan Fuckoff)')
+        self.assertEquals(self.profile.get_vk_link_for_post(is_development_env=False),
+                          f'@id{self.profile.id} (Ivan Fuckoff)')
 
     def test_profile_str(self):
         self.assertEquals(str(self.profile), 'Ivan Fuckoff')
