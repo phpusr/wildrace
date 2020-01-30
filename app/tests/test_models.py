@@ -5,13 +5,6 @@ from django.utils import timezone
 from app import models
 
 
-def create_config():
-    return models.Config.objects.create(
-        sync_posts=True, sync_seconds=600, group_id=101326589, group_short_link='https://vk.com/group',
-        commenting=True, comment_access_token='token123', comment_from_group=True, publish_stat=True
-    )
-
-
 class ModelTests(TestCase):
     def test_user_str(self):
         user = get_user_model().objects.create(username='phpusr')
@@ -19,20 +12,30 @@ class ModelTests(TestCase):
         self.assertEquals(str(user), 'phpusr')
         self.assertEqual(user._meta.label, 'app.User')
 
+
+def create_config():
+    return models.Config.objects.create(
+        sync_posts=True, sync_seconds=600, group_id=101326589, group_short_link='https://vk.com/group',
+        commenting=True, comment_access_token='token123', comment_from_group=True, publish_stat=True
+    )
+
+
+class ConfigTests(TestCase):
+    def setUp(self):
+        self.config = create_config()
+
     def test_config_str(self):
-        self.assertEquals(str(create_config()), 'Config for: https://vk.com/group')
+        self.assertEquals(str(self.config), 'Config for: https://vk.com/group')
 
     def test_config_negative_group_id(self):
         """Test that config return negative value for group ID"""
-        config = create_config()
-        self.assertEquals(config.negative_group_id, -101326589)
+        self.assertEquals(self.config.negative_group_id, -101326589)
 
     def test_config_manager_works(self):
         """Test that config manager works"""
-        config = create_config()
         db_config = models.Config.objects.get()
 
-        self.assertEquals(config, db_config)
+        self.assertEquals(self.config, db_config)
 
 
 def create_profile():

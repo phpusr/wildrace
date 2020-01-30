@@ -3,7 +3,7 @@ from django.test import TestCase, Client
 from django.urls import reverse
 from rest_framework import status
 
-from app.tests.test_model import create_config, create_profile
+from app.tests.test_models import create_config, create_profile
 
 
 class AdminSiteTests(TestCase):
