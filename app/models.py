@@ -123,3 +123,40 @@ class Profile(models.Model):
 
     def __str__(self):
         return self.first_and_last_name
+
+
+class Post(models.Model):
+    class Status(models.IntegerChoices):
+        SUCCESS = 1
+        ERROR_SUM = 2
+        ERROR_PARSE = 3
+        ERROR_START_SUM = 4
+
+    status = models.IntegerField(choices=Status.choices)
+    """Post processing status"""
+
+    author = models.ForeignKey(to=Profile, on_delete=models.PROTECT)
+
+    date = models.DateTimeField()
+
+    number = models.IntegerField()
+
+    text = models.TextField()
+
+    text_hash = models.CharField(max_length=32)
+
+    distance = models.IntegerField(null=True, blank=True)
+
+    sum_distance = models.IntegerField(null=True, blank=True)
+
+    edit_reason = models.CharField(max_length=255, null=True, blank=True)
+
+    last_update = models.DateTimeField(null=True, blank=True)
+
+    @property
+    def start_sum(self):
+        if self.sum_distance is not None and self.distance is not None:
+            return self.sum_distance - self.distance
+
+    def __str__(self):
+        return f'Post(id: {self.id}, number: {self.number}, text: {self.text})'

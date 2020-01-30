@@ -65,3 +65,25 @@ class ProfileTests(TestCase):
 
     def test_profile_str(self):
         self.assertEquals(str(self.profile), 'Ivan Fuckoff')
+
+
+def create_post():
+    profile = create_profile()
+    return models.Post.objects.create(status=1, author=profile, date=timezone.now(), number=1, text='3 + 3',
+                                      text_hash='1fa', distance=15, sum_distance=20, edit_reason='test',
+                                      last_update=timezone.now())
+
+
+class PostTests(TestCase):
+    def test_post_str(self):
+        post = create_post()
+        self.assertEquals(str(post), f'Post(id: {post.id}, number: 1, text: 3 + 3)')
+
+    def test_start_sum(self):
+        """Test that start_sum + distance = sum_distance"""
+        post = create_post()
+        self.assertEquals(post.start_sum, 5)
+
+        post.distance = 10
+        post.sum_distance = 50
+        self.assertEquals(post.start_sum, 40)
