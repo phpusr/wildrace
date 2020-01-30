@@ -44,7 +44,7 @@ class Profile(models.Model):
     join_date = models.DateTimeField()
     """First running date - join date"""
 
-    last_sync = models.DateTimeField()
+    last_sync = models.DateTimeField(null=True, blank=True)
     """Last sync date"""
 
     first_name = models.CharField(max_length=100)
@@ -67,7 +67,7 @@ class Profile(models.Model):
 
     country = models.CharField(max_length=100, blank=True)
 
-    has_photo = models.BooleanField(blank=True, null=True)
+    has_photo = models.BooleanField(null=True, blank=True)
 
     photo_50 = models.URLField(blank=True)
     """
@@ -95,6 +95,12 @@ class Profile(models.Model):
     """
 
     photo_400_orig = models.URLField(blank=True)
+    """
+    url фотографии пользователя, имеющей ширину 400 пикселей.
+    Если у пользователя отсутствует фотография такого размера, ответ не будет содержать этого поля
+    """
+
+    photo_max = models.URLField(blank=True)
     """
     url квадратной фотографии пользователя с максимальной шириной.
     Может быть возвращена фотография, имеющая ширину как 200, так и 100 пикселей.
