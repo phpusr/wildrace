@@ -87,3 +87,14 @@ class PostTests(TestCase):
         post.distance = 10
         post.sum_distance = 50
         self.assertEquals(post.start_sum, 40)
+
+
+def create_stat_log():
+    return models.StatLog.objects.create(publish_date=timezone.now(), stat_type=models.StatLog.StatType.DATE,
+                                         post_id=1, start_value='10.01.2020', end_value='15.02.2020')
+
+
+class StatLogTests(TestCase):
+    def test_stat_log_str(self):
+        stat_log = create_stat_log()
+        self.assertEquals(str(stat_log), 'StatLog(10.01.2020 - 15.02.2020)')

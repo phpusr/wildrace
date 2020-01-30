@@ -160,3 +160,22 @@ class Post(models.Model):
 
     def __str__(self):
         return f'Post(id: {self.id}, number: {self.number}, text: {self.text})'
+
+
+class StatLog(models.Model):
+    publish_date = models.DateTimeField()
+
+    class StatType(models.IntegerChoices):
+        DISTANCE = 0
+        DATE = 1
+
+    stat_type = models.IntegerField(choices=StatType.choices)
+
+    start_value = models.CharField(max_length=100)
+
+    end_value = models.CharField(max_length=100)
+
+    post_id = models.IntegerField()
+
+    def __str__(self):
+        return f'StatLog({self.start_value} - {self.end_value})'
