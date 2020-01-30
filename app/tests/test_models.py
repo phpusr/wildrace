@@ -98,3 +98,13 @@ class StatLogTests(TestCase):
     def test_stat_log_str(self):
         stat_log = create_stat_log()
         self.assertEquals(str(stat_log), 'StatLog(10.01.2020 - 15.02.2020)')
+
+
+def create_temp_data():
+    return models.TempData.objects.create(last_sync_date=timezone.now())
+
+
+class TempDataTests(TestCase):
+    def test_temp_data_str(self):
+        temp_data = create_temp_data()
+        self.assertEquals(str(temp_data), 'TempData')

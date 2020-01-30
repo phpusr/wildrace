@@ -3,7 +3,7 @@ from django.test import TestCase, Client
 from django.urls import reverse
 from rest_framework import status
 
-from app.tests.test_models import create_config, create_profile, create_post, create_stat_log
+from app.tests.test_models import create_config, create_profile, create_post, create_stat_log, create_temp_data
 
 
 class AdminSiteTests(TestCase):
@@ -54,3 +54,11 @@ class AdminSiteTests(TestCase):
 
         self.assertEquals(res.status_code, status.HTTP_200_OK)
         self.assertContains(res, str(stat_log))
+
+    def test_temp_data_exists(self):
+        """Test that test data page exists"""
+        temp_data = create_temp_data()
+        res = self.client.get(reverse('admin:app_tempdata_change', args=[temp_data.id]))
+
+        self.assertEquals(res.status_code, status.HTTP_200_OK)
+        self.assertContains(res, str(temp_data))

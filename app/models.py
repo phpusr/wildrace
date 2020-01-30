@@ -179,3 +179,10 @@ class StatLog(models.Model):
 
     def __str__(self):
         return f'StatLog({self.start_value} - {self.end_value})'
+
+
+class TempData(models.Model):
+    last_sync_date = models.DateTimeField()
+
+    def __str__(self):
+        return self.__class__.__name__
