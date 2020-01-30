@@ -108,7 +108,7 @@ class Profile(models.Model):
     В случае отсутствия у пользователя фотографии возвращается http://vk.com/images/camera_a.gif
     """
 
-    domain = models.SlugField(max_length=100)
+    domain = models.SlugField(max_length=100, blank=True)
 
     @property
     def first_and_last_name(self):
