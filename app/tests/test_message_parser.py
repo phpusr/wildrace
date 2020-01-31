@@ -20,7 +20,7 @@ class MessageParserTests(TestCase):
         self.assertEquals(end_sum_number, result.end_sum_number)
 
     def test_float_distances(self):
-        """Test that distances ma by float"""
+        """Test that distances don't be float"""
         self.assert_none_result('321 + 12.8 = 500')
         self.assert_result('321.2 + 12 = 500.12', 2, [12], 12, 500)
 

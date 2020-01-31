@@ -64,18 +64,18 @@ class MessageParser:
 
         self._reset()
 
-        not_end = self._next_symbol()
+        is_not_last_symbol = self._next_symbol()
 
-        while not_end and not self._is_end_parsing:
+        while is_not_last_symbol and not self._is_end_parsing:
             debug(f'start: {self._current_symbol}')
 
-            find_digit = re.match(EXP_DIGIT)
+            is_digit_symbol = re.match(EXP_DIGIT, self._current_symbol)
 
-            if find_digit:
-                self._current_symbol = ''
+            if is_digit_symbol:
+                self._current_number = ''
                 self._step_1()
             else:
-                not_end = self._next_symbol()
+                is_not_last_symbol = self._next_symbol()
 
         if self._is_end_parsing:
             return MessageParserOut(self._start_sum_number, self._distance_list, self._end_sum_number)
@@ -90,7 +90,7 @@ class MessageParser:
 
     def _next_symbol(self) -> bool:
         """Give next message symbol to current_symbol var"""
-        debug('>> next_symbol')
+        debug('  - next_symbol')
 
         if self._current_index + 1 == len(self.message):
             self._current_symbol = ''
@@ -123,7 +123,7 @@ class MessageParser:
         debug(f'step_2: {self._current_symbol}')
 
         self._next_symbol()
-        if self._current_symbol == EXP_PLUS:
+        if self._current_symbol == EXP_SPLIT:
             self._step_2()
         elif self._current_symbol == EXP_PLUS:
             self._step_3()
@@ -134,6 +134,7 @@ class MessageParser:
 
     def _step_3(self):
         """Plus sign processing"""
+        debug(f'step_3: {self._current_symbol}')
 
         if self._start_sum_number is None:
             self._start_sum_number = int(self._current_number)
@@ -164,4 +165,54 @@ class MessageParser:
 
     def _step_4(self):
         """Equal sign processing"""
-        pass
+        debug(f'step_4: {self._current_symbol}')
+
+        if self._start_sum_number is None:
+            self._reset()
+            return
+
+        self._distance_list.append(int(self._current_number))
+        self._current_number = ''
+
+        self._next_symbol()
+        if re.match(EXP_DIGIT, self._current_symbol):
+            self._step_5()
+        elif self._current_symbol == EXP_SPLIT:
+            self._step_6()
+        else:
+            self._reset()
+
+    def _step_5(self):
+        """Processing space sign after equal sign """
+        debug(f'step_5: {self._current_number}')
+
+        self._current_number += self._current_symbol
+
+        self._next_symbol()
+        if re.match(EXP_DIGIT, self._current_symbol):
+            self._step_5()
+        else:
+            self._finish()
+
+    def _step_6(self):
+        """Processing number after equal sign"""
+        debug(f'step_6: {self._current_symbol}')
+
+        self._next_symbol()
+        if re.match(EXP_DIGIT, self._current_symbol):
+            self._step_5()
+        elif self._current_symbol == EXP_SPLIT:
+            self._step_6()
+        else:
+            self._reset()
+
+    def _finish(self):
+        """Expression processing finish"""
+        debug(f'finish: {self._current_number}')
+
+        self._is_end_parsing = True
+        self._end_sum_number = int(self._current_number)
+
+        debug(f'start_sum_number: {self._start_sum_number}')
+        debug(f'distance_list: {self._distance_list}')
+        debug(f'end_sum_number: {self._end_sum_number}')
