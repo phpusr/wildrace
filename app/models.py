@@ -145,7 +145,7 @@ class Post(models.Model):
 
     date = models.DateTimeField()
 
-    number = models.IntegerField()
+    number = models.IntegerField(null=True, blank=True)
 
     text = models.TextField()
 

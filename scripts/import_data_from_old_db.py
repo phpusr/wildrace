@@ -7,12 +7,14 @@ import pytz
 from psycopg2.extras import RealDictCursor
 
 
-def execute(sql):
-    cursor.execute(sql)
+def execute(table_name):
+    cursor.execute(f'SELECT * FROM {table_name}')
     results = cursor.fetchall()
+
     size = round(getsizeof(results) / 1024, 2)
-    print(f'Count: {len(results)}')
-    print(f'Size: {size} KB')
+    print(f'Imported from "{table_name}"')
+    print(f'- Count: {len(results)}')
+    print(f'- Size: {size} KB')
     return results
 
 
@@ -25,7 +27,7 @@ def get_date(value):
 
 
 def import_config():
-    results = execute('select * from config')
+    results = execute('config')
     for row in results:
         models.Config.objects.create(
             id=row['id'],
@@ -41,7 +43,7 @@ def import_config():
 
 
 def import_profiles():
-    results = execute('select * from profile')
+    results = execute('profile')
     for row in results:
         models.Profile.objects.create(
             id=row['id'],
@@ -65,11 +67,65 @@ def import_profiles():
         )
 
 
+def import_posts():
+    results = execute('post')
+    for row in results:
+        models.Post.objects.create(
+            status=row['status'],
+            author_id=row['from_id'],
+            date=get_date(row['date']),
+            number=row['number'],
+            text=row['text'],
+            text_hash=row['text_hash'],
+            distance=row['distance'],
+            sum_distance=row['sum_distance'],
+            edit_reason=row['edit_reason'],
+            last_update=get_date(row['last_update']),
+        )
+
+
+def import_stat_logs():
+    results = execute('stat_log')
+    for row in results:
+        models.StatLog.objects.create(
+            id=row['id'],
+            publish_date=get_date(row['publish_date']),
+            stat_type=row['stat_type'],
+            start_value=row['start_value'],
+            end_value=row['end_value'],
+            post_id=row['post_id']
+        )
+
+
+def import_temp_data():
+    results = execute('temp_data')
+    for row in results:
+        models.TempData.objects.create(id=row['id'], last_sync_date=get_date(row['last_sync_date']))
+
+
+def delete_all_objects(model):
+    objects = model.objects.all()
+    count = objects.count()
+    objects.delete()
+    print(f'  - Deleted {count} objects from {model.__name__}')
+
+
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'app.settings')
 django.setup()
 from app import models  # noqa: E402
 
 with psycopg2.connect(host='127.0.0.1', user='phpusr', dbname='wildrace', cursor_factory=RealDictCursor) as conn:
+    if True:
+        print('Clean DB')
+        delete_all_objects(models.Config)
+        delete_all_objects(models.Post)
+        delete_all_objects(models.Profile)
+        delete_all_objects(models.StatLog)
+        delete_all_objects(models.TempData)
+
     cursor = conn.cursor()
-    # import_config()
-    # import_profiles()
+    import_config()
+    import_profiles()
+    import_posts()
+    import_stat_logs()
+    import_temp_data()
