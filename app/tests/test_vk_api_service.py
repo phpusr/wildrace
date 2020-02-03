@@ -25,8 +25,15 @@ class VkApiTests(TestCase):
     def setUp(self):
         create_config()
 
-    def test_login(self):
+    def test_authorize_url(self):
+        """Test authorize url"""
+        authorize_url = 'https://oauth.vk.com/authorize?client_id=5344865&display=page&' \
+                        'redirect_uri=https://oauth.vk.com/blank.html&scope=wall,offline&response_type=token&' \
+                        'v=5.92'
+        self.assertEquals(vk_api_service.authorize_url(), authorize_url)
+
+    def test_wall_get(self):
+        """Test that wall.get return value"""
         result = vk_api_service.wall_get(0, 1)
-        print(result)
         self.assertIn('count', result)
         self.assertIn('items', result)

@@ -1,12 +1,27 @@
 import vk_api
-from vk_api.vk_api import VkApiMethod
+from vk_api.vk_api import VkApiMethod, VkApi
+from django.conf import settings
 
 from app.models import Config
 
 
+def authorize_url() -> str:
+    oauth_url = 'https://oauth.vk.com'
+    params = {
+        'client_id': settings.VK_APP_ID,
+        'display': 'page',
+        'redirect_uri': f'{oauth_url}/blank.html',
+        'scope': 'wall,offline',
+        'response_type': 'token',
+        'v': VkApi().api_version
+    }
+    params_str = '&'.join([f'{key}={value}' for key, value in params.items()])
+    return f'{oauth_url}/authorize?{params_str}'
+
+
 def _api() -> VkApiMethod:
     config = Config.objects.get()
-    vk_session = vk_api.VkApi(token=config.comment_access_token)
+    vk_session = VkApi(token=config.comment_access_token)
     return vk_session.get_api()
 
 
