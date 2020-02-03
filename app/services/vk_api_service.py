@@ -1,4 +1,3 @@
-import vk_api
 from vk_api.vk_api import VkApiMethod, VkApi
 from django.conf import settings
 
@@ -35,6 +34,10 @@ def get_post_url(post_id) -> str:
     return f'{get_group_url()}?w=wall{config.negative_group_id}_{post_id}'
 
 
-def wall_get(offset: int, count: int) -> dict:
+def get_wall_posts(offset: int, count: int) -> dict:
     config = Config.objects.get()
     return _get_api().wall.get(owner_id=config.negative_group_id, offset=offset, count=count)
+
+
+def get_user(user_id) -> dict:
+    return _get_api().users.get(user_ids=user_id, fields=['sex', 'photo_50', 'photo_100'])[0]
