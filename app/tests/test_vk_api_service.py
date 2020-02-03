@@ -15,7 +15,7 @@ def create_config():
         group_short_link='',
         commenting=False,
         comment_access_token=os.getenv('ACCESS_TOKEN'),
-        comment_from_group=False,
+        comment_from_group=True,
         publish_stat=False
     )
 
@@ -65,3 +65,18 @@ class VkApiTests(TestCase):
         self.assertIn('photo_50', result)
         self.assertIn('photo_100', result)
         self.assertIn('photo_200', result)
+
+    def test_create_post(self):
+        """Test that wall.post return a value"""
+        message = 'It is a new post from test'
+        result = vk_api_service.create_post(message)
+
+        self.assertIn('post_id', result)
+
+    def test_add_comment_to_post(self):
+        """Test that wall.create_comment return a value"""
+        post_id = vk_api_service.create_post('Post for comment')['post_id']
+        message = 'Message from test'
+        result = vk_api_service.add_comment_to_post(post_id, message)
+
+        self.assertIn('comment_id', result)

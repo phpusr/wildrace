@@ -39,9 +39,29 @@ def get_wall_posts(offset: int, count: int) -> dict:
     return _get_api().wall.get(owner_id=config.negative_group_id, offset=offset, count=count)
 
 
-def get_user(user_id) -> dict:
+def get_user(user_id: int) -> dict:
     return _get_api().users.get(user_ids=user_id, fields=['sex', 'photo_50', 'photo_100'])[0]
 
 
-def get_group(group_id) -> dict:
+def get_group(group_id: int) -> dict:
     return _get_api().groups.getById(group_id=group_id)[0]
+
+
+def create_post(message: str) -> dict:
+    config = Config.objects.get()
+    return _get_api().wall.post(
+        owner_id=config.negative_group_id,
+        message=message,
+        signed=True,
+        from_group=1 if config.comment_from_group else 0
+    )
+
+
+def add_comment_to_post(post_id: int, message: str) -> dict:
+    config = Config.objects.get()
+    return _get_api().wall.create_comment(
+        post_id=post_id,
+        owner_id=config.negative_group_id,
+        message=message,
+        from_group=config.group_id if config.comment_from_group else 0
+    )
