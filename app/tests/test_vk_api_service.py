@@ -14,7 +14,7 @@ def create_config():
         group_id=88923650,
         group_short_link='',
         commenting=False,
-        comment_access_token=os.getenv('ACCESS_TOKEN'),
+        comment_access_token=os.getenv('VK_ACCESS_TOKEN'),
         comment_from_group=True,
         publish_stat=False
     )
