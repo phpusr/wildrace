@@ -126,3 +126,5 @@ AUTH_USER_MODEL = 'app.User'
 #####################################
 
 VK_LINK = 'https://vk.com'
+
+VK_APP_ID = 5344865
