@@ -39,14 +39,14 @@ class VkApiTests(TestCase):
         self.assertEquals(vk_api_service.get_post_url(1226), 'https://vk.com/club88923650?w=wall-88923650_1226')
 
     def test_get_wall_posts(self):
-        """Test that wall.get return value"""
+        """Test that wall.get return a value"""
         result = vk_api_service.get_wall_posts(0, 1)
 
         self.assertIn('count', result)
         self.assertIn('items', result)
 
     def test_get_user(self):
-        """Test that users.get return value"""
+        """Test that users.get return a value"""
         user_id = 354515836
         result = vk_api_service.get_user(user_id)
 
@@ -54,3 +54,14 @@ class VkApiTests(TestCase):
         self.assertIn('sex', result)
         self.assertIn('photo_50', result)
         self.assertIn('photo_100', result)
+
+    def test_get_group(self):
+        """Test that groups.get return a value"""
+        group_id = 88923650
+        result = vk_api_service.get_group(group_id)
+
+        self.assertEquals(result['id'], group_id)
+        self.assertIn('name', result)
+        self.assertIn('photo_50', result)
+        self.assertIn('photo_100', result)
+        self.assertIn('photo_200', result)

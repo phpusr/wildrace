@@ -41,3 +41,7 @@ def get_wall_posts(offset: int, count: int) -> dict:
 
 def get_user(user_id) -> dict:
     return _get_api().users.get(user_ids=user_id, fields=['sex', 'photo_50', 'photo_100'])[0]
+
+
+def get_group(group_id) -> dict:
+    return _get_api().groups.getById(group_id=group_id)[0]
