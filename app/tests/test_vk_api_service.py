@@ -30,7 +30,13 @@ class VkApiTests(TestCase):
         authorize_url = 'https://oauth.vk.com/authorize?client_id=5344865&display=page&' \
                         'redirect_uri=https://oauth.vk.com/blank.html&scope=wall,offline&response_type=token&' \
                         'v=5.92'
-        self.assertEquals(vk_api_service.authorize_url(), authorize_url)
+        self.assertEquals(vk_api_service.get_authorize_url(), authorize_url)
+
+    def test_get_group_url(self):
+        self.assertEquals(vk_api_service.get_group_url(), 'https://vk.com/club88923650')
+
+    def test_get_post_url(self):
+        self.assertEquals(vk_api_service.get_post_url(1226), 'https://vk.com/club88923650?w=wall-88923650_1226')
 
     def test_wall_get(self):
         """Test that wall.get return value"""
