@@ -2,17 +2,17 @@ from typing import List
 
 from django.test import TestCase
 
-from app.services.message_parser import MessageParser
+from app.services.message_parser import parse
 
 
 class MessageParserTests(TestCase):
 
     def assert_none_result(self, message):
-        self.assertIsNone(MessageParser(message).run())
+        self.assertIsNone(parse(message))
 
     def assert_result(self, message: str, start_sum_number, distance_list: List[int], distance: int,
                       end_sum_number: int):
-        result = MessageParser(message).run()
+        result = parse(message)
 
         self.assertEquals(start_sum_number, result.start_sum_number)
         self.assertEquals(distance_list, result.distance_list)
