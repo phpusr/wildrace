@@ -2,13 +2,15 @@ import logging
 import time
 from datetime import datetime, timedelta
 from hashlib import md5
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Iterator
 
+from django.db.models import Q
 from django.utils import timezone
 
 from app.enums import EventType
-from app.models import Post, Profile
-from app.services import vk_api_service
+from app.models import Post, Profile, Config
+from app.services import vk_api_service, message_parser
+from app.util import find, find_all
 
 DOWNLOAD_POST_COUNT = 100
 """
@@ -78,10 +80,10 @@ def _sync_block_posts(vk_post_count: int, download_count: int) -> int:
 
     for vk_post in vk_posts:
         post_id = vk_post['id']
-        post_text = _remove_badh_chars(vk_post['text'])
+        post_text = _remove_bad_chars(vk_post['text'])
         post_date = datetime.utcfromtimestamp(vk_post['date'])
         text_hash = md5(post_text)
-        db_post = next(post for post in last_db_posts if post.id == post_id)
+        db_post = find(last_db_posts, lambda it: it.id == post_id)
         last_post = _get_last_post(last_db_posts, post_id, post_date)
         last_sum_distance = last_post.sum_distance if last_post else 0
         last_post_number = last_post.number if last_post else 0
@@ -97,13 +99,13 @@ def _sync_block_posts(vk_post_count: int, download_count: int) -> int:
 
         # Searching and creating a new profile
         profile = _find_or_create_profile(vk_post, post_date, db_profiles)
-        new_post = Post(id=post_id, status=Post.Status.SUCCESS, profile=profile, date=post_date)
+        new_post = Post(id=post_id, status=Post.Status.SUCCESS, author=profile, date=post_date)
 
         parser_out = _analyze_post_text(post_text, text_hash, last_sum_distance, last_post_number, new_post,
                                         EventType.Create)
 
         # Adding a new post into last posts and post sorting by time
-        if paser_out:
+        if parser_out:
             last_db_posts.append(new_post)
             last_db_posts.sort(key=lambda post: post.date, reverse=True)
 
@@ -114,7 +116,7 @@ def _get_last_posts(post_count: int) -> List[Post]:
     return Post.objects.all().order_by('-date')[:post_count]
 
 
-def _remove_deleted_posts(vk_posts: List[dict], last_db_posts: List[Post]) -> List[Post]:
+def _remove_deleted_posts(vk_posts: Iterator[dict], last_db_posts: List[Post]) -> List[Post]:
     """Deleting from DB deleted posts"""
     # Searching posts for last {number_of_last_days}
     number_of_last_days = 5
@@ -122,9 +124,9 @@ def _remove_deleted_posts(vk_posts: List[dict], last_db_posts: List[Post]) -> Li
     last_day_posts = [post for post in last_db_posts if post.date >= start_date]
 
     def not_find_in_vk(post_id):
-        res = [post for post in vk_posts if post['i'] == post_id]
-        return len(res) == 0
-    deleted_posts = [post for post in last_day_posts if not_find_in_vk(post.id)]
+        return find(vk_posts, lambda it: it['id'] == post_id) is None
+
+    deleted_posts = find_all(last_day_posts, not_find_in_vk)
 
     if not deleted_posts:
         return deleted_posts
@@ -139,8 +141,133 @@ def _remove_deleted_posts(vk_posts: List[dict], last_db_posts: List[Post]) -> Li
 
 
 def _get_last_post(posts, post_id, post_date):
-    filter_posts = [post for post in posts if post.number is not None
-                    and post.id != post_id
-                    and post.date <= post_date]
-    if len(filter_posts):
-        return filter_posts[0]
+    return find(posts, lambda it: it.number is not None and it.id != post_id and it.date <= post_date)
+
+
+def _find_or_create_profile(vk_post: dict, post_date: datetime, db_profiles: List[Profile]) -> Profile:
+    profile_id = vk_post['from_id']
+    db_profile = find(db_profiles, lambda it: it.id == profile_id)
+    if db_profile:
+        return db_profile
+
+    db_profile = Profile(id=profile_id, date=post_date, first_name='Unknown')
+
+    if profile_id >= 0:
+        time.sleep(GETTING_USER_INTERVAL)
+
+        vk_user = vk_api_service.get_user(profile_id)
+        if vk_user:
+            db_profile.first_name = vk_user['first_name']
+            db_profile.last_name = vk_user['last_name']
+            db_profile.sex = vk_user['sex']
+            db_profile.photo_50 = vk_user['photo_50']
+            db_profile.photo_100 = vk_user['photo_100']
+    else:
+        vk_group = vk_api_service.get_group(profile_id * -1)
+        if vk_group:
+            db_profile.first_name = vk_group['name']
+            db_profile.photo_50 = vk_group['photo_50']
+            db_profile.photo_100 = vk_group['photo_100']
+            db_profile.photo_200 = vk_group['photo_200']
+
+    db_profile.save()
+    db_profiles.append(db_profile)
+
+    return db_profile
+
+
+def _analyze_post_text(text: str, text_hash: str, last_sum_distance: int, last_post_number: int, post: Post,
+                       event_type: EventType) -> bool:
+    parser_out = message_parser.parse(text)
+
+    post.text = text
+    post.text_hash = text_hash
+    if parser_out:
+        distance = parser_out.distance
+        new_sum_distance = last_sum_distance + distance
+
+        if parser_out.start_sum_number == last_sum_distance:
+            if new_sum_distance == parser_out.end_sum_number:
+                status = Post.Status.SUCCESS
+            else:
+                status = Post.Status.ERROR_SUM
+        else:
+            status = Post.Status.ERROR_START_SUM
+
+        number = last_post_number + 1
+    else:
+        status = Post.Status.ERROR_PARSE
+        number = None
+        distance = None
+        new_sum_distance = None
+
+    # Check that sum expression is changed
+    if post.number != number or post.distance != distance or post.sum_distance != new_sum_distance \
+                    or post.status != status:
+        post.number = number
+        post.distance = distance
+        post.sum_distance = new_sum_distance
+        post.status = status
+
+        post.save()
+        logger.debug(f' -- {event_type.name} post after analyze: {post}')
+
+        # Adding status comment for post
+        comment_text = _create_comment_text(post, last_sum_distance, new_sum_distance)
+        _add_status_comment(post.id, comment_text)
+
+    return parser_out is not None
+
+
+def _create_comment_text(post: Post, start_sum_distance: int, end_sum_distance: int) -> str:
+    comment_text = ''
+
+    # Appeal
+    if post.status == Post.Status.Success:
+        if post.author.id > 0:
+            comment_text += f'@id{post.author.id} ({post.author.first_name})'
+        else:
+            comment_text += f'@club{post.author.id * -1} ({post.author.first_name})'
+
+    # Running number
+    if post.status != Post.Status.ERROR_PARSE.id:
+        comment_text += f'#{post.number} пробежка: '
+
+    comment_text += {
+        Post.Status.SUCCESS: 'Пост успешно обработан',
+        Post.Status.ERROR_SUM: f'Ошибка при сложении, должно быть: {end_sum_distance}',
+        Post.Status.ERROR_PARSE: f'Ошибка в формате записи, пост не распознан',
+        Post.Status.EROR_START_SUM: f'Ошибка в стартовой сумме, должна быть: {start_sum_distance}'
+    }.get(post.status, 'Ошибка: Не предусмотренный статус, напишите администратору')
+
+    return comment_text
+
+
+def _add_status_comment(post_id: int, comment_text: str):
+    if not Config.objects.get().commenting:
+        return
+
+    time.sleep(PUBLISHING_COMMENT_INTERVAL)
+    vk_api_service.add_comment_to_post(post_id, comment_text)
+
+
+def update_next_posts(updated_post: Post):
+    if updated_post.number is not None:
+        start_post = updated_post
+    else:
+        start_post = Post.objects.filter(date__lte=updated_post.date).order_by('-date').first()
+
+    logger.debug(f'> Update next, start: {start_post}')
+
+    current_post_number = start_post.number if start_post else 0
+    current_sum_distance = start_post.sum_distance if start_post else 0
+
+    next_posts = Post.objects.filter(date__gte=updated_post.date).order_by('date')
+    if start_post is not None:
+        next_posts = next_posts.filter(~Q(id=start_post.id) & Q(date__gte=start_post.date))
+
+    for post in next_posts:
+        _analyze_post_text(post.text, post.text_hash, current_sum_distance, current_post_number, post,
+                           EventType.UPDATE)
+        current_sum_distance = post.sum_distance
+        current_post_number = post.number
