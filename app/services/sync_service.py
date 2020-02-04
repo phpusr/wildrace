@@ -2,8 +2,7 @@ import logging
 import time
 from datetime import datetime, timedelta
 from hashlib import md5
-from typing import List, Dict, Any, Iterator
-
+from typing import List, Iterator
 from django.db.models import Q
 from django.utils import timezone
 
@@ -76,7 +75,7 @@ def _sync_block_posts(vk_post_count: int, download_count: int) -> int:
     vk_posts = reversed(response['items'])
 
     last_db_posts = _get_last_posts(LAST_POSTS_COUNT)
-    deleted_posts = _remove_deleted_posts(vk_posts, last_db_posts)
+    _remove_deleted_posts(vk_posts, last_db_posts)
 
     for vk_post in vk_posts:
         post_id = vk_post['id']
@@ -202,8 +201,11 @@ def _analyze_post_text(text: str, text_hash: str, last_sum_distance: int, last_p
         new_sum_distance = None
 
     # Check that sum expression is changed
-    if post.number != number or post.distance != distance or post.sum_distance != new_sum_distance \
-                    or post.status != status:
+    if (post.number != number
+            or post.distance != distance
+            or post.sum_distance != new_sum_distance
+            or post.status != status):
+
         post.number = number
         post.distance = distance
         post.sum_distance = new_sum_distance
