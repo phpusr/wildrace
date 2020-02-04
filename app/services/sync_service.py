@@ -10,7 +10,7 @@ from django.utils import timezone
 from app.enums import EventType
 from app.models import Post, Profile, Config
 from app.services import vk_api_service, message_parser
-from app.util import find, find_all
+from app.util import find, find_all, remove_non_utf8_chars
 
 DOWNLOAD_POST_COUNT = 100
 """
@@ -80,7 +80,7 @@ def _sync_block_posts(vk_post_count: int, download_count: int) -> int:
 
     for vk_post in vk_posts:
         post_id = vk_post['id']
-        post_text = _remove_bad_chars(vk_post['text'])
+        post_text = remove_non_utf8_chars(vk_post['text'])
         post_date = datetime.utcfromtimestamp(vk_post['date'])
         text_hash = md5(post_text)
         db_post = find(last_db_posts, lambda it: it.id == post_id)

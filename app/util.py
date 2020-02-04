@@ -1,4 +1,4 @@
-from typing import Iterable
+from typing import Iterable, Optional
 
 
 def find(lst: Iterable, action):
@@ -9,3 +9,10 @@ def find(lst: Iterable, action):
 
 def find_all(lst: Iterable, action):
     return list(filter(action, lst))
+
+
+def remove_non_utf8_chars(text: str) -> Optional[str]:
+    if text is None:
+        return None
+
+    return bytes(text, 'utf-8').decode('utf-8', 'ignore')
