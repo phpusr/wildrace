@@ -36,21 +36,62 @@ class SyncServiceTests(TestCase):
         self.config = create_config()
         self.profile = Profile.objects.create(join_date=timezone.now(), first_name='Иван', sex=Profile.Sex.MALE)
 
+    def test_sync_block_posts_count_changed(self):
+        """Test sync block if vk posts count changed"""
+        with patch('app.services.vk_api_service.get_wall_posts') as gi:
+            gi.return_value = {'count': 0}
+            result = sync_service._sync_block_posts(vk_post_count=130, download_count=100)
+            self.assertEquals(gi.call_args.args[0], 30)
+            self.assertEquals(gi.call_args.args[1], 100)
+            self.assertEquals(result, 0)
+
+    def create_vk_post(self, id, text):
+        return {
+            'id': id,
+            'from_id': self.profile.id,
+            'text': text,
+            'date': round(timezone.now().timestamp())
+        }
+
+    def test_sync_block_posts(self):
+        """Test sync block"""
+        items = [
+            self.create_vk_post(5, '18+4=22'),
+            self.create_vk_post(4, '15+3=18'),
+            self.create_vk_post(2, '10+5=15'),
+            self.create_vk_post(1, '0+10=10')
+        ]
+
+        self.create_post(Post.Status.SUCCESS, items[-1]['text'], 1, id=items[-1]['id'])
+        self.create_post(Post.Status.ERROR_SUM, '10+5=16', 2, id=items[-2]['id'])
+        self.create_post(Post.Status.ERROR_SUM, 'some', id=3)
+
+        with patch('app.services.vk_api_service.get_wall_posts') as gi:
+            gi.return_value = {
+                'count': len(items),
+                'items': items
+            }
+            result = sync_service._sync_block_posts(len(items), 100)
+            self.assertEqual(result, len(items))
+
     def test_remove_deleted_posts(self):
         result = sync_service._remove_deleted_posts([], [])
         self.assertEqual(result, [])
 
-        vk_posts = [{'id': 123}, {'id': 124}]
+        vk_posts = [{'id': 123}]
+
         post1 = self.create_post(Post.Status.SUCCESS, 'text', id=123)
-        date = timezone.now() - timedelta(days=5, milliseconds=1)
-        post2 = self.create_post(Post.Status.SUCCESS, 'text', id=124, date=date)
-        posts = [post1, post2]
+        post2 = self.create_post(Post.Status.SUCCESS, 'text', id=124)
+        post3 = self.create_post(Post.Status.SUCCESS, 'text', id=125,
+                                 date=timezone.now() - timedelta(days=5, milliseconds=1))
+
+        posts = [post1, post2, post3]
         result = sync_service._remove_deleted_posts(vk_posts, posts)
 
         self.assertEqual(len(result), 1)
-        self.assertEqual(id(result[0]), id(post1))
-        self.assertEqual(len(posts), 1)
-        self.assertEqual(id(posts[0]), id(post2))
+        self.assertEqual(id(result[0]), id(post2))
+        self.assertEqual(len(posts), 2)
+        self.assertEqual(posts, [post1, post3])
 
     def test_find_profile(self):
         """Test that profile exists in DB"""

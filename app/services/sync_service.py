@@ -3,6 +3,7 @@ import time
 from datetime import datetime, timedelta
 from hashlib import md5
 from typing import List, Iterator
+
 from django.db.models import Q
 from django.utils import timezone
 
@@ -72,7 +73,7 @@ def _sync_block_posts(vk_post_count: int, download_count: int) -> int:
         logger.debug(f' -- Number of posts in VK changed: {vk_post_count} -> {response["count"]}')
         return db_post_count
 
-    vk_posts = reversed(response['items'])
+    vk_posts = list(reversed(response['items']))
 
     last_db_posts = _get_last_posts(LAST_POSTS_COUNT)
     _remove_deleted_posts(vk_posts, last_db_posts)
@@ -93,7 +94,7 @@ def _sync_block_posts(vk_post_count: int, download_count: int) -> int:
                             or db_post.last_update is not None:
                 continue
 
-            _analyze_post_text(post_text, text_hash, last_sum_distance, last_post_number, db_post, EventType.Update)
+            _analyze_post_text(post_text, text_hash, last_sum_distance, last_post_number, db_post, EventType.UPDATE)
             continue
 
         # Searching and creating a new profile
@@ -122,8 +123,8 @@ def _remove_deleted_posts(vk_posts: Iterator[dict], last_db_posts: List[Post]) -
     start_date = timezone.now() - timedelta(days=number_of_last_days)
     last_day_posts = [post for post in last_db_posts if post.date >= start_date]
 
-    def not_find_in_vk(post_id):
-        return find(vk_posts, lambda it: it['id'] == post_id) is None
+    def not_find_in_vk(post):
+        return find(vk_posts, lambda it: it['id'] == post.id) is None
 
     deleted_posts = find_all(last_day_posts, not_find_in_vk)
 
