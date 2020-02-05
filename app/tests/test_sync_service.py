@@ -1,4 +1,4 @@
-import os
+from datetime import timedelta
 from unittest.mock import patch
 
 from django.test import TestCase
@@ -35,6 +35,22 @@ class SyncServiceTests(TestCase):
     def setUp(self):
         self.config = create_config()
         self.profile = Profile.objects.create(join_date=timezone.now(), first_name='Иван', sex=Profile.Sex.MALE)
+
+    def test_remove_deleted_posts(self):
+        result = sync_service._remove_deleted_posts([], [])
+        self.assertEqual(result, [])
+
+        vk_posts = [{'id': 123}, {'id': 124}]
+        post1 = self.create_post(Post.Status.SUCCESS, None, 'text', None, None, id=123)
+        date = timezone.now() - timedelta(days=5, milliseconds=1)
+        post2 = self.create_post(Post.Status.SUCCESS, None, 'text', None, None, id=124, date=date)
+        posts = [post1, post2]
+        result = sync_service._remove_deleted_posts(vk_posts, posts)
+
+        self.assertEqual(len(result), 1)
+        self.assertEqual(id(result[0]), id(post1))
+        self.assertEqual(len(posts), 1)
+        self.assertEqual(id(posts[0]), id(post2))
 
     def test_find_profile(self):
         """Test that profile exists in DB"""
@@ -166,11 +182,14 @@ class SyncServiceTests(TestCase):
             sync_service._add_status_comment(1, 'Status comment')
             self.assertEqual(gi.call_count, 1)
 
-    def create_post(self, status, number, text, distance, sum_distance):
+    def create_post(self, status, number, text, distance, sum_distance, id=None, date=None):
+        if not date:
+            date = timezone.now()
         return Post.objects.create(
+            id=id,
             author=self.profile,
             status=status,
-            date=timezone.now(),
+            date=date,
             text=text,
             text_hash='hash',
             number=number,
