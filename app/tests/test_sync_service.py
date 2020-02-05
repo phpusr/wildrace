@@ -17,7 +17,7 @@ def create_config():
         group_id=88923650,
         group_short_link='',
         commenting=False,
-        comment_access_token=os.getenv('VK_ACCESS_TOKEN'),
+        comment_access_token='-',
         comment_from_group=False,
         publish_stat=False
     )
@@ -165,3 +165,53 @@ class SyncServiceTests(TestCase):
         with patch('app.services.vk_api_service.add_comment_to_post') as gi:
             sync_service._add_status_comment(1, 'Status comment')
             self.assertEqual(gi.call_count, 1)
+
+    def create_post(self, status, number, text, distance, sum_distance):
+        return Post.objects.create(
+            author=self.profile,
+            status=status,
+            date=timezone.now(),
+            text=text,
+            text_hash='hash',
+            number=number,
+            distance=distance,
+            sum_distance=sum_distance
+        )
+
+    def test_update_next_posts(self):
+        """Test that next posts will be updated"""
+        self.create_post(Post.Status.SUCCESS, 1, '0+10=10', 10, 10)
+        updated_post = self.create_post(Post.Status.ERROR_PARSE, None, 'text', None, None)
+        changed_post = self.create_post(Post.Status.SUCCESS, 3, '15+6=21', 6, 21)
+
+        with patch('app.services.sync_service._create_comment_text') as gi:
+            sync_service.update_next_posts(updated_post)
+            self.assertEqual(gi.call_count, 1)
+
+        changed_post_new = Post.objects.get(id=changed_post.id)
+        self.assertEqual(changed_post_new.status, Post.Status.ERROR_START_SUM)
+        self.assertEqual(changed_post_new.number, 2)
+        self.assertEqual(changed_post_new.sum_distance, 16)
+
+    def test_update_next_posts_2(self):
+        """Test that next posts will be updated"""
+        self.create_post(Post.Status.SUCCESS, 1, '0+10=10', 10, 10)
+        updated_post = self.create_post(Post.Status.SUCCESS, 2, '10+5=15', 5, 15)
+        changed_post1 = self.create_post(Post.Status.SUCCESS, 3, '15+6=21', 6, 21)
+        self.create_post(Post.Status.ERROR_PARSE, None, 'text', None, None)
+        changed_post2 = self.create_post(Post.Status.SUCCESS, 4, '21+3=24', 3, 24)
+        self.create_post(Post.Status.SUCCESS, 5, '59+11=70', 11, 70)
+
+        updated_post.sum_distance = 50
+        with patch('app.services.sync_service._create_comment_text') as gi:
+            sync_service.update_next_posts(updated_post)
+            self.assertEqual(gi.call_count, 2)
+
+        changed_post1_new = Post.objects.get(id=changed_post1.id)
+        self.assertEqual(changed_post1_new.status, Post.Status.ERROR_START_SUM)
+        self.assertEqual(changed_post1_new.sum_distance, 56)
+
+        changed_post2_new = Post.objects.get(id=changed_post2.id)
+        self.assertEqual(changed_post2_new.status, Post.Status.ERROR_START_SUM)
+        self.assertEqual(changed_post2_new.sum_distance, 59)
+

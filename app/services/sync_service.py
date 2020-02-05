@@ -253,17 +253,18 @@ def _add_status_comment(post_id: int, comment_text: str):
 
 
 def update_next_posts(updated_post: Post):
+    runnings = Post.objects.filter(number__isnull=False)
     if updated_post.number is not None:
         start_post = updated_post
     else:
-        start_post = Post.objects.filter(date__lte=updated_post.date).order_by('-date').first()
+        start_post = runnings.filter(date__lte=updated_post.date).order_by('-date').first()
 
     logger.debug(f'> Update next, start: {start_post}')
 
     current_post_number = start_post.number if start_post else 0
     current_sum_distance = start_post.sum_distance if start_post else 0
 
-    next_posts = Post.objects.filter(date__gte=updated_post.date).order_by('date')
+    next_posts = runnings.filter(date__gte=updated_post.date).order_by('date')
     if start_post is not None:
         next_posts = next_posts.filter(~Q(id=start_post.id) & Q(date__gte=start_post.date))
 
