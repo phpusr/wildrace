@@ -36,6 +36,51 @@ class SyncServiceTests(TestCase):
         self.config = create_config()
         self.profile = Profile.objects.create(join_date=timezone.now(), first_name='Иван', sex=Profile.Sex.MALE)
 
+    def test_find_profile(self):
+        """Test that profile exists in DB"""
+        vk_post = {'from_id': self.profile.id}
+        db_profiles = list(Profile.objects.all())
+        result = sync_service._find_or_create_profile(vk_post, timezone.now(), db_profiles)
+        self.assertEqual(result, self.profile)
+
+    def test_create_profile(self):
+        """Test that profile will receive from vk and will save to DB"""
+        vk_post = {'from_id': 100}
+        db_profiles = []
+        post_date = timezone.now()
+        with patch('app.services.vk_api_service.get_user') as gi:
+            gi.return_value = {'id': 100, 'first_name': 'Ivan', 'last_name': 'Drago', 'sex': 2, 'photo_50': '50.jpg',
+                               'photo_100': '100.jpg'}
+
+            result = sync_service._find_or_create_profile(vk_post, post_date, db_profiles)
+            self.assertEqual(gi.call_count, 1)
+            self.assertEqual(gi.call_args.args[0], 100)
+            self.assertEqual(result.id, 100)
+            self.assertEqual(result.join_date, post_date)
+            self.assertEqual(result.first_name, 'Ivan')
+            self.assertEqual(result.last_name, 'Drago')
+            self.assertEqual(result.photo_50, '50.jpg')
+            self.assertEqual(result.photo_100, '100.jpg')
+
+    def test_create_group(self):
+        """Test that group will receive and save to DB"""
+        vk_post = {'from_id': -100}
+        db_profiles = []
+        post_date = timezone.now()
+        with patch('app.services.vk_api_service.get_group') as gi:
+            gi.return_value = {'name': 'Wild Race', 'photo_50': '50.jpg', 'photo_100': '100.jpg',
+                               'photo_200': '200.jpg'}
+
+            result = sync_service._find_or_create_profile(vk_post, post_date, db_profiles)
+            self.assertEqual(gi.call_count, 1)
+            self.assertEqual(gi.call_args.args[0], 100)
+            self.assertEqual(result.id, -100)
+            self.assertEqual(result.join_date, post_date)
+            self.assertEqual(result.first_name, 'Wild Race')
+            self.assertEqual(result.photo_50, '50.jpg')
+            self.assertEqual(result.photo_100, '100.jpg')
+            self.assertEqual(result.photo_200, '200.jpg')
+
     def analyze_post_text(self, text, new_post_number, new_sum_distance, status):
         text_hash = 'hash'
         last_sum_distance = 100

@@ -150,10 +150,9 @@ def _find_or_create_profile(vk_post: dict, post_date: datetime, db_profiles: Lis
         return db_profile
 
     db_profile = Profile(id=profile_id, join_date=post_date, first_name='Unknown', sex=Profile.Sex.UNKNOWN)
+    time.sleep(GETTING_USER_INTERVAL)
 
     if profile_id >= 0:
-        time.sleep(GETTING_USER_INTERVAL)
-
         vk_user = vk_api_service.get_user(profile_id)
         if vk_user:
             db_profile.first_name = vk_user['first_name']
