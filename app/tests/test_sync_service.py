@@ -2,7 +2,9 @@ import os
 from unittest.mock import patch
 
 from django.test import TestCase
+from django.utils import timezone
 
+from app.enums import EventType
 from app.models import Config, Post, Profile
 from app.services import sync_service
 
@@ -31,7 +33,54 @@ def create_comment_text(status, profile=None):
 class SyncServiceTests(TestCase):
 
     def setUp(self):
-        create_config()
+        self.config = create_config()
+        self.profile = Profile.objects.create(join_date=timezone.now(), first_name='Иван', sex=Profile.Sex.MALE)
+
+    def analyze_post_text(self, text, new_post_number, new_sum_distance, status):
+        text_hash = 'hash'
+        last_sum_distance = 100
+        last_post_number = 22
+        post = Post(author=self.profile, date=timezone.now())
+        with patch('app.services.sync_service._create_comment_text') as gi:
+            sync_service._analyze_post_text(text, 'hash', last_sum_distance, last_post_number, post,
+                                            EventType.CREATE)
+            self.assertEqual(post.text, text)
+            self.assertEqual(post.text_hash, text_hash)
+            self.assertEqual(post.status, status)
+            self.assertEqual(post.number, new_post_number)
+            self.assertEqual(post.sum_distance, new_sum_distance)
+
+            self.assertEqual(gi.call_count, 1)
+            self.assertEqual(gi.call_args.args[0], post)
+            self.assertEqual(gi.call_args.args[1], last_sum_distance)
+            self.assertEqual(gi.call_args.args[2], new_sum_distance)
+
+    def test_analyze_post_text(self):
+        """Test that analyze post text is correct"""
+        self.analyze_post_text(
+            text='100 + 5 = 105',
+            new_post_number=23,
+            new_sum_distance=105,
+            status=Post.Status.SUCCESS
+        )
+        self.analyze_post_text(
+            text='100 + 5 = 104',
+            new_post_number=23,
+            new_sum_distance=105,
+            status=Post.Status.ERROR_SUM
+        )
+        self.analyze_post_text(
+            text='101 + 5 = 105',
+            new_post_number=23,
+            new_sum_distance=105,
+            status=Post.Status.ERROR_START_SUM
+        )
+        self.analyze_post_text(
+            text='text',
+            new_post_number=None,
+            new_sum_distance=None,
+            status=Post.Status.ERROR_PARSE
+        )
 
     def test_create_comment_text(self):
         """Test that comment text is correct"""
