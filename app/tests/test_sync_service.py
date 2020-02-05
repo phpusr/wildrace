@@ -6,7 +6,7 @@ from django.utils import timezone
 
 from app.enums import EventType
 from app.models import Config, Post, Profile
-from app.services import sync_service
+from app.services import sync_service, message_parser
 
 
 def create_config():
@@ -41,9 +41,9 @@ class SyncServiceTests(TestCase):
         self.assertEqual(result, [])
 
         vk_posts = [{'id': 123}, {'id': 124}]
-        post1 = self.create_post(Post.Status.SUCCESS, None, 'text', None, None, id=123)
+        post1 = self.create_post(Post.Status.SUCCESS, 'text', id=123)
         date = timezone.now() - timedelta(days=5, milliseconds=1)
-        post2 = self.create_post(Post.Status.SUCCESS, None, 'text', None, None, id=124, date=date)
+        post2 = self.create_post(Post.Status.SUCCESS, 'text', id=124, date=date)
         posts = [post1, post2]
         result = sync_service._remove_deleted_posts(vk_posts, posts)
 
@@ -182,9 +182,14 @@ class SyncServiceTests(TestCase):
             sync_service._add_status_comment(1, 'Status comment')
             self.assertEqual(gi.call_count, 1)
 
-    def create_post(self, status, number, text, distance, sum_distance, id=None, date=None):
-        if not date:
-            date = timezone.now()
+    def create_post(self, status, text, number=None, distance=None, sum_distance=None, id=None, date=None):
+        out = message_parser.parse(text)
+        if out:
+            distance = distance if distance else out.distance
+            sum_distance = sum_distance if sum_distance else out.end_sum_number
+
+        date = date if date else timezone.now()
+
         return Post.objects.create(
             id=id,
             author=self.profile,
@@ -199,9 +204,9 @@ class SyncServiceTests(TestCase):
 
     def test_update_next_posts(self):
         """Test that next posts will be updated"""
-        self.create_post(Post.Status.SUCCESS, 1, '0+10=10', 10, 10)
-        updated_post = self.create_post(Post.Status.ERROR_PARSE, None, 'text', None, None)
-        changed_post = self.create_post(Post.Status.SUCCESS, 3, '15+6=21', 6, 21)
+        self.create_post(Post.Status.SUCCESS, '0+10=10', 1)
+        updated_post = self.create_post(Post.Status.ERROR_PARSE, 'text')
+        changed_post = self.create_post(Post.Status.SUCCESS, '15+6=21', 3)
 
         with patch('app.services.sync_service._create_comment_text') as gi:
             sync_service.update_next_posts(updated_post)
@@ -214,12 +219,12 @@ class SyncServiceTests(TestCase):
 
     def test_update_next_posts_2(self):
         """Test that next posts will be updated"""
-        self.create_post(Post.Status.SUCCESS, 1, '0+10=10', 10, 10)
-        updated_post = self.create_post(Post.Status.SUCCESS, 2, '10+5=15', 5, 15)
-        changed_post1 = self.create_post(Post.Status.SUCCESS, 3, '15+6=21', 6, 21)
-        self.create_post(Post.Status.ERROR_PARSE, None, 'text', None, None)
-        changed_post2 = self.create_post(Post.Status.SUCCESS, 4, '21+3=24', 3, 24)
-        self.create_post(Post.Status.SUCCESS, 5, '59+11=70', 11, 70)
+        self.create_post(Post.Status.SUCCESS, '0+10=10', 1)
+        updated_post = self.create_post(Post.Status.SUCCESS, '10+5=15', 2)
+        changed_post1 = self.create_post(Post.Status.SUCCESS, '15+6=21', 3)
+        self.create_post(Post.Status.ERROR_PARSE, 'text')
+        changed_post2 = self.create_post(Post.Status.SUCCESS, '21+3=24', 4,)
+        self.create_post(Post.Status.SUCCESS, '59+11=70', 5)
 
         updated_post.sum_distance = 50
         with patch('app.services.sync_service._create_comment_text') as gi:
