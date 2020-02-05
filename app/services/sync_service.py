@@ -23,13 +23,13 @@ Post count for searching last data.
 Some posts may change or delete
 """
 
-SYNC_BLOCK_INTERVAL = 1000
+SYNC_BLOCK_INTERVAL = 1
 """Interval between requests to vk in seconds"""
 
-GETTING_USER_INTERVAL = 300
+GETTING_USER_INTERVAL = 0.3
 """Interval between getting user info in seconds"""
 
-PUBLISHING_COMMENT_INTERVAL = 300
+PUBLISHING_COMMENT_INTERVAL = 0.3
 """Interval between comment publishing in seconds"""
 
 logger = logging.getLogger(__name__)
@@ -64,7 +64,7 @@ def _sync_block_posts(vk_post_count: int, download_count: int) -> int:
     else:
         offset = 0
 
-    db_profiles = Profile.objects.all()
+    db_profiles = list(Profile.objects.all())
 
     response = vk_api_service.get_wall_posts(offset, download_count)
 
@@ -80,8 +80,8 @@ def _sync_block_posts(vk_post_count: int, download_count: int) -> int:
     for vk_post in vk_posts:
         post_id = vk_post['id']
         post_text = remove_non_utf8_chars(vk_post['text'])
-        post_date = datetime.utcfromtimestamp(vk_post['date'])
-        text_hash = md5(post_text)
+        post_date = datetime.utcfromtimestamp(vk_post['date']).astimezone(timezone.get_default_timezone())
+        text_hash = md5(post_text.encode())
         db_post = find(last_db_posts, lambda it: it.id == post_id)
         last_post = _get_last_post(last_db_posts, post_id, post_date)
         last_sum_distance = last_post.sum_distance if last_post else 0
@@ -101,7 +101,7 @@ def _sync_block_posts(vk_post_count: int, download_count: int) -> int:
         new_post = Post(id=post_id, status=Post.Status.SUCCESS, author=profile, date=post_date)
 
         parser_out = _analyze_post_text(post_text, text_hash, last_sum_distance, last_post_number, new_post,
-                                        EventType.Create)
+                                        EventType.CREATE)
 
         # Adding a new post into last posts and post sorting by time
         if parser_out:
@@ -112,7 +112,7 @@ def _sync_block_posts(vk_post_count: int, download_count: int) -> int:
 
 
 def _get_last_posts(post_count: int) -> List[Post]:
-    return Post.objects.all().order_by('-date')[:post_count]
+    return list(Post.objects.all().order_by('-date')[:post_count])
 
 
 def _remove_deleted_posts(vk_posts: Iterator[dict], last_db_posts: List[Post]) -> List[Post]:
@@ -149,7 +149,7 @@ def _find_or_create_profile(vk_post: dict, post_date: datetime, db_profiles: Lis
     if db_profile:
         return db_profile
 
-    db_profile = Profile(id=profile_id, date=post_date, first_name='Unknown')
+    db_profile = Profile(id=profile_id, join_date=post_date, first_name='Unknown', sex=Profile.Sex.UNKNOWN)
 
     if profile_id >= 0:
         time.sleep(GETTING_USER_INTERVAL)
@@ -225,21 +225,21 @@ def _create_comment_text(post: Post, start_sum_distance: int, end_sum_distance: 
     comment_text = ''
 
     # Appeal
-    if post.status == Post.Status.Success:
+    if post.status != Post.Status.SUCCESS:
         if post.author.id > 0:
-            comment_text += f'@id{post.author.id} ({post.author.first_name})'
+            comment_text += f'@id{post.author.id} ({post.author.first_name}), '
         else:
-            comment_text += f'@club{post.author.id * -1} ({post.author.first_name})'
+            comment_text += f'@club{post.author.id * -1} ({post.author.first_name}), '
 
     # Running number
-    if post.status != Post.Status.ERROR_PARSE.id:
+    if post.status != Post.Status.ERROR_PARSE:
         comment_text += f'#{post.number} пробежка: '
 
     comment_text += {
         Post.Status.SUCCESS: 'Пост успешно обработан',
         Post.Status.ERROR_SUM: f'Ошибка при сложении, должно быть: {end_sum_distance}',
         Post.Status.ERROR_PARSE: f'Ошибка в формате записи, пост не распознан',
-        Post.Status.EROR_START_SUM: f'Ошибка в стартовой сумме, должна быть: {start_sum_distance}'
+        Post.Status.ERROR_START_SUM: f'Ошибка в стартовой сумме, должна быть: {start_sum_distance}'
     }.get(post.status, 'Ошибка: Не предусмотренный статус, напишите администратору')
 
     return comment_text
