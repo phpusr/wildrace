@@ -64,7 +64,22 @@ class SyncServiceTests(TestCase):
             sum_distance=sum_distance
         )
 
+    def test_transactional_sync_posts(self):
+        """Test that sync post runs in transaction"""
+        items = [
+            self.create_vk_post(5, '18+4=22'),
+            self.create_vk_post('a', '18+4=22'),
+        ]
+        with patch('app.services.vk_api_service.get_wall_posts') as gwp:
+            gwp.return_value = {'count': len(items), 'items': items}
+            try:
+                sync_service.sync_posts()
+            except ValueError:
+                pass
+            self.assertEqual(Post.objects.count(), 0)
+
     def test_sync_posts(self):
+        """Test that sync_posts call get_wall_posts 2 times"""
         with patch('app.services.vk_api_service.get_wall_posts') as gi:
             gi.return_value = {'count': 0, 'items': []}
             sync_service.sync_posts()
@@ -271,6 +286,27 @@ class SyncServiceTests(TestCase):
         with patch('app.services.vk_api_service.add_comment_to_post') as gi:
             sync_service._add_status_comment(1, 'Status comment')
             self.assertEqual(gi.call_count, 1)
+
+    def test_update_next_posts_transactional(self):
+        """Test that update_next_post runs in transaction"""
+        updated_post = self.create_post(Post.Status.SUCCESS, '0+5=5', 1)
+        next_post1 = self.create_post(Post.Status.SUCCESS, '5+15=20', 2)
+
+        updated_post.sum_distance = 10
+
+        def raise_error(post, *args):
+            if post == next_post1:
+                raise RuntimeError('Ooops!')
+
+        with patch('app.services.sync_service._create_comment_text') as apt:
+            apt.side_effect = raise_error
+            try:
+                sync_service.update_next_posts(updated_post)
+            except RuntimeError:
+                pass
+            new_next_post1 = Post.objects.get(id=next_post1.id)
+            self.assertEquals(next_post1.sum_distance, new_next_post1.sum_distance)
+            self.assertEquals(next_post1.status, new_next_post1.status)
 
     def test_update_next_posts(self):
         """Test that next posts will be updated"""

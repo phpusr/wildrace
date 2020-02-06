@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from hashlib import md5
 from typing import List, Iterator
 
+from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
 
@@ -36,6 +37,7 @@ PUBLISHING_COMMENT_INTERVAL = 0.3
 logger = logging.getLogger(__name__)
 
 
+@transaction.atomic
 def sync_posts():
     logger.debug('-------- Start sync --------')
 
@@ -253,6 +255,7 @@ def _add_status_comment(post_id: int, comment_text: str):
     vk_api_service.add_comment_to_post(post_id, comment_text)
 
 
+@transaction.atomic
 def update_next_posts(updated_post: Post):
     runnings = Post.objects.filter(number__isnull=False)
     if updated_post.number is not None:
