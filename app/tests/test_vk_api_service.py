@@ -1,4 +1,5 @@
 import os
+from unittest.mock import patch
 
 from django.test import TestCase
 
@@ -68,15 +69,19 @@ class VkApiTests(TestCase):
 
     def test_create_post(self):
         """Test that wall.post return a value"""
-        message = 'It is a new post from test'
-        result = vk_api_service.create_post(message)
-
-        self.assertIn('post_id', result)
+        with patch('vk_api.vk_api.VkApi.method') as m:
+            m.return_value = {'post_id', 1}
+            result = vk_api_service.create_post('It is a new post from test')
+            self.assertIn('post_id', result)
 
     def test_add_comment_to_post(self):
         """Test that wall.create_comment return a value"""
-        post_id = vk_api_service.create_post('Post for comment')['post_id']
-        message = 'Message from test'
-        result = vk_api_service.add_comment_to_post(post_id, message)
+        with patch('vk_api.vk_api.VkApi.method') as m:
+            m.return_value = {'post_id': 1}
+            post_id = vk_api_service.create_post('Post for comment')['post_id']
 
-        self.assertIn('comment_id', result)
+            m.return_value = {'comment_id': 100}
+            result = vk_api_service.add_comment_to_post(post_id, 'Message from test')
+
+            self.assertEqual(m.call_count, 2)
+            self.assertIn('comment_id', result)

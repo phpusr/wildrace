@@ -45,7 +45,8 @@ class SyncServiceTests(TestCase):
             'date': timestamp if timestamp else round(timezone.now().timestamp())
         }
 
-    def create_post(self, status, text, number=None, distance=None, sum_distance=None, id=None, date=None, timestamp=None):
+    def create_post(self, status, text, number=None, distance=None, sum_distance=None, id=None, date=None,
+                    timestamp=None):
         out = message_parser.parse(text)
         if out:
             distance = distance if distance else out.distance
