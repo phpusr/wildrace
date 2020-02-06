@@ -11,7 +11,7 @@ def find_all(lst: Iterable, action):
     return list(filter(action, lst))
 
 
-def remove_non_utf8_chars(text: str) -> Optional[str]:
+def remove_non_utf8_chars(text: Optional[str]) -> Optional[str]:
     if text is None:
         return None
 
