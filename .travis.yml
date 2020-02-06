@@ -9,4 +9,4 @@ script:
   - coverage run manage.py test && flake8
 
 after_success:
-  - codecov
+  - bash <(curl -s https://codecov.io/bash)
