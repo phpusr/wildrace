@@ -36,6 +36,34 @@ class SyncServiceTests(TestCase):
         self.config = create_config()
         self.profile = Profile.objects.create(join_date=timezone.now(), first_name='Иван', sex=Profile.Sex.MALE)
 
+    def create_vk_post(self, id, text):
+        return {
+            'id': id,
+            'from_id': self.profile.id,
+            'text': text,
+            'date': round(timezone.now().timestamp())
+        }
+
+    def create_post(self, status, text, number=None, distance=None, sum_distance=None, id=None, date=None):
+        out = message_parser.parse(text)
+        if out:
+            distance = distance if distance else out.distance
+            sum_distance = sum_distance if sum_distance else out.end_sum_number
+
+        date = date if date else timezone.now()
+
+        return Post.objects.create(
+            id=id,
+            author=self.profile,
+            status=status,
+            date=date,
+            text=text,
+            text_hash='hash',
+            number=number,
+            distance=distance,
+            sum_distance=sum_distance
+        )
+
     def test_sync_posts(self):
         with patch('app.services.vk_api_service.get_wall_posts') as gi:
             gi.return_value = {'count': 0, 'items': []}
@@ -73,14 +101,6 @@ class SyncServiceTests(TestCase):
             self.assertEqual(gi.call_args.args[0], 30)
             self.assertEqual(gi.call_args.args[1], 100)
             self.assertEqual(result, 0)
-
-    def create_vk_post(self, id, text):
-        return {
-            'id': id,
-            'from_id': self.profile.id,
-            'text': text,
-            'date': round(timezone.now().timestamp())
-        }
 
     def test_sync_block_posts(self):
         """Test sync block"""
@@ -251,26 +271,6 @@ class SyncServiceTests(TestCase):
         with patch('app.services.vk_api_service.add_comment_to_post') as gi:
             sync_service._add_status_comment(1, 'Status comment')
             self.assertEqual(gi.call_count, 1)
-
-    def create_post(self, status, text, number=None, distance=None, sum_distance=None, id=None, date=None):
-        out = message_parser.parse(text)
-        if out:
-            distance = distance if distance else out.distance
-            sum_distance = sum_distance if sum_distance else out.end_sum_number
-
-        date = date if date else timezone.now()
-
-        return Post.objects.create(
-            id=id,
-            author=self.profile,
-            status=status,
-            date=date,
-            text=text,
-            text_hash='hash',
-            number=number,
-            distance=distance,
-            sum_distance=sum_distance
-        )
 
     def test_update_next_posts(self):
         """Test that next posts will be updated"""
