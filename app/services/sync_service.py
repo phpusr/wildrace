@@ -84,7 +84,7 @@ def _sync_block_posts(vk_post_count: int, download_count: int) -> int:
         post_id = vk_post['id']
         post_text = remove_non_utf8_chars(vk_post['text'])
         post_date = datetime.utcfromtimestamp(vk_post['date']).astimezone(timezone.get_default_timezone())
-        text_hash = md5(post_text.encode())
+        text_hash = md5(post_text.encode()).hexdigest()
         db_post = find(last_db_posts, lambda it: it.id == post_id)
         last_post = _get_last_post(last_db_posts, post_id, post_date)
         last_sum_distance = last_post.sum_distance if last_post else 0

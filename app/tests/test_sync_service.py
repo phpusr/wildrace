@@ -1,4 +1,5 @@
-from datetime import timedelta
+from datetime import timedelta, datetime
+from hashlib import md5
 from unittest.mock import patch
 
 from django.test import TestCase
@@ -36,21 +37,25 @@ class SyncServiceTests(TestCase):
         self.config = create_config()
         self.profile = Profile.objects.create(join_date=timezone.now(), first_name='Иван', sex=Profile.Sex.MALE)
 
-    def create_vk_post(self, id, text):
+    def create_vk_post(self, id, text, timestamp=None):
         return {
             'id': id,
             'from_id': self.profile.id,
             'text': text,
-            'date': round(timezone.now().timestamp())
+            'date': timestamp if timestamp else round(timezone.now().timestamp())
         }
 
-    def create_post(self, status, text, number=None, distance=None, sum_distance=None, id=None, date=None):
+    def create_post(self, status, text, number=None, distance=None, sum_distance=None, id=None, date=None, timestamp=None):
         out = message_parser.parse(text)
         if out:
             distance = distance if distance else out.distance
             sum_distance = sum_distance if sum_distance else out.end_sum_number
 
-        date = date if date else timezone.now()
+        if not date:
+            if timestamp:
+                date = datetime.utcfromtimestamp(timestamp).astimezone(timezone.get_default_timezone())
+            else:
+                date = timezone.now()
 
         return Post.objects.create(
             id=id,
@@ -58,7 +63,7 @@ class SyncServiceTests(TestCase):
             status=status,
             date=date,
             text=text,
-            text_hash='hash',
+            text_hash=md5(text.encode()).hexdigest(),
             number=number,
             distance=distance,
             sum_distance=sum_distance
@@ -120,14 +125,16 @@ class SyncServiceTests(TestCase):
     def test_sync_block_posts(self):
         """Test sync block"""
         items = [
-            self.create_vk_post(5, '18+4=22'),
-            self.create_vk_post(4, '15+3=18'),
-            self.create_vk_post(2, '10+5=15'),
-            self.create_vk_post(1, '0+10=10')
+            self.create_vk_post(1, '0+10=10', 1),
+            self.create_vk_post(2, '10+5=15', 2),
+            self.create_vk_post(4, '15+3=18', 3),
+            self.create_vk_post(5, '18+4=22', 4)
         ]
+        items.reverse()
 
-        self.create_post(Post.Status.SUCCESS, items[-1]['text'], 1, id=items[-1]['id'])
-        self.create_post(Post.Status.ERROR_SUM, '10+5=16', 2, id=items[-2]['id'])
+        self.create_post(Post.Status.SUCCESS, items[-1]['text'], 1, id=items[-1]['id'],
+                         timestamp=items[-1]['date'])
+        self.create_post(Post.Status.ERROR_SUM, '10+5=16', 2, id=items[-2]['id'], timestamp=items[-2]['date'])
         self.create_post(Post.Status.ERROR_SUM, 'some', id=3)
 
         with patch('app.services.vk_api_service.get_wall_posts') as gi:
@@ -137,6 +144,22 @@ class SyncServiceTests(TestCase):
             }
             result = sync_service._sync_block_posts(len(items), 100)
             self.assertEqual(result, len(items))
+
+    @patch('app.services.sync_service._analyze_post_text')
+    def test_sync_block_posts_with_last_update(self, apt):
+        items = [self.create_vk_post(1, 'text')]
+        post = self.create_post(Post.Status.SUCCESS, '0+5=5', 1)
+        post.last_update = timezone.now()
+        post.save()
+
+        with patch('app.services.vk_api_service.get_wall_posts') as gi:
+            gi.return_value = {
+                'count': len(items),
+                'items': items
+            }
+            result = sync_service._sync_block_posts(1, 100)
+            self.assertEqual(result, 1)
+            self.assertEqual(apt.call_count, 0)
 
     def test_remove_deleted_posts(self):
         result = sync_service._remove_deleted_posts([], [])
