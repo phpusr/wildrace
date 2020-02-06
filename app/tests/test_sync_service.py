@@ -36,14 +36,43 @@ class SyncServiceTests(TestCase):
         self.config = create_config()
         self.profile = Profile.objects.create(join_date=timezone.now(), first_name='Иван', sex=Profile.Sex.MALE)
 
+    def test_sync_posts(self):
+        with patch('app.services.vk_api_service.get_wall_posts') as gi:
+            gi.return_value = {'count': 0, 'items': []}
+            sync_service.sync_posts()
+            self.assertEqual(gi.call_count, 2)
+
+    def test_sync_posts_error_post_number(self):
+        """Test that number of post in DB > number of post in VK"""
+        self.create_post(Post.Status.ERROR_PARSE, 'text',
+                         date=timezone.now() - timedelta(days=5, milliseconds=1))
+        with self.assertRaises(RuntimeError):
+            with patch('app.services.vk_api_service.get_wall_posts') as gi:
+                gi.return_value = {'count': 0, 'items': []}
+                sync_service.sync_posts()
+
+    @patch('app.services.vk_api_service.get_wall_posts')
+    @patch('time.sleep')
+    def test_sync_posts_need_sync(self, ts, gwp):
+        """Test that _sync_block_posts calls 2 times"""
+        gwp.return_value = {'count': 1}
+        ts.return_value = True
+        with patch('app.services.sync_service._sync_block_posts') as sbp:
+            sbp.side_effect = [0, 1]
+            sync_service.sync_posts()
+            self.assertEqual(gwp.call_count, 2)
+            self.assertEqual(ts.call_count, 1)
+            self.assertEqual(sbp.call_count, 2)
+
     def test_sync_block_posts_count_changed(self):
         """Test sync block if vk posts count changed"""
         with patch('app.services.vk_api_service.get_wall_posts') as gi:
             gi.return_value = {'count': 0}
             result = sync_service._sync_block_posts(vk_post_count=130, download_count=100)
-            self.assertEquals(gi.call_args.args[0], 30)
-            self.assertEquals(gi.call_args.args[1], 100)
-            self.assertEquals(result, 0)
+            self.assertEqual(gi.call_count, 1)
+            self.assertEqual(gi.call_args.args[0], 30)
+            self.assertEqual(gi.call_args.args[1], 100)
+            self.assertEqual(result, 0)
 
     def create_vk_post(self, id, text):
         return {
@@ -279,4 +308,3 @@ class SyncServiceTests(TestCase):
         changed_post2_new = Post.objects.get(id=changed_post2.id)
         self.assertEqual(changed_post2_new.status, Post.Status.ERROR_START_SUM)
         self.assertEqual(changed_post2_new.sum_distance, 59)
-
