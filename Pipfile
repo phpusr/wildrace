@@ -5,6 +5,7 @@ verify_ssl = true
 
 [dev-packages]
 flake8 = "*"
+coverage = ">=5.0.3,<5.1"
 
 [packages]
 django = ">=3.0.2,<3.1.0"
