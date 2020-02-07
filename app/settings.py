@@ -157,3 +157,5 @@ LOGGING = {
 VK_LINK = 'https://vk.com'
 
 VK_APP_ID = 5344865
+
+JS_DATE_FORMAT = '%Y-%m-%d'
