@@ -220,7 +220,7 @@ def update_stat():
 
 
 @transaction.atomic
-def publish_stat_post():
+def interval_publish_stat_post():
     """Publishing stat every {PUBLISHING_STAT_INTERVAL} km"""
     last_running = _get_one_running(direction='-')
 
@@ -239,7 +239,8 @@ def publish_stat_post():
 
 @transaction.atomic
 def publish_stat_post(stat: StatDto) -> int:
-    logger.debug(f'>> Publish stat: {stat.start_distance} -> {stat.end_distance} ({stat.start_date} - {stat.end_date})')
+    logger.debug(f'>> Publish stat: {stat.start_distance} -> {stat.end_distance} '
+                 f'({stat.start_date} - {stat.end_date})')
 
     post_text = _create_post_text(stat)
     post_id = vk_api_service.create_post(post_text)['post_id']

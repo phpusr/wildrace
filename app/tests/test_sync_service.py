@@ -6,7 +6,7 @@ from django.test import TestCase
 from django.utils import timezone
 
 from app.enums import EventType
-from app.models import Config, Post, Profile
+from app.models import Config, Post, Profile, TempData
 from app.services import sync_service, message_parser
 
 
@@ -36,6 +36,7 @@ class SyncServiceTests(TestCase):
     def setUp(self):
         self.config = create_config()
         self.profile = Profile.objects.create(join_date=timezone.now(), first_name='Иван', sex=Profile.Sex.MALE)
+        TempData.objects.create(last_sync_date=timezone.now())
 
     def create_vk_post(self, id, text, timestamp=None):
         return {
