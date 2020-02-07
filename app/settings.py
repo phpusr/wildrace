@@ -159,3 +159,8 @@ VK_LINK = 'https://vk.com'
 VK_APP_ID = 5344865
 
 JS_DATE_FORMAT = '%Y-%m-%d'
+
+POST_DATE_FORMAT = '%d.%m.%y'
+
+# Auto publishing stat interval every {value} km
+PUBLISHING_STAT_INTERVAL = 1000

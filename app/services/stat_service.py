@@ -4,10 +4,12 @@ from datetime import datetime, timedelta
 from typing import Optional, List
 
 from django.conf import settings
-from django.db.models import Sum, F
+from django.db import transaction
+from django.db.models import Sum, F, Count
 from django.utils import timezone
 
-from app.models import Profile, StatLog, Post
+from app.models import Profile, StatLog, Post, TempData
+from app.services import vk_api_service
 from app.util import find_all, get_count_days
 
 logger = logging.getLogger(__name__)
@@ -105,6 +107,7 @@ class StatDto:
                        start_value=start_value, end_value=end_value)
 
 
+@transaction.atomic
 def calc_stat(stat_type: StatLog.StatType, start_range: Optional[int], end_range: Optional[int]):
     stat = StatDto()
 
@@ -178,6 +181,7 @@ def _get_one_running(stat: StatDto = None, direction: str = '') -> Optional[Post
 
 def _get_runners(first_running: Optional[Post], last_running: Optional[Post]) -> List[RunnerDto]:
     runners = Profile.objects\
+        .annotate(running_count=Count('post__number'))\
         .annotate(distance_sum=Sum('post__distance'))\
         .order_by('-distance_sum')
 
@@ -186,7 +190,7 @@ def _get_runners(first_running: Optional[Post], last_running: Optional[Post]) ->
     if last_running:
         runners.filter(date__lte=last_running.date)
 
-    return [RunnerDto(r, r.distance_sum) for r in runners]
+    return [RunnerDto(r, r.running_count, r.distance_sum) for r in runners]
 
 
 def _get_new_runners(runners: List[RunnerDto], start_date: Optional[datetime]):
@@ -197,3 +201,117 @@ def _get_new_runners(runners: List[RunnerDto], start_date: Optional[datetime]):
     new_runners = sorted(new_runners, lambda it: it.join_date)
 
     return new_runners[:MAX_NEW_RUNNERS_COUNT], len(new_runners)
+
+
+def get_stat() -> dict:
+    last_post = _get_one_running(direction='-')
+    return {
+        'distance_sum': last_post.sum_distance if last_post else 0,
+        'running_count': last_post.number if last_post else 0,
+        'post_count': Post.objects.count()
+    }
+
+
+@transaction.atomic
+def update_stat():
+    temp_data = TempData.objects.get()
+    temp_data.last_sync_date = timezone.now()
+    temp_data.save()
+
+
+@transaction.atomic
+def publish_stat_post():
+    """Publishing stat every {PUBLISHING_STAT_INTERVAL} km"""
+    last_running = _get_one_running(direction='-')
+
+    if not last_running:
+        return
+
+    last_stat_log = StatLog.objects.filter(stat_type=StatLog.StatType.DISTANCE).order_by('-publish_date').first()
+
+    start_distance = int(last_stat_log.end_value) if last_stat_log else 0
+    end_distance = start_distance = settings.PUBLISHING_STAT_INTERVAL
+
+    if last_running.sum_distance >= end_distance:
+        stat = calc_stat(StatLog.StatType.DISTANCE, start_distance, end_distance)
+        publish_stat_post(stat)
+
+
+@transaction.atomic
+def publish_stat_post(stat: StatDto) -> int:
+    logger.debug(f'>> Publish stat: {stat.start_distance} -> {stat.end_distance} ({stat.start_date} - {stat.end_date})')
+
+    post_text = _create_post_text(stat)
+    post_id = vk_api_service.create_post(post_text)['post_id']
+    stat_log = stat.create_stat_log(post_id)
+    stat_log.save()
+
+    return post_id
+
+
+def _create_post_text(stat: StatDto) -> str:
+    is_dev = settings.DEBUG
+
+    if stat.new_runners:
+        new_runners_str = 'Поприветствуем наших новичков:\n'
+        urls = [r.get_vk_link_for_post(is_dev) for r in stat.new_runners]
+        new_runners_str += ', '.join(urls)
+        if len(stat.new_runners) < stat.new_runners_count:
+            new_runners_str += '...'
+        else:
+            new_runners_str += '.'
+    else:
+        new_runners_str = 'В этот раз без новичков'
+
+    if stat.type == StatLog.StatType.DISTANCE:
+        segment = f'{stat.start_distance}-{stat.end_distance}'
+    else:
+        segment = f'{stat.start_date.strftime(settings.POST_DATE_FORMAT)} - ' \
+                  f'{stat.end_date.strftime(settings.POST_DATE_FORMAT)}'
+
+    def runner_to_str(runner: RunnerDto) -> str:
+        return f'- {runner.profile.get_vk_link_for_post(is_dev)} ({runner.distance_sum} км)'
+
+    top_int_runner_urls = [runner_to_str(r) for r in stat.top_interval_runners]
+    top_all_runner_urls = [runner_to_str(r) for r in stat.top_all_runners]
+
+    s = 'СТАТИСТИКА\n'
+
+    if stat.end_distance:
+        s += f'Отметка в {stat.end_distance} км преодолена\n\n'
+    else:
+        s += f'Статистика за {segment}\n\n'
+
+    if stat.new_runners:
+        s += f'{new_runners_str}\n'
+
+    s += f'\n\nнаши итоги в цифрах:\n'
+    s += '1. Количество дней бега:\n'
+    s += f'- Всего - {stat.all_days_count} дн.\n'
+    s += f'- Отрезок {segment} - {stat.interval_days_count} дн.\n'
+    s += '2. Километраж:\n'
+    s += '- Средний в день - {:.1} км/д\n'.format(stat.distance_per_day)
+    s += '- Средняя длина одной пробежки - {:.1} км/тр\n'.format(stat.distance_per_training)
+    s += '3. Тренировки:\n'
+    s += f'- Всего - {stat.all_training_count} тр.\n'
+    s += '- Среднее в день - {:.1} тр.\n'.format(stat.training_count_per_day)
+    s += f'- Максимум от одного человека - {stat.max_one_man_training_count.running_count} тр. ' \
+         f'({stat.max_one_man_training_count.profile.get_vk_link_for_post(is_dev)})\n'
+    s += '4. Бегуны:\n'
+    s += f'- Всего отметилось - {stat.all_runners_count} чел.\n'
+    s += f'- Отметилось на отрезке {segment} - {stat.interval_runners_count} чел.\n'
+    s += f'- Новых на отрезке {segment} - {stat.new_runners_count} чел.'
+    s += '5. Топ 5 бегунов на отрезке:\n'
+    s += '\n'.join(top_int_runner_urls) + '\n'
+    s += '6. Топ 5 бегунов за все время:'
+    s += '\n'.join(top_all_runner_urls) + '\n'
+
+    # Adding url to previous stat post
+    last_log = StatLog.objects.order_by('-publish_date').first()
+    if last_log:
+        s += f'\nПредыдущий пост со статистикой: {vk_api_service.get_post_url(last_log.post_id)}'
+
+    s += '\nВсем отличного бега!\n'
+    s += '\n#ДикийЗабегСтатистика\n'
+
+    return s

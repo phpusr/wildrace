@@ -10,7 +10,7 @@ from django.utils import timezone
 
 from app.enums import EventType
 from app.models import Post, Profile, Config
-from app.services import vk_api_service, message_parser
+from app.services import vk_api_service, message_parser, stat_service
 from app.util import find, find_all, remove_non_utf8_chars
 
 DOWNLOAD_POST_COUNT = 100
@@ -54,6 +54,8 @@ def sync_posts():
 
         if need_sync:
             time.sleep(SYNC_BLOCK_INTERVAL)
+
+    stat_service.update_stat()
 
     logger.debug('-------- End sync --------')
 
