@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Iterable, Optional
 
 
@@ -16,3 +17,13 @@ def remove_non_utf8_chars(text: Optional[str]) -> Optional[str]:
         return None
 
     return bytes(text, 'utf-8').decode('utf-8', 'ignore')
+
+
+def get_count_days(start_date: Optional[datetime], end_date: Optional[datetime]):
+    if not start_date or not end_date:
+        return None
+
+    if start_date > end_date:
+        raise RuntimeError('start_date > end_date')
+
+    return (end_date - start_date).days + 1

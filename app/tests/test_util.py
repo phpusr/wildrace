@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from unittest import TestCase
 
 from app import util
@@ -32,3 +33,16 @@ class UtilTests(TestCase):
 
         result = util.remove_non_utf8_chars('good')
         self.assertEquals(result, 'good')
+
+    def test_get_count_days(self):
+        now = datetime.now()
+        self.assertIsNone(util.get_count_days(None, None))
+        self.assertIsNone(util.get_count_days(None, now))
+        self.assertIsNone(util.get_count_days(now, None))
+
+        future = now + timedelta(hours=4)
+        with self.assertRaises(RuntimeError):
+            util.get_count_days(future, now)
+
+        result = util.get_count_days(now, future)
+        self.assertEqual(result, 1)

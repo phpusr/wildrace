@@ -1,6 +1,6 @@
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.conf import settings
 
 
 class User(AbstractUser):
@@ -131,6 +131,11 @@ class Profile(models.Model):
         return self.first_and_last_name
 
 
+class RunningManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(number__isnull=False)
+
+
 class Post(models.Model):
     class Status(models.IntegerChoices):
         SUCCESS = 1
@@ -158,6 +163,9 @@ class Post(models.Model):
     edit_reason = models.CharField(max_length=255, null=True, blank=True)
 
     last_update = models.DateTimeField(null=True, blank=True)
+
+    objects = models.Manager()
+    runnings = RunningManager()
 
     @property
     def start_sum(self):
