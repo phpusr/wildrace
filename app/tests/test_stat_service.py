@@ -69,14 +69,15 @@ def create_runnings():
     return runnings
 
 
-def create_date(year, month, day, hour, minute, second):
+def create_date(year, month, day, hour=0, minute=0, second=0):
     return datetime(year, month, day, hour, minute, second).astimezone(timezone.get_current_timezone())
 
 
 class StatServiceTests(TestCase):
 
-    def setUp(self):
-        create_runnings()
+    def test_calc_stat_without_data(self):
+        with self.assertRaises(Post.DoesNotExist):
+            stat_service.calc_stat(StatLog.StatType.DISTANCE, None, None)
 
     def test_calc_stat_without_params(self):
         """Test that test_calc_stat raises RuntimeError without params"""
@@ -85,6 +86,7 @@ class StatServiceTests(TestCase):
 
     def test_calc_stat_all_time(self):
         """Test that stat is right for whole time"""
+        create_runnings()
         stat = stat_service.calc_stat(StatLog.StatType.DATE, None, None)
 
         max_one_man_distance = RunnerDto(Profile.objects.get(pk=63399502), 2, 20)
@@ -98,7 +100,6 @@ class StatServiceTests(TestCase):
         ]
         top_int_runners = top_all_runners
 
-        self.assertIsNotNone(stat)
         self.assertIsNone(stat.start_distance)
         self.assertIsNone(stat.end_distance)
         self.assertEqual(stat.start_date, create_date(2015, 9, 1, 3, 56, 9))
@@ -117,3 +118,76 @@ class StatServiceTests(TestCase):
         self.assertAlmostEqual(stat.distance_per_day, 28, 2)
         self.assertAlmostEqual(stat.distance_per_training, 5.6, 2)
         self.assertAlmostEqual(stat.training_count_per_day, 5, 2)
+
+    def test_calc_stat_for_dates(self):
+        """Test that stat is right between 2 dates"""
+        create_runnings()
+
+        start_date = create_date(2015, 9, 2)
+        end_date = create_date(2015, 9, 3)
+
+        stat = stat_service.calc_stat(
+            StatLog.StatType.DATE,
+            start_range=int(start_date.timestamp()),
+            end_range=int(end_date.timestamp())
+        )
+
+        max_one_man_distance = RunnerDto(Profile.objects.get(pk=117963335), 1, 16)
+        max_one_man_training_count = RunnerDto(Profile.objects.get(pk=39752943), 2, 9)
+
+        top_all_runners = [
+            RunnerDto(Profile.objects.get(pk=117963335), 1, 16),
+            RunnerDto(Profile.objects.get(pk=8429458), 1, 12),
+            RunnerDto(Profile.objects.get(pk=39752943), 2, 9),
+            RunnerDto(Profile.objects.get(pk=63399502), 1, 8),
+            RunnerDto(Profile.objects.get(pk=10811344), 1, 6)
+        ]
+
+        top_interval_runners = [
+            RunnerDto(Profile.objects.get(pk=117963335), 1, 16),
+            RunnerDto(Profile.objects.get(pk=63399502), 1, 8),
+            RunnerDto(Profile.objects.get(pk=10811344), 1, 6),
+            RunnerDto(Profile.objects.get(pk=11351451), 1, 5),
+            RunnerDto(Profile.objects.get(pk=39752943), 1, 5)
+        ]
+
+        self.assertIsNone(stat.start_distance)
+        self.assertIsNone(stat.end_distance)
+        self.assertEqual(stat.start_date, start_date)
+        self.assertEqual(stat.end_date, create_date(2015, 9, 3, 23, 59, 59))
+        self.assertEqual(stat.all_days_count, 3)
+        self.assertEqual(stat.interval_days_count, 2)
+        self.assertEqual(stat.all_distance, 77)
+        self.assertEqual(stat.max_one_man_distance, max_one_man_distance)
+        self.assertEqual(stat.all_training_count, 13)
+        self.assertEqual(stat.max_one_man_training_count, max_one_man_training_count)
+        self.assertEqual(stat.all_runners_count, 12)
+        self.assertEqual(stat.interval_runners_count, 11)
+        self.assertEqual(len(stat.new_runners), 10)
+        self.assertEqual(stat.new_runners_count, 10)
+        self.assertEqual(stat.top_all_runners, top_all_runners)
+        self.assertEqual(stat.top_interval_runners, top_interval_runners)
+        self.assertEqual(stat.type, StatLog.StatType.DATE)
+        self.assertAlmostEqual(stat.distance_per_day, 25.67, 2)
+        self.assertAlmostEqual(stat.distance_per_training, 5.92, 2)
+        self.assertAlmostEqual(stat.training_count_per_day, 4.33, 2)
+
+    def test_create_stat_log(self):
+        """Test that create_stat_log return correct values"""
+        create_runnings()
+        stat = stat_service.calc_stat(StatLog.StatType.DATE, None, None)
+
+        stat_log = stat.create_stat_log(100)
+        self.assertIsNone(stat_log.id)
+        self.assertEqual(stat_log.post_id, 100)
+        self.assertEqual(stat_log.stat_type, StatLog.StatType.DATE)
+        self.assertEqual(stat_log.start_value, '2015-09-01')
+        self.assertEqual(stat_log.end_value, '2015-09-04')
+
+        stat = stat_service.calc_stat(StatLog.StatType.DISTANCE, 100, 200)
+        stat_log = stat.create_stat_log(200)
+        self.assertIsNone(stat_log.id)
+        self.assertEqual(stat_log.post_id, 200)
+        self.assertEqual(stat_log.stat_type, StatLog.StatType.DISTANCE)
+        self.assertEqual(stat_log.start_value, '100')
+        self.assertEqual(stat_log.end_value, '200')

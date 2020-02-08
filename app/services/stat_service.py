@@ -76,23 +76,14 @@ class StatDto:
 
     @property
     def distance_per_day(self) -> float:
-        if self.all_days_count == 0:
-            return 0
-
         return self.all_distance / self.all_days_count
 
     @property
     def distance_per_training(self) -> float:
-        if self.all_training_count == 0:
-            return 0
-
         return self.all_distance / self.all_training_count
 
     @property
     def training_count_per_day(self):
-        if self.all_days_count == 0:
-            return 0
-
         return self.all_training_count / self.all_days_count
 
     def create_stat_log(self, post_id):
@@ -103,7 +94,7 @@ class StatDto:
             start_value = self.start_date.strftime(settings.JS_DATE_FORMAT)
             end_value = self.end_date.strftime(settings.JS_DATE_FORMAT)
 
-        return StatLog(post_id=post_id, date=timezone.now(), stat_type=self.type,
+        return StatLog(post_id=post_id, publish_date=timezone.now(), stat_type=self.type,
                        start_value=start_value, end_value=end_value)
 
 
@@ -113,11 +104,10 @@ def calc_stat(stat_type: StatLog.StatType, start_range: Optional[int], end_range
 
     if stat_type == StatLog.StatType.DATE:
         if start_range is not None:
-            stat.start_date = datetime.utcfromtimestamp(start_range)
-
+            stat.start_date = _convert_timestamp_to_date(start_range)
         if end_range is not None:
             # Change time at and of day
-            stat.end_date = datetime.utcfromtimestamp(end_range) + timedelta(hours=23, minutes=59, seconds=59)
+            stat.end_date = _convert_timestamp_to_date(end_range) + timedelta(hours=23, minutes=59, seconds=59)
     elif stat_type == StatLog.StatType.DISTANCE:
         stat.start_distance = start_range
         stat.end_distance = end_range
@@ -161,6 +151,10 @@ def calc_stat(stat_type: StatLog.StatType, start_range: Optional[int], end_range
     return stat
 
 
+def _convert_timestamp_to_date(timestamp: int) -> datetime:
+    return datetime.utcfromtimestamp(timestamp).astimezone(timezone.get_default_timezone())
+
+
 def _get_one_running(stat: StatDto = None, direction: str = '') -> Optional[Post]:
     runnings = Post.runnings.order_by(f'{direction}date')\
         .annotate(start_sum_distance=F('sum_distance')-F('distance'))
@@ -178,16 +172,12 @@ def _get_one_running(stat: StatDto = None, direction: str = '') -> Optional[Post
     return runnings.first()
 
 
-def _get_runners(first_running: Optional[Post], last_running: Optional[Post]) -> List[RunnerDto]:
+def _get_runners(first_running: Post, last_running: Post) -> List[RunnerDto]:
     runners = Profile.objects\
-        .annotate(running_count=Count('post__number'))\
-        .annotate(distance_sum=Sum('post__distance'))\
+        .filter(post__date__gte=first_running.date, post__date__lte=last_running.date)\
+        .annotate(running_count=Count('post__number')) \
+        .annotate(distance_sum=Sum('post__distance')) \
         .order_by('-distance_sum')
-
-    if first_running:
-        runners.filter(post__date__gte=first_running.date)
-    if last_running:
-        runners.filter(post__date__lte=last_running.date)
 
     return [RunnerDto(r, r.running_count, r.distance_sum) for r in runners]
 
