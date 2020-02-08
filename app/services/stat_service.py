@@ -116,36 +116,33 @@ def calc_stat(stat_type: StatLog.StatType, start_range: Optional[int], end_range
 
     first_running = _get_one_running()
     first_int_running = _get_one_running(stat)
-
-    if not stat.start_date and first_int_running:
-        stat.start_date = first_int_running.date
-
     last_int_running = _get_one_running(stat, direction='-')
-
-    if not stat.end_date and last_int_running:
-        stat.end_date = last_int_running.date
-
     last_running = last_int_running
 
-    if not first_running or not last_running:
+    if not first_running or not last_running or not first_int_running or not last_int_running:
         raise Post.DoesNotExist()
 
+    if not stat.start_date:
+        stat.start_date = first_int_running.date
+
+    if not stat.end_date:
+        stat.end_date = last_int_running.date
+
     runners = _get_runners(first_running, last_running)
-    stat.top_all_runners = runners[:TOP_RUNNERS_COUNT]
     int_runners = _get_runners(first_int_running, last_int_running)
+
+    stat.top_all_runners = runners[:TOP_RUNNERS_COUNT]
     stat.top_interval_runners = int_runners[:TOP_RUNNERS_COUNT]
-
-    stat.all_days_count = get_count_days(first_running.date, last_running.date)
-    stat.interval_days_count = get_count_days(stat.start_date, stat.end_date)
-
-    stat.all_distance = last_running.sum_distance if last_running else -1
-    stat.max_one_man_distance = runners[0]
-
     stat.all_runners_count = len(runners)
     stat.interval_runners_count = len(int_runners)
     stat.new_runners, stat.new_runners_count = _get_new_runners(int_runners, stat.start_date)
 
-    stat.all_training_count = last_running.number if last_running else -1
+    stat.all_days_count = get_count_days(first_running.date, last_running.date)
+    stat.interval_days_count = get_count_days(stat.start_date, stat.end_date)
+    stat.all_distance = last_running.sum_distance
+    stat.all_training_count = last_running.number
+
+    stat.max_one_man_distance = runners[0]
     stat.max_one_man_training_count = sorted(runners, key=lambda it: it.running_count, reverse=True)[0]
 
     return stat
@@ -182,10 +179,7 @@ def _get_runners(first_running: Post, last_running: Post) -> List[RunnerDto]:
     return [RunnerDto(r, r.running_count, r.distance_sum) for r in runners]
 
 
-def _get_new_runners(runners: List[RunnerDto], start_date: Optional[datetime]):
-    if not start_date:
-        return [], 0
-
+def _get_new_runners(runners: List[RunnerDto], start_date: datetime):
     new_runners = find_all(runners, lambda it: it.profile.join_date >= start_date)
     new_runners = [r.profile for r in new_runners]
     new_runners = sorted(new_runners, key=lambda it: it.join_date)
