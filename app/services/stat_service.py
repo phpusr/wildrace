@@ -26,10 +26,10 @@ class RunnerDto:
 
 
 class StatDto:
-    start_distance: Optional[int]
-    end_distance: Optional[int]
-    start_date: Optional[datetime]
-    end_date: Optional[datetime]
+    start_distance: Optional[int] = None
+    end_distance: Optional[int] = None
+    start_date: Optional[datetime] = None
+    end_date: Optional[datetime] = None
 
     all_days_count: int = 0
     """All running days"""
@@ -68,7 +68,7 @@ class StatDto:
     """Top of runners in interval"""
 
     @property
-    def type(self):
+    def type(self) -> StatLog.StatType:
         if self.start_distance is not None and self.end_distance is not None:
             return StatLog.StatType.DISTANCE
 
@@ -156,25 +156,24 @@ def calc_stat(stat_type: StatLog.StatType, start_range: Optional[int], end_range
     stat.new_runners, stat.new_runners_count = _get_new_runners(int_runners, stat.start_date)
 
     stat.all_training_count = last_running.number if last_running else -1
-    stat.max_one_man_training_count = sorted(runners, lambda it: it.running_count * -1)[0]
+    stat.max_one_man_training_count = sorted(runners, key=lambda it: it.running_count, reverse=True)[0]
 
     return stat
 
 
 def _get_one_running(stat: StatDto = None, direction: str = '') -> Optional[Post]:
-    runnings = Post.runnings.order_by(f'{direction}date')
+    runnings = Post.runnings.order_by(f'{direction}date')\
+        .annotate(start_sum_distance=F('sum_distance')-F('distance'))
 
-    if stat.start_date:
-        runnings = runnings.filter(date__gte=stat.start_date)
-    if stat.end_date:
-        runnings = runnings.filter(date__lte=stat.end_date)
-
-    runnings = runnings.annotate(start_sum_distance=F('sum_distance')-F('distance'))
-
-    if stat.start_distance:
-        runnings = runnings.filter(start_sum_distance__gte=stat.start_distance)
-    if stat.end_distance:
-        runnings = runnings.filter(start_sum_distance__lt=stat.end_distance)
+    if stat:
+        if stat.start_date:
+            runnings = runnings.filter(date__gte=stat.start_date)
+        if stat.end_date:
+            runnings = runnings.filter(date__lte=stat.end_date)
+        if stat.start_distance:
+            runnings = runnings.filter(start_sum_distance__gte=stat.start_distance)
+        if stat.end_distance:
+            runnings = runnings.filter(start_sum_distance__lt=stat.end_distance)
 
     return runnings.first()
 
@@ -186,9 +185,9 @@ def _get_runners(first_running: Optional[Post], last_running: Optional[Post]) ->
         .order_by('-distance_sum')
 
     if first_running:
-        runners.filter(date__gte=first_running.date)
+        runners.filter(post__date__gte=first_running.date)
     if last_running:
-        runners.filter(date__lte=last_running.date)
+        runners.filter(post__date__lte=last_running.date)
 
     return [RunnerDto(r, r.running_count, r.distance_sum) for r in runners]
 
@@ -197,8 +196,9 @@ def _get_new_runners(runners: List[RunnerDto], start_date: Optional[datetime]):
     if not start_date:
         return [], 0
 
-    new_runners = find_all(runners, lambda it: it.join_date >= start_date)
-    new_runners = sorted(new_runners, lambda it: it.join_date)
+    new_runners = find_all(runners, lambda it: it.profile.join_date >= start_date)
+    new_runners = [r.profile for r in new_runners]
+    new_runners = sorted(new_runners, key=lambda it: it.join_date)
 
     return new_runners[:MAX_NEW_RUNNERS_COUNT], len(new_runners)
 
