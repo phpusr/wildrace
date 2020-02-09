@@ -5,8 +5,8 @@ install:
   - pip install pipenv
   - pipenv install --dev
 
+before_script:
+  - bash <(curl -s https://codecov.io/bash)
+
 script:
   - coverage run manage.py test && flake8
-
-after_success:
-  - bash <(curl -s https://codecov.io/bash)
