@@ -171,7 +171,7 @@ def _get_one_running(stat: StatDto = None, direction: str = '') -> Optional[Post
 
 def _get_runners(first_running: Post, last_running: Post) -> List[RunnerDto]:
     runners = Profile.objects\
-        .filter(post__date__gte=first_running.date, post__date__lte=last_running.date)\
+        .filter(post__number__isnull=False, post__date__gte=first_running.date, post__date__lte=last_running.date)\
         .annotate(running_count=Count('post__number')) \
         .annotate(distance_sum=Sum('post__distance')) \
         .order_by('-distance_sum')

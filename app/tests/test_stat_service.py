@@ -9,6 +9,7 @@ from app.services.stat_service import RunnerDto
 
 DATA = """
  2015-09-01 03:56:09 |  39752943 | Сергей     | Щеднов       |        4
+ 2015-09-01 18:23:34 |	-1013265 | Дикий"	  | Забег        |		
  2015-09-01 22:15:01 |   8429458 | Иван       | Решетов      |       12
  2015-09-02 02:56:41 |  82121484 | Евгений    | Саксонов     |        5
  2015-09-02 03:02:30 |  84566235 | Александр  | Фомин        |        2
@@ -41,7 +42,14 @@ def create_or_get_profile(profile_id, first_name, last_name, date):
 
 
 def create_running(number, profile, distance, sum_distance, date):
-    return Post.objects.create(status=Post.Status.SUCCESS, number=number, author=profile, distance=distance,
+    if not distance:
+        status = Post.Status.ERROR_PARSE
+        number = None
+        sum_distance = None
+    else:
+        status = Post.Status.SUCCESS
+
+    return Post.objects.create(status=status, number=number, author=profile, distance=distance,
                                sum_distance=sum_distance, date=date)
 
 
@@ -53,15 +61,18 @@ def create_runnings():
         if not row:
             continue
 
-        number += 1
         props = row.split('|')
         date = datetime.strptime(props[0].strip(), '%Y-%m-%d %H:%M:%S') \
             .astimezone(timezone.get_default_timezone())
         profile_id = int(props[1].strip())
         first_name = props[2].strip()
         last_name = props[3].strip()
-        distance = int(props[4].strip())
-        sum_distance += distance
+        try:
+            distance = int(props[4].strip())
+            sum_distance += distance
+            number += 1
+        except ValueError:
+            distance = None
 
         profile = create_or_get_profile(profile_id, first_name, last_name, date)
         running = create_running(number, profile, distance, sum_distance, date)
@@ -137,6 +148,7 @@ class StatServiceTests(TestCase):
             RunnerDto(Profile.objects.get(pk=39752943), 2, 9)
         ]
         top_int_runners = top_all_runners
+        new_runners = list(Profile.objects.exclude(pk=-1013265).order_by('join_date'))
 
         self.assertIsNone(stat.start_distance)
         self.assertIsNone(stat.end_distance)
@@ -148,7 +160,7 @@ class StatServiceTests(TestCase):
         self.assertEqual(stat.all_training_count, 20)
         self.assertEqual(stat.max_one_man_training_count, max_one_man_training_count)
         self.assertEqual(stat.all_runners_count, 15)
-        self.assertEqual(stat.new_runners, list(Profile.objects.order_by('join_date')))
+        self.assertEqual(stat.new_runners, new_runners)
         self.assertEqual(stat.new_runners_count, 15)
         self.assertEqual(stat.top_all_runners, top_all_runners)
         self.assertEqual(stat.top_interval_runners, top_int_runners)
@@ -279,3 +291,20 @@ class StatServiceTests(TestCase):
         self.assertEqual(stat_log.stat_type, StatLog.StatType.DISTANCE)
         self.assertEqual(stat_log.start_value, '100')
         self.assertEqual(stat_log.end_value, '200')
+
+    def test_get_stat(self):
+        """Test that get_stat return correct values"""
+        stat = stat_service.get_stat()
+        self.assertEqual(stat, {
+            'distance_sum': 0,
+            'running_count': 0,
+            'post_count': 0
+        })
+
+        create_runnings()
+        stat = stat_service.get_stat()
+        self.assertEqual(stat, {
+            'distance_sum': 112,
+            'running_count': 20,
+            'post_count': 21
+        })
