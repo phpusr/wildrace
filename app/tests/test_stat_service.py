@@ -6,7 +6,7 @@ from django.utils import timezone
 
 from app.models import StatLog, Profile, Post, TempData
 from app.services import stat_service
-from app.services.stat_service import RunnerDto
+from app.services.stat_service import RunnerDto, StatDto
 
 DATA = """
  2015-09-01 03:56:09 |  39752943 | Сергей     | Щеднов       |        4
@@ -327,7 +327,7 @@ class StatServiceTests(TestCase):
     @patch('app.services.vk_api_service.create_post', return_value={'post_id': 123})
     @patch('app.services.stat_service._create_post_text', return_value='Post text')
     def test_interval_publish_stat_post(self, create_text, create_post):
-        """Test that stat log is publishing"""
+        """Test that stat is publishing through interval"""
         with self.settings(PUBLISHING_STAT_INTERVAL=50):
             stat_service.interval_publish_stat_post()
             self.assertEqual(create_text.call_count, 0)
@@ -355,3 +355,19 @@ class StatServiceTests(TestCase):
             stat_service.interval_publish_stat_post()
             self.assertEqual(create_text.call_count, 2)
             self.assertEqual(create_post.call_count, 2)
+
+    @patch('app.services.vk_api_service.create_post', return_value={'post_id': 123})
+    @patch('app.services.stat_service._create_post_text', return_value='Post text')
+    def test_publish_stat_post(self, create_text, create_post):
+        """Test that stat is publishing"""
+        stat = StatDto(start_distance=1000, end_distance=2000)
+        post_id = stat_service.publish_stat_post(stat)
+        self.assertEqual(post_id, 123)
+        self.assertEqual(create_text.call_count, 1)
+        self.assertEqual(create_post.call_count, 1)
+        self.assertEqual(create_post.call_args.args, ('Post text',))
+
+        stat_log = StatLog.objects.last()
+        self.assertEqual(StatLog.objects.count(), 1)
+        self.assertEqual(stat_log.start_value, '1000')
+        self.assertEqual(stat_log.end_value, '2000')

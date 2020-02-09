@@ -25,6 +25,7 @@ class RunnerDto:
     distance_sum: int
 
 
+@dataclass
 class StatDto:
     start_distance: Optional[int] = None
     end_distance: Optional[int] = None
@@ -40,13 +41,13 @@ class StatDto:
     all_distance: int = 0
     """Distance for whole time in KM"""
 
-    max_one_man_distance: RunnerDto
+    max_one_man_distance: RunnerDto = None
     """Max distance from one man for whole time"""
 
     all_training_count: int = 0
     """Training count for whole time"""
 
-    max_one_man_training_count: RunnerDto
+    max_one_man_training_count: RunnerDto = None
     """Max training count from one man for whole time"""
 
     all_runners_count: int = 0
@@ -55,16 +56,16 @@ class StatDto:
     interval_runners_count: int = 0
     """Runners which ran on interval"""
 
-    new_runners: List[Profile]
+    new_runners: List[Profile] = None
     """New runners on interval (max: 25)"""
 
     new_runners_count: int = 0
     """New runners count on interval"""
 
-    top_all_runners = List[RunnerDto]
+    top_all_runners: List[RunnerDto] = None
     """Top of runners for whole time"""
 
-    top_interval_runners = List[RunnerDto]
+    top_interval_runners: List[RunnerDto] = None
     """Top of runners in interval"""
 
     @property
