@@ -211,10 +211,13 @@ def interval_publish_stat_post():
     if not last_running:
         return
 
-    last_stat_log = StatLog.objects.filter(stat_type=StatLog.StatType.DISTANCE).order_by('-publish_date').first()
+    last_stat_log = StatLog.objects\
+        .filter(stat_type=StatLog.StatType.DISTANCE)\
+        .order_by('-publish_date')\
+        .first()
 
     start_distance = int(last_stat_log.end_value) if last_stat_log else 0
-    end_distance = start_distance = settings.PUBLISHING_STAT_INTERVAL
+    end_distance = start_distance + settings.PUBLISHING_STAT_INTERVAL
 
     if last_running.sum_distance >= end_distance:
         stat = calc_stat(StatLog.StatType.DISTANCE, start_distance, end_distance)

@@ -1,9 +1,10 @@
-from datetime import datetime
+from datetime import datetime, timedelta
+from unittest.mock import patch
 
 from django.test import TestCase
 from django.utils import timezone
 
-from app.models import StatLog, Profile, Post
+from app.models import StatLog, Profile, Post, TempData
 from app.services import stat_service
 from app.services.stat_service import RunnerDto
 
@@ -308,3 +309,49 @@ class StatServiceTests(TestCase):
             'running_count': 20,
             'post_count': 21
         })
+
+    def test_update_stat(self):
+        """Test that update stat correct update last_sync_date"""
+        temp_data = TempData.objects.create(
+            last_sync_date=timezone.now() - timedelta(days=100)
+        )
+
+        before_date = timezone.now()
+        stat_service.update_stat()
+        after_date = timezone.now()
+        temp_data.refresh_from_db()
+
+        self.assertGreaterEqual(temp_data.last_sync_date, before_date)
+        self.assertLessEqual(temp_data.last_sync_date, after_date)
+
+    @patch('app.services.vk_api_service.create_post', return_value={'post_id': 123})
+    @patch('app.services.stat_service._create_post_text', return_value='Post text')
+    def test_interval_publish_stat_post(self, create_text, create_post):
+        """Test that stat log is publishing"""
+        with self.settings(PUBLISHING_STAT_INTERVAL=50):
+            stat_service.interval_publish_stat_post()
+            self.assertEqual(create_text.call_count, 0)
+            self.assertEqual(create_post.call_count, 0)
+
+            create_runnings()
+            stat_service.interval_publish_stat_post()
+            last_stat_log = StatLog.objects.last()
+            self.assertEqual(create_text.call_count, 1)
+            self.assertEqual(create_post.call_count, 1)
+            self.assertEqual(create_post.call_args.args, ('Post text',))
+            self.assertEqual(last_stat_log.stat_type, StatLog.StatType.DISTANCE)
+            self.assertEqual(last_stat_log.start_value, '0')
+            self.assertEqual(last_stat_log.end_value, '50')
+
+            stat_service.interval_publish_stat_post()
+            last_stat_log = StatLog.objects.last()
+            self.assertEqual(create_text.call_count, 2)
+            self.assertEqual(create_post.call_count, 2)
+            self.assertEqual(create_post.call_args.args, ('Post text',))
+            self.assertEqual(last_stat_log.stat_type, StatLog.StatType.DISTANCE)
+            self.assertEqual(last_stat_log.start_value, '50')
+            self.assertEqual(last_stat_log.end_value, '100')
+
+            stat_service.interval_publish_stat_post()
+            self.assertEqual(create_text.call_count, 2)
+            self.assertEqual(create_post.call_count, 2)
