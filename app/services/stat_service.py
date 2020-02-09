@@ -264,43 +264,41 @@ def _create_post_text(stat: StatDto) -> str:
     top_int_runner_urls = [runner_to_str(r) for r in stat.top_interval_runners]
     top_all_runner_urls = [runner_to_str(r) for r in stat.top_all_runners]
 
-    s = 'СТАТИСТИКА\n'
+    s = 'СТАТИСТИКА\n\n'
 
     if stat.end_distance:
         s += f'Отметка в {stat.end_distance} км преодолена\n\n'
     else:
         s += f'Статистика за {segment}\n\n'
 
-    if stat.new_runners:
-        s += f'{new_runners_str}\n'
-
-    s += f'\n\nнаши итоги в цифрах:\n'
+    s += f'{new_runners_str}\n\n'
+    s += f'Наши итоги в цифрах:\n'
     s += '1. Количество дней бега:\n'
     s += f'- Всего - {stat.all_days_count} дн.\n'
     s += f'- Отрезок {segment} - {stat.interval_days_count} дн.\n'
     s += '2. Километраж:\n'
-    s += '- Средний в день - {:.1} км/д\n'.format(stat.distance_per_day)
-    s += '- Средняя длина одной пробежки - {:.1} км/тр\n'.format(stat.distance_per_training)
+    s += '- Средний в день - {:.1f} км/д\n'.format(stat.distance_per_day)
+    s += '- Средняя длина одной пробежки - {:.1f} км/тр\n'.format(stat.distance_per_training)
     s += '3. Тренировки:\n'
     s += f'- Всего - {stat.all_training_count} тр.\n'
-    s += '- Среднее в день - {:.1} тр.\n'.format(stat.training_count_per_day)
+    s += '- Среднее в день - {:.1f} тр.\n'.format(stat.training_count_per_day)
     s += f'- Максимум от одного человека - {stat.max_one_man_training_count.running_count} тр. ' \
          f'({stat.max_one_man_training_count.profile.get_vk_link_for_post(is_dev)})\n'
     s += '4. Бегуны:\n'
     s += f'- Всего отметилось - {stat.all_runners_count} чел.\n'
     s += f'- Отметилось на отрезке {segment} - {stat.interval_runners_count} чел.\n'
-    s += f'- Новых на отрезке {segment} - {stat.new_runners_count} чел.'
+    s += f'- Новых на отрезке {segment} - {stat.new_runners_count} чел.\n'
     s += '5. Топ 5 бегунов на отрезке:\n'
     s += '\n'.join(top_int_runner_urls) + '\n'
     s += '6. Топ 5 бегунов за все время:'
-    s += '\n'.join(top_all_runner_urls) + '\n'
+    s += '\n'.join(top_all_runner_urls) + '\n\n'
 
     # Adding url to previous stat post
     last_log = StatLog.objects.order_by('-publish_date').first()
     if last_log:
-        s += f'\nПредыдущий пост со статистикой: {vk_api_service.get_post_url(last_log.post_id)}'
+        s += f'Предыдущий пост со статистикой: {vk_api_service.get_post_url(last_log.post_id)}\n\n'
 
-    s += '\nВсем отличного бега!\n'
-    s += '\n#ДикийЗабегСтатистика\n'
+    s += 'Всем отличного бега!\n\n'
+    s += '#ДикийЗабегСтатистика'
 
     return s

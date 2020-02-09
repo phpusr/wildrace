@@ -1,16 +1,17 @@
+import os
 from datetime import datetime, timedelta
 from unittest.mock import patch
 
 from django.test import TestCase
 from django.utils import timezone
 
-from app.models import StatLog, Profile, Post, TempData
+from app.models import StatLog, Profile, Post, TempData, Config
 from app.services import stat_service
 from app.services.stat_service import RunnerDto, StatDto
 
 DATA = """
  2015-09-01 03:56:09 |  39752943 | Сергей     | Щеднов       |        4
- 2015-09-01 18:23:34 |	-1013265 | Дикий"	  | Забег        |		
+ 2015-09-01 18:23:34 |	-1013265 | Дикий"	  | Забег        |
  2015-09-01 22:15:01 |   8429458 | Иван       | Решетов      |       12
  2015-09-02 02:56:41 |  82121484 | Евгений    | Саксонов     |        5
  2015-09-02 03:02:30 |  84566235 | Александр  | Фомин        |        2
@@ -31,6 +32,13 @@ DATA = """
  2015-09-04 06:43:31 |  52649788 | Ирина      | Жукова       |        4
  2015-09-04 07:12:15 | 151575104 | Роман      | Горобинский  |        4
 """
+
+
+def create_config():
+    return Config.objects.create(
+        sync_posts=False, sync_seconds=600, group_id=101326589, group_short_link='https://vk.com/group',
+        commenting=False, comment_access_token='token123', comment_from_group=False, publish_stat=False
+    )
 
 
 def create_or_get_profile(profile_id, first_name, last_name, date):
@@ -371,3 +379,32 @@ class StatServiceTests(TestCase):
         self.assertEqual(StatLog.objects.count(), 1)
         self.assertEqual(stat_log.start_value, '1000')
         self.assertEqual(stat_log.end_value, '2000')
+
+    def test_create_post_text(self):
+        """Test that stat text is correct for distance segment"""
+        self.maxDiff = None
+        create_runnings()
+        create_config()
+        path = os.path.dirname(os.path.abspath(__file__))
+
+        stat = stat_service.calc_stat(StatLog.StatType.DISTANCE, 50, 100)
+        stat.new_runners_count = 5
+        text = stat_service._create_post_text(stat)
+        with open(os.path.join(path, 'data', 'stat_1.txt')) as f:
+            self.assertEqual(text, f.read())
+
+        """Test that stat text is correct for date segment"""
+        stat.create_stat_log('123').save()
+
+        stat = stat_service.calc_stat(StatLog.StatType.DATE, None, None)
+        text = stat_service._create_post_text(stat)
+        with open(os.path.join(path, 'data', 'stat_2.txt')) as f:
+            self.assertEqual(text, f.read())
+
+        """Test that stat text is correct without new runners"""
+        stat = stat_service.calc_stat(StatLog.StatType.DISTANCE, 90, 100)
+        self.assertEqual(stat.new_runners_count, 0)
+        text = stat_service._create_post_text(stat)
+        print(text)
+        with open(os.path.join(path, 'data', 'stat_3.txt')) as f:
+            self.assertEqual(text, f.read())
