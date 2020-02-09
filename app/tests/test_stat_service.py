@@ -76,13 +76,51 @@ def create_date(year, month, day, hour=0, minute=0, second=0):
 class StatServiceTests(TestCase):
 
     def test_calc_stat_without_data(self):
+        """Test that raised exception if no data in DB"""
         with self.assertRaises(Post.DoesNotExist):
             stat_service.calc_stat(StatLog.StatType.DISTANCE, None, None)
 
     def test_calc_stat_without_params(self):
         """Test that test_calc_stat raises RuntimeError without params"""
+        create_runnings()
         with self.assertRaises(RuntimeError):
             stat_service.calc_stat(None, None, None)
+
+        """Test without start distance"""
+        stat = stat_service.calc_stat(StatLog.StatType.DISTANCE, None, 100)
+        self.assertEqual(stat.type, StatLog.StatType.DATE)
+        self.assertIsNone(stat.start_distance)
+        self.assertEqual(stat.end_distance, 100)
+        self.assertEqual(stat.start_date, create_date(2015, 9, 1, 3, 56, 9))
+        self.assertEqual(stat.end_date, create_date(2015, 9, 4, 3, 22, 14))
+
+        """Test without end distance"""
+        stat = stat_service.calc_stat(StatLog.StatType.DISTANCE, 16, None)
+        self.assertEqual(stat.type, StatLog.StatType.DATE)
+        self.assertEqual(stat.start_distance, 16)
+        self.assertIsNone(stat.end_distance)
+        self.assertEqual(stat.start_date, create_date(2015, 9, 2, 2, 56, 41))
+        self.assertEqual(stat.end_date, create_date(2015, 9, 4, 7, 12, 15))
+
+        """Test without start date"""
+        start_date = None
+        end_date = create_date(2015, 9, 3)
+        stat = stat_service.calc_stat(StatLog.StatType.DATE, start_date, int(end_date.timestamp()))
+        self.assertEqual(stat.type, StatLog.StatType.DATE)
+        self.assertIsNone(stat.start_distance)
+        self.assertIsNone(stat.end_distance)
+        self.assertEqual(stat.start_date, create_date(2015, 9, 1, 3, 56, 9))
+        self.assertEqual(stat.end_date, create_date(2015, 9, 3, 23, 59, 59))
+
+        """Test without end date"""
+        start_date = create_date(2015, 9, 3, 4, 38, 2)
+        end_date = None
+        stat = stat_service.calc_stat(StatLog.StatType.DATE, int(start_date.timestamp()), end_date)
+        self.assertEqual(stat.type, StatLog.StatType.DATE)
+        self.assertIsNone(stat.start_distance)
+        self.assertIsNone(stat.end_distance)
+        self.assertEqual(stat.start_date, start_date)
+        self.assertEqual(stat.end_date, create_date(2015, 9, 4, 7, 12, 15))
 
     def test_calc_stat_all_time(self):
         """Test that stat is right for whole time"""
