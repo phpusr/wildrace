@@ -9,29 +9,7 @@ from app.models import StatLog, Profile, Post, TempData, Config
 from app.services import stat_service
 from app.services.stat_service import RunnerDto, StatDto
 
-DATA = """
- 2015-09-01 03:56:09 |  39752943 | Сергей     | Щеднов       |        4
- 2015-09-01 18:23:34 |	-1013265 | Дикий"	  | Забег        |
- 2015-09-01 22:15:01 |   8429458 | Иван       | Решетов      |       12
- 2015-09-02 02:56:41 |  82121484 | Евгений    | Саксонов     |        5
- 2015-09-02 03:02:30 |  84566235 | Александр  | Фомин        |        2
- 2015-09-02 05:10:44 |  18273238 | Данил      | Нечаев       |        3
- 2015-09-03 02:13:31 |   2437792 | Станислав  | Карлштремс   |        4
- 2015-09-03 03:19:02 |  11351451 | Александр  | Зиангиров    |        5
- 2015-09-03 04:26:04 |  39752943 | Сергей     | Щеднов       |        5
- 2015-09-03 04:38:02 |  63399502 | Сергей     | Губин        |        8
- 2015-09-03 10:53:35 | 117963335 | Анастасия  | Литвинцева   |       16
- 2015-09-03 15:26:13 | 258765420 | Денис      | Карелин      |        5
- 2015-09-03 17:01:38 | 282180599 | Юлия       | Гайнетдинова |        2
- 2015-09-03 17:16:16 |  10811344 | Данис      | Султангужин  |        6
- 2015-09-04 01:39:39 |   2437792 | Станислав  | Карлштремс   |        5
- 2015-09-04 02:55:57 |  84566235 | Александр  | Фомин        |        3
- 2015-09-04 03:03:23 |   1553750 | Дмитрий    | Пыргаев      |        5
- 2015-09-04 03:22:14 |  63399502 | Сергей     | Губин        |       12
- 2015-09-04 03:46:21 | 282180599 | Юлия       | Гайнетдинова |        2
- 2015-09-04 06:43:31 |  52649788 | Ирина      | Жукова       |        4
- 2015-09-04 07:12:15 | 151575104 | Роман      | Горобинский  |        4
-"""
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 def create_config():
@@ -66,27 +44,29 @@ def create_runnings():
     number = 0
     sum_distance = 0
     runnings = []
-    for row in DATA.split('\n'):
-        if not row:
-            continue
 
-        props = row.split('|')
-        date = datetime.strptime(props[0].strip(), '%Y-%m-%d %H:%M:%S') \
-            .astimezone(timezone.get_default_timezone())
-        profile_id = int(props[1].strip())
-        first_name = props[2].strip()
-        last_name = props[3].strip()
-        try:
-            distance = int(props[4].strip())
-            sum_distance += distance
-            number += 1
-        except ValueError:
-            distance = None
+    with open(os.path.join(BASE_DIR, 'data', 'runnings.txt')) as f:
+        for row in f.readlines():
+            if not row:
+                continue
 
-        profile = create_or_get_profile(profile_id, first_name, last_name, date)
-        running = create_running(number, profile, distance, sum_distance, date)
-        runnings.append(running)
-    return runnings
+            props = row.split('|')
+            date = datetime.strptime(props[0].strip(), '%Y-%m-%d %H:%M:%S') \
+                .astimezone(timezone.get_default_timezone())
+            profile_id = int(props[1].strip())
+            first_name = props[2].strip()
+            last_name = props[3].strip()
+            try:
+                distance = int(props[4].strip())
+                sum_distance += distance
+                number += 1
+            except ValueError:
+                distance = None
+
+            profile = create_or_get_profile(profile_id, first_name, last_name, date)
+            running = create_running(number, profile, distance, sum_distance, date)
+            runnings.append(running)
+        return runnings
 
 
 def create_date(year, month, day, hour=0, minute=0, second=0):
@@ -385,12 +365,11 @@ class StatServiceTests(TestCase):
         self.maxDiff = None
         create_runnings()
         create_config()
-        path = os.path.dirname(os.path.abspath(__file__))
 
         stat = stat_service.calc_stat(StatLog.StatType.DISTANCE, 50, 100)
         stat.new_runners_count = 5
         text = stat_service._create_post_text(stat)
-        with open(os.path.join(path, 'data', 'stat_1.txt')) as f:
+        with open(os.path.join(BASE_DIR, 'data', 'stat_1.txt')) as f:
             self.assertEqual(text, f.read())
 
         """Test that stat text is correct for date segment"""
@@ -398,7 +377,7 @@ class StatServiceTests(TestCase):
 
         stat = stat_service.calc_stat(StatLog.StatType.DATE, None, None)
         text = stat_service._create_post_text(stat)
-        with open(os.path.join(path, 'data', 'stat_2.txt')) as f:
+        with open(os.path.join(BASE_DIR, 'data', 'stat_2.txt')) as f:
             self.assertEqual(text, f.read())
 
         """Test that stat text is correct without new runners"""
@@ -406,5 +385,5 @@ class StatServiceTests(TestCase):
         self.assertEqual(stat.new_runners_count, 0)
         text = stat_service._create_post_text(stat)
         print(text)
-        with open(os.path.join(path, 'data', 'stat_3.txt')) as f:
+        with open(os.path.join(BASE_DIR, 'data', 'stat_3.txt')) as f:
             self.assertEqual(text, f.read())
