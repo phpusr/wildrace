@@ -5,17 +5,17 @@
                 <v-flex>
                     <v-layout align-start>
                         <v-avatar class="elevation-2">
-                            <img :src="post.from.photo_50" alt="" />
+                            <img :src="post.author.photo50" alt="" />
                         </v-avatar>
                         <div class="ml-2">
                             <h3>
                                 <a :href="post.link" target="_blank">#{{post.number}}</a>
-                                {{post.from.firstName}}
-                                {{post.from.lastName}}
+                                {{post.author.firstName}}
+                                {{post.author.lastName}}
                             </h3>
                             <div class="caption grey--text lighten-3">{{date}}</div>
                         </div>
-                        <post-parser-status :status-id="post.statusId" class="ml-2" />
+                        <post-parser-status :status-id="post.status" class="ml-2" />
 
                         <v-tooltip top v-if="post.lastUpdate">
                             <v-btn icon class="blue-grey lighten-4" slot="activator">

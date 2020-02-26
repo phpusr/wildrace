@@ -33,9 +33,9 @@ export default {
         loginNotFound: "Не найден пользователь с таким логином и паролем"
     },
     post: {
-        totalSumDistance: "Всего пробежали (км)",
-        numberOfRuns: "Количество пробежек",
-        numberOfPosts: "Количество постов",
+        totalDistanceSum: "Всего пробежали (км)",
+        runningCount: "Количество пробежек",
+        postCount: "Количество постов",
 
         editDialogTitle: "Редактирование поста",
         number: "№",

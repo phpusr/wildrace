@@ -1,10 +1,10 @@
 import Vue from "vue"
 
-const api = Vue.resource("/post/{id}")
+const api = Vue.resource("/api/posts/{id}")
 
 export default {
     getOne: id => api.get({id}),
-    getAll: params => Vue.http.get("/post", {params}),
+    getAll: params => Vue.http.get("/api/posts", {params}),
     getStat: () => api.get({id: "getStat"}, {params: {test: 1}}),
     getLastSyncDate: () => api.get({id: "getLastSyncDate"}),
     update: (post, updateNextPosts) => Vue.http.put(`/post/${post.id}`, post, {params: {updateNextPosts}}),

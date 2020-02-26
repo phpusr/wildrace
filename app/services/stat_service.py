@@ -191,9 +191,9 @@ def _get_new_runners(runners: List[RunnerDto], start_date: datetime):
 def get_stat() -> dict:
     last_post = _get_one_running(direction='-')
     return {
-        'distance_sum': last_post.sum_distance if last_post else 0,
-        'running_count': last_post.number if last_post else 0,
-        'post_count': Post.objects.count()
+        'distanceSum': last_post.sum_distance if last_post else 0,
+        'runningCount': last_post.number if last_post else 0,
+        'postCount': Post.objects.count()
     }
 
 

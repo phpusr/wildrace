@@ -29,7 +29,6 @@
     import InfiniteLoading from "vue-infinite-loading"
     import postApi from "../api/post"
     import {mapMutations, mapState} from "vuex"
-    import {postSortDirection} from "../util/data"
 
     export default {
         components: {Post, InfiniteLoading},
@@ -48,13 +47,13 @@
                 const params = this.$route.query
                 const {body} = await postApi.getAll({
                         ...params,
-                        size: 10,
-                        sort: `date,${postSortDirection}`,
-                        page: this.page
+                        limit: 10,
+                        offset: this.page * 10
                 })
-                const {list} = body
                 this.addPostsMutation(body)
-                if (list.length) {
+
+                const {results} = body
+                if (results.length) {
                     this.page += 1
                     $state.loaded()
                 } else {
@@ -67,11 +66,11 @@
             statTitles() {
                 const data = this.post
                 const stat = data.stat
-                const numberOfPostsString = (data.totalElements === stat.numberOfPosts) ? stat.numberOfPosts : `${data.totalElements} / ${stat.numberOfPosts}`
+                const postCount = (data.totalElements === stat.postCount) ? stat.postCount : `${data.totalElements} / ${stat.postCount}`
                 return [
-                    {title: this.$t("post.totalSumDistance"), value: stat.sumDistance},
-                    {title: this.$t("post.numberOfRuns"), value: stat.numberOfRuns},
-                    {title: this.$t("post.numberOfPosts"), value: numberOfPostsString}
+                    {title: this.$t("post.totalDistanceSum"), value: stat.distanceSum},
+                    {title: this.$t("post.runningCount"), value: stat.runningCount},
+                    {title: this.$t("post.postCount"), value: postCount}
                 ]
             },
             containerConfig() {

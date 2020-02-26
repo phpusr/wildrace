@@ -26,9 +26,7 @@
         <link href="{{ css_file }}" rel="stylesheet">
     {% endfor %}
 
-    <script>
-        document.frontendData = {{ frontendData|safe }}
-    </script>
+    {{ frontend_data|json_script:'frontend-data' }}
 </head>
 <body>
 

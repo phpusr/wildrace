@@ -16,11 +16,19 @@ Including another URLconf
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 
 from . import views
 
+app_name = 'app'
+
+router = DefaultRouter()
+router.register('posts', views.PostViewSet)
+
 urlpatterns = [
+    path('', views.index),
+    path('api/', include(router.urls)),
+    path('api/auth/', include('rest_framework.urls')),
     path('admin/', admin.site.urls),
-    path('', views.index)
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

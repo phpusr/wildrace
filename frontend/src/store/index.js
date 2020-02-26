@@ -19,7 +19,7 @@ function sortPosts(posts) {
     posts.sort((a, b) => (a.date - b.date) * direction)
 }
 
-const {user, stat, lastSyncDate, config} = document.frontendData
+const {user, stat, lastSyncDate, config} = JSON.parse(document.getElementById('frontend-data').textContent);
 
 export default new Vuex.Store({
     state: {
@@ -37,7 +37,7 @@ export default new Vuex.Store({
             if (state.user == null) {
                 return null
             }
-            return state.user.is_superuser
+            return state.user.isSuperuser
         }
     },
     mutations: {
@@ -55,12 +55,12 @@ export default new Vuex.Store({
                 replaceObject(data.posts, post)
             }
         },
-        addPostsMutation(state, {list, totalElements}) {
-            if (list.length) {
-                state.post.posts.push(...list)
+        addPostsMutation(state, {results, count}) {
+            if (results.length) {
+                state.post.posts.push(...results)
                 sortPosts(state.post.posts)
             }
-            state.post.totalElements = totalElements
+            state.post.totalElements = count
         },
         resetPostsMutation(state) {
             state.post.posts = []
