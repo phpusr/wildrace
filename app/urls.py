@@ -24,7 +24,7 @@ from . import views
 app_name = 'app'
 
 router = DefaultRouter()
-router.register('posts', views.PostViewSet)
+router.register('posts', views.PostViewSet, 'Post')
 
 urlpatterns = [
     path('', views.index),

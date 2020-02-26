@@ -35,5 +35,17 @@ def index(request):
 
 
 class PostViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
-    queryset = Post.objects.order_by('-date')
     serializer_class = PostSerializer
+
+    def get_queryset(self):
+        queryset = Post.objects.order_by('-date')
+
+        manual_editing = self.request.query_params.get('me')
+        if manual_editing:
+            queryset = queryset.filter(last_update__isnull=False)
+
+        status = self.request.query_params.get('status')
+        if status:
+            queryset = queryset.filter(status=status)
+
+        return queryset
