@@ -10,8 +10,8 @@
                             :label="$t('post.number')"
                     />
                     <v-select
-                            :value="post.statusId + ''"
-                            @change="post.statusId = +$event"
+                            :value="post.status + ''"
+                            @change="post.status = +$event"
                             :items="statuses"
                             :label="$t('post.status')"
                             required

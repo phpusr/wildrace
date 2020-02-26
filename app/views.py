@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.shortcuts import render
-from rest_framework import viewsets, mixins
+from rest_framework import viewsets, mixins, permissions
 
 from app.models import TempData, Post
 from app.serializers import PostSerializer
@@ -34,7 +34,9 @@ def index(request):
     return render(request, 'app/index.html', result)
 
 
-class PostViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+class PostViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin,
+                  viewsets.GenericViewSet):
+    permission_classes = [permissions.DjangoModelPermissionsOrAnonReadOnly]
     serializer_class = PostSerializer
 
     def get_queryset(self):
