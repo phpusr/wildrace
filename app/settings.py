@@ -154,6 +154,8 @@ LOGGING = {
 
 #####################################
 
+VERSION = '3.0.0-alpha'
+
 VK_LINK = 'https://vk.com'
 
 VK_APP_ID = 5344865

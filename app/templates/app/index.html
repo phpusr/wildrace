@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <title>Wild Race</title>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    {% comment %}<script async src="https://www.googletagmanager.com/gtag/js?id={{ google_analytics_id }}"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', {{googleAnalyticsId}});
+    </script>{% endcomment %}
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+    <link rel="icon" href="favicon.ico">
+    <link href='https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons' rel="stylesheet">
+
+    {% for css_file in css_files %}
+        <link href="{{ css_file }}" rel="stylesheet">
+    {% endfor %}
+
+    <script>
+        document.frontendData = {{ frontendData|safe }}
+    </script>
+</head>
+<body>
+
+<noscript>
+    <strong>We're sorry but frontend doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+</noscript>
+
+<div id="app"></div>
+
+{% for js_file in js_files %}
+    <script src="{{ js_file }}"></script>
+{%  endfor %}
+
+</body>
+</html>

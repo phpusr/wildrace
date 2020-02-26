@@ -11,7 +11,7 @@
             </div>
             <div class="pt-1">
                 <a href="https://github.com/phpusr/wildrace" target="_blank">
-                    <img src="/img/GitHub-Mark-32px.png" class="logo" alt="GitHub logo"/>
+                    <img src="/static/img/GitHub-Mark-32px.png" class="logo" alt="GitHub logo">
                 </a>
             </div>
         </v-layout>

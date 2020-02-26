@@ -37,7 +37,7 @@ export default new Vuex.Store({
             if (state.user == null) {
                 return null
             }
-            return state.user.roles.includes("ROLE_ADMIN")
+            return state.user.is_superuser
         }
     },
     mutations: {
