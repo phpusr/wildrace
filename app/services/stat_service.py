@@ -150,7 +150,7 @@ def calc_stat(stat_type: StatLog.StatType, start_range: Optional[int], end_range
 
 
 def _convert_timestamp_to_date(timestamp: int) -> datetime:
-    return datetime.utcfromtimestamp(timestamp).astimezone(timezone.get_default_timezone())
+    return datetime.utcfromtimestamp(timestamp / 1000).astimezone(timezone.get_default_timezone())
 
 
 def _get_one_running(stat: StatDto = None, direction: str = '') -> Optional[Post]:

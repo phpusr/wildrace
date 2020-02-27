@@ -1,9 +1,11 @@
 from django.conf import settings
 from django.shortcuts import render
 from rest_framework import viewsets, mixins, permissions
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
-from app.models import TempData, Post
-from app.serializers import PostSerializer
+from app.models import TempData, Post, StatLog
+from app.serializers import PostSerializer, StatSerializer
 from app.services import stat_service, vk_api_service
 
 
@@ -51,3 +53,26 @@ class PostViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.Updat
             queryset = queryset.filter(status=status)
 
         return queryset
+
+
+@api_view()
+def stat_view(request):
+    start_range = request.GET.get('startRange', None)
+    if start_range:
+        start_range = int(start_range)
+
+    end_range = request.GET.get('endRange', None)
+    if end_range:
+        end_range = int(end_range)
+
+    stat_type_str = request.GET.get('type', None)
+    if stat_type_str == 'distance':
+        stat_type = StatLog.StatType.DISTANCE
+    elif stat_type_str == 'date':
+        stat_type = StatLog.StatType.DATE
+    else:
+        stat_type = None
+
+    stat = stat_service.calc_stat(stat_type, start_range, end_range)
+    serializer = StatSerializer(stat)
+    return Response(serializer.data)

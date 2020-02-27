@@ -1,12 +1,12 @@
 <template>
     <span v-if="number">
         <profile-link v-bind="profile" />
-        <span> - {{ numberOfRuns }}</span>
+        <span> - {{ runningCount }}</span>
         <span> {{ $t("default.trainings") }}</span>
     </span>
     <span v-else>
         <profile-link v-bind="profile" />
-        <span> - {{ sumDistance }}</span>
+        <span> - {{ distanceSum }}</span>
         <span> {{ $t("default.km") }}</span>
     </span>
 </template>
@@ -19,8 +19,8 @@
         props: {
             number: Boolean,
             profile: Object,
-            sumDistance: Number,
-            numberOfRuns: Number
+            distanceSum: Number,
+            runningCount: Number
         }
     }
 </script>
