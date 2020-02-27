@@ -17,20 +17,23 @@
                     {{alertMessage}}
                 </v-alert>
 
-                <v-form v-model="valid" class="mt-1">
+                <form id="login-form" class="mt-1" method="post" action="/api/auth/login/">
+                    <input type="hidden" name="csrfmiddlewaretoken" :value="csrfToken">
+                    <input type="hidden" name="next" value="/">
+
                     <v-text-field
-                            v-model="user.username"
+                            name="username"
                             :label="$t('user.username')"
                     />
                     <v-text-field
-                            v-model="user.password"
+                            name="password"
                             :label="$t('user.password')"
                             :append-icon="showPassword ? 'visibility_off' : 'visibility'"
                             :type="showPassword ? 'text' : 'password'"
                             @click:append="showPassword = !showPassword"
                             @keyup.enter="login"
                     />
-                </v-form>
+                </form>
             </v-card-text>
 
             <v-divider/>
@@ -49,30 +52,19 @@
 </template>
 
 <script>
-    import {mapActions} from "vuex"
+    import {getCsrfToken} from "../util";
 
     export default {
         data: () => ({
             show: false,
-            valid: false,
-            user: {},
             showPassword: false,
-            alertMessage: null
+            alertMessage: null,
+            csrfToken: getCsrfToken()
         }),
         methods: {
-            ...mapActions(["loginAction"]),
             async login() {
-                try {
-                    await this.loginAction(this.user)
-                    this.show = false
-                    this.alertMessage = null
-                } catch(e) {
-                    if (e.status === 401) {
-                        this.alertMessage = this.$t("user.loginNotFound")
-                    } else {
-                        this.alertMessage = `${e.status}: ${e.statusText}`
-                    }
-                }
+                const form = document.getElementById('login-form')
+                form.submit()
             },
             cancel() {
                 this.show = false

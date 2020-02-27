@@ -12,9 +12,12 @@
                         <login-dialog v-else />
                     </v-list-tile-content>
 
-                    <v-btn v-if="user" flat icon>
-                        <v-icon @click="logoutAction">exit_to_app</v-icon>
-                    </v-btn>
+                    <form id="logout-form" action="/api/auth/logout/">
+                        <input type="hidden" name="next" value="/">
+                        <v-btn v-if="user" flat icon>
+                            <v-icon @click="logout">exit_to_app</v-icon>
+                        </v-btn>
+                    </form>
                 </v-list-tile>
             </v-list>
         </v-toolbar>
@@ -79,6 +82,12 @@
                 return this.$vuetify.breakpoint.smAndDown
             }
         },
-        methods: mapActions(["logoutAction", "syncPosts"])
+        methods: {
+            ...mapActions(["syncPosts"]),
+            logout() {
+                const form = document.getElementById('logout-form')
+                form.submit()
+            }
+        }
     }
 </script>

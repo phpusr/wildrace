@@ -44,3 +44,7 @@ export function convertStatParams(params) {
 
     return newParams
 }
+
+export function getCsrfToken() {
+    return document.querySelector('[name=csrfmiddlewaretoken]').value
+}

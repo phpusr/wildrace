@@ -9,6 +9,7 @@ import i18n from "./i18n"
 import store from "./store"
 
 import "vuetify/dist/vuetify.min.css"
+import {getCsrfToken} from "./util";
 
 // connectToWS()
 
@@ -23,3 +24,5 @@ new Vue({
     i18n,
     store
 }).$mount("#app")
+
+Vue.http.headers.common['X-CSRFToken'] = getCsrfToken()
