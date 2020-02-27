@@ -19,7 +19,7 @@ export function activityHandler(component) {
                     component.updatePostMutation(body)
                     break
                 case "Remove":
-                    component.removePostMutation(body)
+                    component.removePostMutation(body.id)
                     break
                 default:
                     throw new Error(`Looks like the event type is unknown: "${data.eventType}"`)

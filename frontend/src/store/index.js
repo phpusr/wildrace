@@ -67,8 +67,8 @@ export default new Vuex.Store({
         updatePostMutation(state, post) {
             replaceObject(state.post.posts, post)
         },
-        removePostMutation(state, post) {
-            if (deleteObject(state.post.posts, post.id)) {
+        removePostMutation(state, postId) {
+            if (deleteObject(state.post.posts, postId)) {
                 state.post.totalElements--
             }
         },

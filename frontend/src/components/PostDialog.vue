@@ -61,6 +61,7 @@
 
 <script>
     import postApi from "../api/post"
+    import {mapMutations} from "vuex"
 
     export default {
         data() {
@@ -91,17 +92,20 @@
             }
         },
         methods: {
+            ...mapMutations(['updatePostMutation', 'removePostMutation']),
             async fetchData() {
                 const {body} = await postApi.getOne(this.postId)
                 this.post = body
             },
-            update() {
-                postApi.update(this.post, this.updateNextPosts)
+            async update() {
+                const {body} = await postApi.update(this.post, this.updateNextPosts)
+                this.updatePostMutation(body)
                 this.goToMainPage()
             },
-            remove() {
+            async remove() {
                 if (confirm(this.$t("default.confirmDelete"))) {
-                    postApi.remove(this.post.id, this.updateNextPosts)
+                    await postApi.remove(this.post.id, this.updateNextPosts)
+                    this.removePostMutation(this.post.id)
                     this.goToMainPage()
                 }
             },
