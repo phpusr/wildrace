@@ -15,8 +15,8 @@ class ModelTests(TestCase):
 
 def create_config():
     return models.Config.objects.create(
-        sync_posts=True, sync_seconds=600, group_id=101326589, group_short_link='https://vk.com/group',
-        commenting=True, comment_access_token='token123', comment_from_group=True, publish_stat=True
+        sync_posts=True, sync_seconds=600, group_id=101326589, commenting=True, comment_access_token='token123',
+        comment_from_group=True, publish_stat=True
     )
 
 
@@ -25,7 +25,7 @@ class ConfigTests(TestCase):
         self.config = create_config()
 
     def test_config_str(self):
-        self.assertEquals(str(self.config), 'Config for: https://vk.com/group')
+        self.assertEquals(str(self.config), 'Config for: 101326589')
 
     def test_config_negative_group_id(self):
         """Test that config return negative value for group ID"""

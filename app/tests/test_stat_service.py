@@ -14,8 +14,8 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 def create_config():
     return Config.objects.create(
-        sync_posts=False, sync_seconds=600, group_id=101326589, group_short_link='https://vk.com/group',
-        commenting=False, comment_access_token='token123', comment_from_group=False, publish_stat=False
+        sync_posts=False, sync_seconds=600, group_id=101326589, commenting=False, comment_access_token='token123',
+        comment_from_group=False, publish_stat=False
     )
 
 
@@ -105,7 +105,7 @@ class StatServiceTests(TestCase):
         """Test without start date"""
         start_date = None
         end_date = create_date(2015, 9, 3)
-        stat = stat_service.calc_stat(StatLog.StatType.DATE, start_date, int(end_date.timestamp()))
+        stat = stat_service.calc_stat(StatLog.StatType.DATE, start_date, int(end_date.timestamp() * 1000))
         self.assertEqual(stat.type, StatLog.StatType.DATE)
         self.assertIsNone(stat.start_distance)
         self.assertIsNone(stat.end_distance)
@@ -115,7 +115,7 @@ class StatServiceTests(TestCase):
         """Test without end date"""
         start_date = create_date(2015, 9, 3, 4, 38, 2)
         end_date = None
-        stat = stat_service.calc_stat(StatLog.StatType.DATE, int(start_date.timestamp()), end_date)
+        stat = stat_service.calc_stat(StatLog.StatType.DATE, int(start_date.timestamp() * 1000), end_date)
         self.assertEqual(stat.type, StatLog.StatType.DATE)
         self.assertIsNone(stat.start_distance)
         self.assertIsNone(stat.end_distance)
@@ -167,8 +167,8 @@ class StatServiceTests(TestCase):
 
         stat = stat_service.calc_stat(
             StatLog.StatType.DATE,
-            start_range=int(start_date.timestamp()),
-            end_range=int(end_date.timestamp())
+            start_range=int(start_date.timestamp() * 1000),
+            end_range=int(end_date.timestamp() * 1000)
         )
 
         max_one_man_distance = RunnerDto(Profile.objects.get(pk=117963335), 1, 16)
@@ -285,17 +285,17 @@ class StatServiceTests(TestCase):
         """Test that get_stat return correct values"""
         stat = stat_service.get_stat()
         self.assertEqual(stat, {
-            'distance_sum': 0,
-            'running_count': 0,
-            'post_count': 0
+            'distanceSum': 0,
+            'runningCount': 0,
+            'postCount': 0
         })
 
         create_runnings()
         stat = stat_service.get_stat()
         self.assertEqual(stat, {
-            'distance_sum': 112,
-            'running_count': 20,
-            'post_count': 21
+            'distanceSum': 112,
+            'runningCount': 20,
+            'postCount': 21
         })
 
     def test_update_stat(self):

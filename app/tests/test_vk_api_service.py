@@ -13,7 +13,6 @@ def create_config():
         sync_posts=False,
         sync_seconds=300,
         group_id=88923650,
-        group_short_link='',
         commenting=False,
         comment_access_token=os.getenv('VK_ACCESS_TOKEN'),
         comment_from_group=True,
