@@ -56,11 +56,6 @@ class PostViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.Updat
         return queryset
 
 
-class ConfigViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, viewsets.GenericViewSet):
-    queryset = Config.objects.all()
-    serializer_class = ConfigSerializer
-
-
 class StatView(APIView):
     permission_classes = [permissions.AllowAny]
 
@@ -90,3 +85,8 @@ class StatPublishView(APIView):
             post_id = stat_service.publish_stat_post(stat)
             return Response(post_id)
         return Response(form.errors)
+
+
+class ConfigViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, viewsets.GenericViewSet):
+    queryset = Config.objects.all()
+    serializer_class = ConfigSerializer
