@@ -33,6 +33,12 @@ class PublicApiTests(TestCase):
     def setUp(self):
         self.client = APIClient()
 
+    def test_stat_without_type(self):
+        """Test that stat will return errors without type"""
+        res = self.client.get(STAT_URL)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.data, {'type': ['This field is required.']})
+
     def test_distance_stat(self):
         """Test that stat is calculating for distance"""
         create_runnings()
@@ -68,6 +74,12 @@ class PrivateApiTests(TestCase):
         self.user = get_user_model().objects.create(username='phpusr', password='pass123', is_staff=True)
         self.client.force_authenticate(self.user)
         self.config = create_config()
+
+    def test_publish_without_type(self):
+        """Test that stat will return errors without type"""
+        res = self.client.post(STAT_PUBLISH_URL)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.data, {'type': ['This field is required.']})
 
     def test_publish_stat(self):
         """Test that stat is published"""
