@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 
 from app.forms import StatForm, PostForm
 from app.models import TempData, Post, Config
-from app.permissions import IsAdminUserOrReadOnly, IsReadOnly
+from app.permissions import IsAdminUserOrReadOnly
 from app.serializers import PostSerializer, StatSerializer, ConfigSerializer
 from app.services import stat_service, vk_api_service
 
@@ -44,7 +44,7 @@ class PostViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.Updat
     serializer_class = PostSerializer
 
     def get_queryset(self):
-        form = PostForm(self.request.GET)
+        form = PostForm(self.request.query_params)
         if not form.is_valid():
             return Post.objects.none()
 
@@ -62,10 +62,10 @@ class PostViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.Updat
 
 
 class StatView(APIView):
-    permission_classes = [IsReadOnly]
+    permission_classes = [IsAdminUserOrReadOnly]
 
     def get(self, request, format=None):
-        form = StatForm(request.GET)
+        form = StatForm(request.query_params)
         if form.is_valid():
             stat = stat_service.calc_stat(
                 stat_type=form.stat_type,
@@ -77,10 +77,8 @@ class StatView(APIView):
         else:
             return Response(form.errors)
 
-
-class StatPublishView(APIView):
     def post(self, request, format=None):
-        form = StatForm(request.POST)
+        form = StatForm(request.data)
         if form.is_valid():
             stat = stat_service.calc_stat(
                 stat_type=form.stat_type,

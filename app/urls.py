@@ -29,7 +29,6 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('api/', include(router.urls)),
     path('api/stat/', views.StatView.as_view(), name='stat'),
-    path('api/stat/publish/', views.StatPublishView.as_view(), name='stat-publish'),
     path('api/auth/', include('rest_framework.urls')),
     path('admin/', admin.site.urls),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

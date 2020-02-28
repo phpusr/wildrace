@@ -13,7 +13,6 @@ from app.tests.test_stat_service import create_runnings
 
 POSTS_URL = reverse('post-list')
 STAT_URL = reverse('stat')
-STAT_PUBLISH_URL = reverse('stat-publish')
 CONFIG_URL = reverse('config-detail', args=[1])
 
 
@@ -99,7 +98,7 @@ class PublicApiTests(TestCase):
 
     def test_publish_stat(self):
         """Test that stat publish required authentication"""
-        res = self.client.post(STAT_PUBLISH_URL, {'type': 'distance'})
+        res = self.client.post(STAT_URL, {'type': 'distance'})
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_retrieve_config(self):
@@ -135,7 +134,7 @@ class PrivateApiTests(TestCase):
 
     def test_publish_without_type(self):
         """Test that stat will return errors without type"""
-        res = self.client.post(STAT_PUBLISH_URL)
+        res = self.client.post(STAT_URL)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, {'type': ['This field is required.']})
 
@@ -145,7 +144,7 @@ class PrivateApiTests(TestCase):
         stat = stat_service.calc_stat(StatLog.StatType.DISTANCE, None, None)
         with patch('app.services.stat_service.publish_stat_post') as psp:
             psp.return_value = 123
-            res = self.client.post(STAT_PUBLISH_URL, {'type': 'distance'})
+            res = self.client.post(STAT_URL, {'type': 'distance'})
             self.assertEqual(psp.call_count, 1)
             self.assertEqual(psp.call_args.args[0], stat)
             self.assertEqual(res.data, 123)
