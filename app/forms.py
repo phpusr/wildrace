@@ -3,6 +3,14 @@ from django import forms
 from app.models import StatLog
 
 
+class PostForm(forms.Form):
+    me = forms.ChoiceField(required=False, choices=(
+        ('true', 'True'),
+        ('false', 'False')
+    ))
+    status = forms.IntegerField(required=False, min_value=1, max_value=4)
+
+
 class StatForm(forms.Form):
     start_range = forms.IntegerField(required=False)
     end_range = forms.IntegerField(required=False)

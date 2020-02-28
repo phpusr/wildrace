@@ -6,11 +6,12 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from app.models import Config, StatLog
-from app.serializers import ConfigSerializer, StatSerializer
+from app.models import Config, StatLog, Post
+from app.serializers import ConfigSerializer, StatSerializer, PostSerializer
 from app.services import vk_api_service, stat_service
 from app.tests.test_stat_service import create_runnings
 
+POSTS_URL = reverse('post-list')
 STAT_URL = reverse('stat')
 STAT_PUBLISH_URL = reverse('stat-publish')
 CONFIG_URL = reverse('config-detail', args=[1])
@@ -29,9 +30,48 @@ def create_config():
     )
 
 
+def post_detail_url(post_id):
+    return reverse('post-detail', args=[post_id])
+
+
 class PublicApiTests(TestCase):
     def setUp(self):
         self.client = APIClient()
+
+    def test_post_list(self):
+        """Test retrieving a list of posts"""
+        create_runnings()
+        res = self.client.get(POSTS_URL)
+        posts = Post.objects.order_by('-date')[:10]
+        serializer = PostSerializer(posts, many=True)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.data['results'], serializer.data)
+
+    def test_post_list_with_wrong_filter(self):
+        """Test retrieving a list of post with wrong filter"""
+        res = self.client.get(POSTS_URL, {'me': 1})
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.data['count'], 0)
+        self.assertEqual(len(res.data['results']), 0)
+
+    def test_post_list_with_filter(self):
+        """Test filtered retrieving a list of post"""
+        create_runnings()
+        res = self.client.get(POSTS_URL, {'me': 'true', 'status': Post.Status.ERROR_PARSE})
+        posts = Post.objects.filter(last_update__isnull=False, status=Post.Status.ERROR_PARSE).order_by('date')
+        serializer = PostSerializer(posts, many=True)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.data['results'], serializer.data)
+
+    def test_post_edit(self):
+        """Test that post editing required authentication"""
+        res = self.client.patch(post_detail_url(1), {'distance': 100})
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_post_delete(self):
+        """Test that post deleting required authentication"""
+        res = self.client.delete(post_detail_url(1))
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_stat_without_type(self):
         """Test that stat will return errors without type"""
@@ -74,6 +114,24 @@ class PrivateApiTests(TestCase):
         self.user = get_user_model().objects.create(username='phpusr', password='pass123', is_staff=True)
         self.client.force_authenticate(self.user)
         self.config = create_config()
+
+    def test_post_edit(self):
+        """Test that post will be editing"""
+        create_runnings()
+        post = Post.objects.first()
+        res = self.client.patch(post_detail_url(post.id), {'distance': 777})
+        post.refresh_from_db()
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(post.distance, 777)
+
+    def test_post_delete(self):
+        """Test that post will be deleted"""
+        create_runnings()
+        post = Post.objects.first()
+        res = self.client.delete(post_detail_url(post.id))
+        with self.assertRaises(Post.DoesNotExist):
+            post.refresh_from_db()
+        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_publish_without_type(self):
         """Test that stat will return errors without type"""

@@ -1,11 +1,12 @@
 from django.conf import settings
 from django.shortcuts import render
-from rest_framework import viewsets, mixins, permissions
+from rest_framework import viewsets, mixins
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from app.forms import StatForm
+from app.forms import StatForm, PostForm
 from app.models import TempData, Post, Config
+from app.permissions import IsAdminUserOrReadOnly, IsReadOnly
 from app.serializers import PostSerializer, StatSerializer, ConfigSerializer
 from app.services import stat_service, vk_api_service
 
@@ -39,17 +40,21 @@ def index(request):
 
 class PostViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin,
                   viewsets.GenericViewSet):
-    permission_classes = [permissions.DjangoModelPermissionsOrAnonReadOnly]
+    permission_classes = [IsAdminUserOrReadOnly]
     serializer_class = PostSerializer
 
     def get_queryset(self):
+        form = PostForm(self.request.GET)
+        if not form.is_valid():
+            return Post.objects.none()
+
         queryset = Post.objects.order_by('-date')
 
-        manual_editing = self.request.query_params.get('me')
-        if manual_editing:
+        manual_editing = form.cleaned_data['me']
+        if manual_editing == 'true':
             queryset = queryset.filter(last_update__isnull=False)
 
-        status = self.request.query_params.get('status')
+        status = form.cleaned_data['status']
         if status:
             queryset = queryset.filter(status=status)
 
@@ -57,7 +62,7 @@ class PostViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.Updat
 
 
 class StatView(APIView):
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [IsReadOnly]
 
     def get(self, request, format=None):
         form = StatForm(request.GET)
