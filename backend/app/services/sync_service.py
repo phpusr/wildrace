@@ -4,14 +4,13 @@ from datetime import datetime, timedelta
 from hashlib import md5
 from typing import List, Iterator
 
-from django.db import transaction
-from django.db.models import Q
-from django.utils import timezone
-
 from app.enums import EventType
 from app.models import Post, Profile, Config
 from app.services import vk_api_service, message_parser, stat_service
 from app.util import find, find_all, remove_non_utf8_chars
+from django.db import transaction
+from django.db.models import Q
+from django.utils import timezone
 
 DOWNLOAD_POST_COUNT = 100
 """

@@ -1,13 +1,12 @@
-from django.shortcuts import render
-from rest_framework import viewsets, mixins
-from rest_framework.response import Response
-from rest_framework.views import APIView
-
 from app.forms import StatForm, PostForm
 from app.models import Post, Config
 from app.permissions import IsAdminUserOrReadOnly
 from app.serializers import PostSerializer, StatSerializer, ConfigSerializer
 from app.services import stat_service, index_page_service
+from django.shortcuts import render
+from rest_framework import viewsets, mixins
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 
 def index(request):

@@ -1,9 +1,8 @@
+from app.tests.test_models import create_config, create_profile, create_post, create_stat_log, create_temp_data
 from django.contrib.auth import get_user_model
 from django.test import TestCase, Client
 from django.urls import reverse
 from rest_framework import status
-
-from app.tests.test_models import create_config, create_profile, create_post, create_stat_log, create_temp_data
 
 
 class AdminSiteTests(TestCase):

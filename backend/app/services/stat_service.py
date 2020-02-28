@@ -3,14 +3,13 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Optional, List
 
+from app.models import Profile, StatLog, Post, TempData
+from app.services import vk_api_service
+from app.util import find_all, get_count_days
 from django.conf import settings
 from django.db import transaction
 from django.db.models import Sum, F, Count
 from django.utils import timezone
-
-from app.models import Profile, StatLog, Post, TempData
-from app.services import vk_api_service
-from app.util import find_all, get_count_days
 
 logger = logging.getLogger(__name__)
 

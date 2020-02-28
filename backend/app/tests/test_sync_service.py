@@ -2,12 +2,11 @@ from datetime import timedelta, datetime
 from hashlib import md5
 from unittest.mock import patch
 
-from django.test import TestCase
-from django.utils import timezone
-
 from app.enums import EventType
 from app.models import Config, Post, Profile, TempData
 from app.services import sync_service, message_parser
+from django.test import TestCase
+from django.utils import timezone
 
 
 def create_config():

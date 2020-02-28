@@ -1,8 +1,7 @@
 from typing import List
 
-from django.test import TestCase
-
 from app.services.message_parser import parse
+from django.test import TestCase
 
 
 class MessageParserTests(TestCase):

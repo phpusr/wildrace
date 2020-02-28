@@ -1,11 +1,2 @@
 /.idea/
 /*.iml
-
-__pycache__/
-
-/db.sqlite3
-
-# coverage
-/htmlcov/
-/.coverage
-/coverage.xml

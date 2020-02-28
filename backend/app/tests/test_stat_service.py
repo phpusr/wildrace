@@ -2,12 +2,11 @@ import os
 from datetime import datetime, timedelta
 from unittest.mock import patch
 
-from django.test import TestCase
-from django.utils import timezone
-
 from app.models import StatLog, Profile, Post, TempData, Config
 from app.services import stat_service
 from app.services.stat_service import RunnerDto, StatDto
+from django.test import TestCase
+from django.utils import timezone
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 

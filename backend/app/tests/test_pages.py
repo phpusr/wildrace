@@ -1,11 +1,10 @@
+from app.models import TempData
+from app.tests.test_api import create_config
 from django.contrib.auth import get_user_model
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.utils import timezone
 from rest_framework import status
-
-from app.models import TempData
-from app.tests.test_api import create_config
 
 INDEX_URL = reverse('index')
 

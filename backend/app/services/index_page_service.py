@@ -1,9 +1,8 @@
-from djangorestframework_camel_case.render import CamelCaseJSONRenderer
-
 from app import settings
 from app.models import TempData
 from app.serializers import FrontendDataSerializer
 from app.services import stat_service, vk_api_service
+from djangorestframework_camel_case.render import CamelCaseJSONRenderer
 
 
 def get_data(user):

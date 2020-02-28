@@ -1,7 +1,6 @@
-from rest_framework import serializers
-
 from app.models import Post, Profile, Config, User
 from app.services import vk_api_service
+from rest_framework import serializers
 
 
 class UserSerializer(serializers.ModelSerializer):

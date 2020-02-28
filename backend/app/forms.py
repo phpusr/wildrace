@@ -1,6 +1,5 @@
-from django import forms
-
 from app.models import StatLog
+from django import forms
 
 
 class PostForm(forms.Form):

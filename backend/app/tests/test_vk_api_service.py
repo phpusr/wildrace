@@ -1,10 +1,9 @@
 import os
 from unittest.mock import patch
 
-from django.test import TestCase
-
 from app.models import Config
 from app.services import vk_api_service
+from django.test import TestCase
 
 
 def create_config():

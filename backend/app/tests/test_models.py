@@ -1,8 +1,7 @@
+from app import models
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.utils import timezone
-
-from app import models
 
 
 class ModelTests(TestCase):

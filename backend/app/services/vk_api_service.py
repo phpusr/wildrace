@@ -1,7 +1,6 @@
-from vk_api.vk_api import VkApiMethod, VkApi
-from django.conf import settings
-
 from app.models import Config
+from django.conf import settings
+from vk_api.vk_api import VkApiMethod, VkApi
 
 
 def get_authorize_url() -> str:

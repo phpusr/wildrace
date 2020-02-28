@@ -1,15 +1,14 @@
 from unittest.mock import patch
 
+from app.models import Config, StatLog, Post
+from app.serializers import ConfigSerializer, StatSerializer, PostSerializer
+from app.services import vk_api_service, stat_service
+from app.tests.test_stat_service import create_runnings
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
-
-from app.models import Config, StatLog, Post
-from app.serializers import ConfigSerializer, StatSerializer, PostSerializer
-from app.services import vk_api_service, stat_service
-from app.tests.test_stat_service import create_runnings
 
 POSTS_URL = reverse('post-list')
 STAT_URL = reverse('stat')
