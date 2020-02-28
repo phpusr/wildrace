@@ -17,9 +17,6 @@ class Config(models.Model):
     group_id = models.IntegerField()
     """VK group ID"""
 
-    group_short_link = models.CharField(max_length=100)
-    """VK group name in URL"""
-
     commenting = models.BooleanField()
     """Commenting of posts status processing"""
 
@@ -37,7 +34,7 @@ class Config(models.Model):
         return self.group_id * -1
 
     def __str__(self):
-        return f'Config for: {self.group_short_link}'
+        return f'Config for: {self.group_id}'
 
 
 class Profile(models.Model):

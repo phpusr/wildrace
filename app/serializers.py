@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
-from app.models import Post, Profile
+from app.models import Post, Profile, Config
+from app.services import vk_api_service
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -18,6 +19,18 @@ class PostSerializer(serializers.ModelSerializer):
         fields = ['id', 'number', 'status', 'author', 'distance', 'sum_distance', 'text', 'date', 'last_update',
                   'edit_reason']
         read_only_fields = ['id', 'date']
+
+
+class ConfigSerializer(serializers.ModelSerializer):
+    authorize_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Config
+        fields = '__all__'
+        read_only_fields = ['id']
+
+    def get_authorize_url(self, instance):
+        return vk_api_service.get_authorize_url()
 
 
 class RunnerSerializer(serializers.Serializer):

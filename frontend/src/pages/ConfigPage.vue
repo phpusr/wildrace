@@ -45,8 +45,10 @@
                 <v-btn to="/config/edit">{{$t("default.editButton")}}</v-btn>
             </div>
             <div v-else>
-                <v-btn :disabled="!valid" @click="save" color="primary">{{$t("default.saveButton")}}</v-btn>
-                <v-btn @click="cancel" primary>{{$t("default.cancelButton")}}</v-btn>
+                <div>
+                    <v-btn :disabled="!valid" @click="save" color="primary">{{$t("default.saveButton")}}</v-btn>
+                    <v-btn @click="cancel" primary>{{$t("default.cancelButton")}}</v-btn>
+                </div>
             </div>
         </v-form>
     </v-flex>
@@ -70,9 +72,8 @@
         methods: {
             async fetchData() {
                 const response = await configApi.get()
-                const {config, authorizeUrl} = response.body
-                this.config = config
-                this.authorizeUrl = authorizeUrl
+                this.config = response.body
+                this.authorizeUrl = this.config.authorizeUrl
 
                 const {access_token, error} = this.$route.query
                 if (access_token) {

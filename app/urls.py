@@ -25,6 +25,7 @@ app_name = 'app'
 
 router = DefaultRouter()
 router.register('posts', views.PostViewSet, 'Post')
+router.register('config', views.ConfigViewSet)
 
 urlpatterns = [
     path('', views.index),

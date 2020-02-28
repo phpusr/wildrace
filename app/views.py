@@ -5,8 +5,8 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from app.forms import StatForm
-from app.models import TempData, Post
-from app.serializers import PostSerializer, StatSerializer
+from app.models import TempData, Post, Config
+from app.serializers import PostSerializer, StatSerializer, ConfigSerializer
 from app.services import stat_service, vk_api_service
 
 
@@ -54,6 +54,12 @@ class PostViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.Updat
             queryset = queryset.filter(status=status)
 
         return queryset
+
+
+class ConfigViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, viewsets.GenericViewSet):
+    permission_classes = [permissions.DjangoModelPermissions]
+    queryset = Config.objects.all()
+    serializer_class = ConfigSerializer
 
 
 @api_view()
