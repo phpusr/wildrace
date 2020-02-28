@@ -21,16 +21,15 @@ from rest_framework.routers import DefaultRouter
 
 from . import views
 
-app_name = 'app'
-
 router = DefaultRouter()
 router.register('posts', views.PostViewSet, 'Post')
 router.register('config', views.ConfigViewSet)
 
 urlpatterns = [
-    path('', views.index),
+    path('', views.index, name='index'),
     path('api/', include(router.urls)),
-    path('api/stat/', views.stat_view),
+    path('api/stat/', views.StatView.as_view(), name='stat'),
+    path('api/stat/publish/', views.StatPublishView.as_view(), name='stat-publish'),
     path('api/auth/', include('rest_framework.urls')),
     path('admin/', admin.site.urls),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -1,8 +1,8 @@
 from django.conf import settings
 from django.shortcuts import render
 from rest_framework import viewsets, mixins, permissions
-from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from app.forms import StatForm
 from app.models import TempData, Post, Config
@@ -57,17 +57,36 @@ class PostViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.Updat
 
 
 class ConfigViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, viewsets.GenericViewSet):
-    permission_classes = [permissions.DjangoModelPermissions]
     queryset = Config.objects.all()
     serializer_class = ConfigSerializer
 
 
-@api_view()
-def stat_view(request):
-    form = StatForm(request.GET)
-    if form.is_valid():
-        stat = stat_service.calc_stat(form.stat_type, form.cleaned_data['start_range'], form.cleaned_data['end_range'])
-        serializer = StatSerializer(stat)
-        return Response(serializer.data)
-    else:
+class StatView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request, format=None):
+        form = StatForm(request.GET)
+        if form.is_valid():
+            stat = stat_service.calc_stat(
+                stat_type=form.stat_type,
+                start_range=form.cleaned_data['start_range'],
+                end_range=form.cleaned_data['end_range']
+            )
+            serializer = StatSerializer(stat)
+            return Response(serializer.data)
+        else:
+            return Response(form.errors)
+
+
+class StatPublishView(APIView):
+    def post(self, request, format=None):
+        form = StatForm(request.POST)
+        if form.is_valid():
+            stat = stat_service.calc_stat(
+                stat_type=form.stat_type,
+                start_range=form.cleaned_data['start_range'],
+                end_range=form.cleaned_data['end_range']
+            )
+            post_id = stat_service.publish_stat_post(stat)
+            return Response(post_id)
         return Response(form.errors)
