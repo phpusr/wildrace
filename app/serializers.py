@@ -1,7 +1,31 @@
 from rest_framework import serializers
 
-from app.models import Post, Profile, Config
+from app.models import Post, Profile, Config, User
 from app.services import vk_api_service
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'is_staff', 'is_authenticated']
+
+
+class SimpleStatSerializer(serializers.Serializer):
+    distance_sum = serializers.IntegerField()
+    running_count = serializers.IntegerField()
+    post_count = serializers.IntegerField()
+
+
+class SimpleConfigSerializer(serializers.Serializer):
+    project_version = serializers.CharField()
+    group_link = serializers.CharField()
+
+
+class FrontendDataSerializer(serializers.Serializer):
+    user = UserSerializer()
+    stat = SimpleStatSerializer()
+    last_sync_date = serializers.IntegerField()
+    config = SimpleConfigSerializer()
 
 
 class ProfileSerializer(serializers.ModelSerializer):

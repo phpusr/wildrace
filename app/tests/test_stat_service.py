@@ -285,17 +285,17 @@ class StatServiceTests(TestCase):
         """Test that get_stat return correct values"""
         stat = stat_service.get_stat()
         self.assertEqual(stat, {
-            'distanceSum': 0,
-            'runningCount': 0,
-            'postCount': 0
+            'distance_sum': 0,
+            'running_count': 0,
+            'post_count': 0
         })
 
         create_runnings()
         stat = stat_service.get_stat()
         self.assertEqual(stat, {
-            'distanceSum': 112,
-            'runningCount': 20,
-            'postCount': 21
+            'distance_sum': 112,
+            'running_count': 20,
+            'post_count': 21
         })
 
     def test_update_stat(self):

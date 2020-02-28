@@ -18,7 +18,7 @@ function sortPosts(posts) {
     posts.sort((a, b) => (a.date - b.date) * direction)
 }
 
-const {user, stat, lastSyncDate, config} = JSON.parse(document.getElementById('frontend-data').textContent);
+const {user, stat, lastSyncDate, config} = document.frontendData
 
 export default new Vuex.Store({
     state: {
@@ -36,7 +36,7 @@ export default new Vuex.Store({
             if (state.user == null) {
                 return null
             }
-            return state.user.isSuperuser
+            return state.user.isStaff
         }
     },
     mutations: {
