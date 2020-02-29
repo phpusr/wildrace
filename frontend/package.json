@@ -41,7 +41,20 @@
     "parserOptions": {
       "parser": "babel-eslint"
     },
-    "rules": {}
+    "rules": {
+      "semi": [
+        "warn",
+        "never"
+      ],
+      "quotes": [
+        "warn",
+        "double"
+      ],
+      "comma-dangle": [
+        "warn",
+        "never"
+      ]
+    }
   },
   "browserslist": [
     "> 1%",
