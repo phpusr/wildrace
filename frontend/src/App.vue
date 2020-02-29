@@ -6,7 +6,7 @@
             <v-content>
                 <v-container class="pa-1">
                     <v-flex offset-md2 class="mt-3">
-                        <h1 v-html="title" class="text-xs-center text-md-left"></h1>
+                        <h1 v-html="title" class="text-center text-md-left"></h1>
                         <router-view/>
                     </v-flex>
                 </v-container>

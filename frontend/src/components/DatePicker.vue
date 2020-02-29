@@ -3,21 +3,21 @@
             :close-on-content-click="false"
             v-model="menu"
             :nudge-right="40"
-            lazy
             transition="scale-transition"
             offset-y
-            full-width
             min-width="290px"
     >
-        <v-text-field
-                slot="activator"
-                :value="viewFormattedDate"
-                :label="label"
-                prepend-icon="event"
-                readonly
-                clearable
-                @click:clear="$emit('input')"
-        />
+        <template v-slot:activator="{ on }">
+            <v-text-field
+                    v-on="on"
+                    :value="viewFormattedDate"
+                    :label="label"
+                    prepend-icon="mdi-calendar"
+                    readonly
+                    clearable
+                    @click:clear="$emit('input')"
+            />
+        </template>
         <v-date-picker
                 :value="isoFormattedDate"
                 @input="input"

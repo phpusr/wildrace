@@ -57,7 +57,10 @@
       "comma-dangle": [
         "warn",
         "never"
-      ]
+      ],
+      "vue/no-unused-components": ["warn", {
+        "ignoreWhenBindingPresent": true
+      }]
     }
   },
   "browserslist": [

@@ -27,18 +27,18 @@ export function convertStatParams(params) {
     if (type === dateTab.name) {
         newParams.type = dateTab.name
         if (checkValue(startRange)) {
-            newParams.startRange = parseJSDate(startRange).getTime()
+            newParams.start_range = parseJSDate(startRange).getTime()
         }
         if (checkValue(endRange)) {
-            newParams.endRange = parseJSDate(endRange).getTime()
+            newParams.end_range = parseJSDate(endRange).getTime()
         }
     } else {
         newParams.type = distanceTab.name
         if (checkValue(startRange)) {
-            newParams.startRange = +startRange
+            newParams.start_range = +startRange
         }
         if (checkValue(endRange)) {
-            newParams.endRange = +endRange
+            newParams.end_range = +endRange
         }
     }
 

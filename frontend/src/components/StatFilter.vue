@@ -8,34 +8,22 @@
                 <v-tab-item>
                     <v-card flat>
                         <v-card-text>
-                            <v-layout wrap>
-                                <v-flex xs5 sm3>
+                            <v-row no-gutters>
+                                <v-col cols="12" sm="6" class="d-flex">
                                     <v-text-field v-model="startDistance" mask="##########" solo @keyup.enter="recount" clearable />
-                                </v-flex>
-
-                                <v-flex xs1>
-                                    <div class="mt-1 display-1 text-xs-center">-</div>
-                                </v-flex>
-
-                                <v-flex xs5 sm3>
+                                    <div class="mx-3 mt-1 display-1 text-center">-</div>
                                     <v-text-field v-model="endDistance" mask="##########" solo @keyup.enter="recount" clearable />
-                                </v-flex>
+                                    <div class="ml-3 mt-1 headline">{{ $t("default.km") }}</div>
+                                </v-col>
 
-                                <v-flex xs1>
-                                    <div class="ml-2 mt-2 headline">{{ $t("default.km") }}</div>
-                                </v-flex>
-
-                                <v-flex xs4 sm2>
+                                <v-col cols="8" sm="4" class="ml-sm-5">
                                     <v-btn @click="recount" color="info">{{$t("stat.recount")}}</v-btn>
-                                </v-flex>
-
-                                <v-flex xs4 sm2>
-                                    <v-btn v-if="userIsAdmin" @click="publishPost" color="error"
+                                    <v-btn v-if="userIsAdmin" @click="publishPost" color="error"  class="ml-3"
                                            :title="$t('stat.titlePublishButton')">
                                         {{$t('stat.textPublishButton')}}
                                     </v-btn>
-                                </v-flex>
-                            </v-layout>
+                                </v-col>
+                            </v-row>
                         </v-card-text>
                     </v-card>
                 </v-tab-item>
@@ -43,30 +31,21 @@
                 <v-tab-item>
                     <v-card flat>
                         <v-card-text>
-                            <v-layout wrap>
-                                <v-flex xs5 sm3>
+                            <v-row no-gutters>
+                                <v-col cols="12" sm="6" class="d-flex">
                                     <date-picker v-model="startDate" />
-                                </v-flex>
-
-                                <v-flex xs1>
-                                    <div class="mt-2 display-1 text-xs-center">-</div>
-                                </v-flex>
-
-                                <v-flex xs5 sm3>
+                                    <div class="mx-3 mt-2 display-1 text-center">-</div>
                                     <date-picker v-model="endDate" />
-                                </v-flex>
+                                </v-col>
 
-                                <v-flex xs4 sm2>
+                                <v-col cols="8" sm="4" class="ml-sm-5">
                                     <v-btn @click="recount" color="info">{{$t("stat.recount")}}</v-btn>
-                                </v-flex>
-
-                                <v-flex xs4 sm2>
-                                    <v-btn v-if="userIsAdmin" @click="publishPost" color="error"
+                                    <v-btn v-if="userIsAdmin" @click="publishPost" color="error" class="ml-3"
                                            :title="$t('stat.titlePublishButton')">
                                         {{$t('stat.textPublishButton')}}
                                     </v-btn>
-                                </v-flex>
-                            </v-layout>
+                                </v-col>
+                            </v-row>
                         </v-card-text>
                     </v-card>
                 </v-tab-item>
