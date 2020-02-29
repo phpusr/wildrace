@@ -9,14 +9,13 @@
     <title>Wild Race</title>
 
     <!-- Global site tag (gtag.js) - Google Analytics -->
-    {% comment %}<script async src="https://www.googletagmanager.com/gtag/js?id={{ google_analytics_id }}"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ google_analytics_id }}"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
-
-        gtag('config', {{googleAnalyticsId}});
-    </script>{% endcomment %}
+        gtag('config', '{{ google_analytics_id }}');
+    </script>
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
     <link rel="icon" href="favicon.ico">

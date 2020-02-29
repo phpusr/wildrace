@@ -195,3 +195,5 @@ POST_DATE_FORMAT = '%d.%m.%y'
 
 # Auto publishing stat interval every {value} km
 PUBLISHING_STAT_INTERVAL = 1000
+
+GOOGLE_ANALYTICS_ID = os.getenv('GOOGLE_ANALYTICS_ID', '0')
