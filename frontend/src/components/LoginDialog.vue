@@ -52,7 +52,7 @@
 </template>
 
 <script>
-    import {getCsrfToken} from "../util";
+    import {getCsrfToken} from "../util"
 
     export default {
         data: () => ({
@@ -63,7 +63,7 @@
         }),
         methods: {
             async login() {
-                const form = document.getElementById('login-form')
+                const form = document.getElementById("login-form")
                 form.submit()
             },
             cancel() {

@@ -85,7 +85,7 @@
         methods: {
             ...mapActions(["syncPosts"]),
             logout() {
-                const form = document.getElementById('logout-form')
+                const form = document.getElementById("logout-form")
                 form.submit()
             }
         }

@@ -92,7 +92,7 @@
             }
         },
         methods: {
-            ...mapMutations(['updatePostMutation', 'removePostMutation']),
+            ...mapMutations(["updatePostMutation", "removePostMutation"]),
             async fetchData() {
                 const {body} = await postApi.getOne(this.postId)
                 this.post = body
