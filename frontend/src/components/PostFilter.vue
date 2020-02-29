@@ -1,9 +1,10 @@
 <template>
-    <v-layout v-if="userIsAdmin" row wrap>
-        <v-flex class="mb-2" xs12>
+    <div v-if="userIsAdmin">
+        <div class="mb-2">
             <span class="headline grey--text text--lighten-5">{{$t("post.filter")}}</span>
-        </v-flex>
-        <v-flex xs12>
+        </div>
+
+        <div>
             <v-select
                     :label="$t('post.status')"
                     :value="$route.query.status"
@@ -19,15 +20,16 @@
                     </span>
                 </template>
             </v-select>
-        </v-flex>
-        <v-flex xs12>
+        </div>
+
+        <div>
             <v-checkbox
                     :label="$t('post.manualEditing')"
                     :input-value="$route.query.me === 'true'"
                     @change="changeQuery('me', $event)"
             />
-        </v-flex>
-    </v-layout>
+        </div>
+    </div>
 </template>
 
 <script>
