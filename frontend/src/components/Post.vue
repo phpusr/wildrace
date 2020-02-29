@@ -19,7 +19,7 @@
 
                         <v-tooltip top v-if="post.lastUpdate">
                             <template v-slot:activator="{ on }">
-                                <v-btn icon class="blue-grey lighten-4" v-on="on">
+                                <v-btn icon class="blue-grey lighten-4 ml-2" v-on="on">
                                     <v-icon>mdi-account-check</v-icon>
                                 </v-btn>
                             </template>
