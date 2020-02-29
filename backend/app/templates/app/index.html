@@ -8,15 +8,17 @@
 
     <title>Wild Race</title>
 
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id={{ google_analytics_id }}"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', '{{ google_analytics_id }}');
-    </script>
-    <!-- Global site tag (gtag.js) - Google Analytics -->
+    {% if not debug %}
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id={{ google_analytics_id }}"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '{{ google_analytics_id }}');
+        </script>
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+    {% endif %}
 
     <link rel="icon" href="favicon.ico">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900">

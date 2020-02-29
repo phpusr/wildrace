@@ -22,6 +22,7 @@ def get_data(user):
     })
 
     data = {
+        'debug': settings.DEBUG,
         'google_analytics_id': settings.GOOGLE_ANALYTICS_ID,
         'frontend_data': CamelCaseJSONRenderer().render(serializer.data).decode('utf-8')
     }
