@@ -2,7 +2,7 @@
     <v-footer dark class="pa-4">
         <v-layout justify-center>
             <div class="text-block">
-                <v-layout column class="text-block text-xs-center">
+                <v-layout column class="text-block text-center">
                     <div class="font-weight-bold">{{$t("default.projectName")}} v{{config.projectVersion}}</div>
                     <div>
                         Created by <a href="http://vk.com/phpusr">Sergey Doronin</a>
@@ -28,7 +28,7 @@
 
 <style>
     .text-block {
-        width: 185px;
+        width: 200px;
     }
     .logo {
         filter: invert(100%);

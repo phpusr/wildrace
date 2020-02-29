@@ -1,5 +1,5 @@
 <template>
-    <v-navigation-drawer :value="value" @input="$emit('input', $event)" clipped app dark>
+    <v-navigation-drawer :value="value" @input="$emit('input', $event)" clipped app dark width="350px">
         <v-toolbar flat class="transparent">
             <v-list class="pt-4" :class="mobile ? 'pl-0' : 'pl-4'">
                 <v-list-item>
@@ -22,12 +22,12 @@
             </v-list>
         </v-toolbar>
 
-        <router-view name="menu" class="px-4 mt-5" />
+        <router-view name="menu" class="mx-5 mt-5" />
 
         <v-list class="mt-3">
             <v-list-item v-if="mobile && userIsAdmin" to="/config">
                 <v-list-item-action>
-                    <v-icon>settings</v-icon>
+                    <v-icon>mdi-settings</v-icon>
                 </v-list-item-action>
                 <v-list-item-content>
                     <v-list-item-title>{{$t("pages./config")}}</v-list-item-title>
@@ -36,7 +36,7 @@
 
             <v-list-item v-if="mobile && userIsAdmin" @click="syncPosts" class="mt-2">
                 <v-list-item-action>
-                    <v-icon>sync</v-icon>
+                    <v-icon>mdi-sync</v-icon>
                 </v-list-item-action>
                 <v-list-item-content>
                     <v-list-item-title>{{$t("sync.title")}}</v-list-item-title>

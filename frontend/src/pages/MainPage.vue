@@ -2,16 +2,16 @@
     <v-flex md8>
         <router-view />
         <v-container v-bind="containerConfig" class="pa-0">
-            <v-layout text-xs-center>
-                <v-flex d-flex xs4 v-for="v in statTitles" :key="v.title">
-                    <v-card>
+            <v-row>
+                <v-col cols="4" v-for="v in statTitles" :key="v.title">
+                    <v-card class="text-center">
                         <v-card-text>
-                            <div class="display-1">{{v.value}}</div>
-                            <div>{{v.title}}</div>
+                            <v-list-item-title class="display-1">{{v.value}}</v-list-item-title>
+                            <v-list-item-subtitle>{{v.title}}</v-list-item-subtitle>
                         </v-card-text>
                     </v-card>
-                </v-flex>
-            </v-layout>
+                </v-col>
+            </v-row>
 
             <v-layout column>
                 <post v-for="p in post.posts" :post="p" :key="p.id" />
