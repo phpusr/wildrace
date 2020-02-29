@@ -1,25 +1,28 @@
 <template>
     <v-flex md8>
         <router-view />
-        <v-container v-bind="containerConfig" class="pa-0">
-            <v-row>
-                <v-col cols="4" v-for="v in statTitles" :key="v.title">
+        <v-container class="pa-0">
+            <v-row no-gutters>
+                <v-col cols="4" v-for="v in statTitles" :key="v.title" :class="v.class">
                     <v-card class="text-center">
                         <v-card-text>
-                            <v-list-item-title class="display-1">{{v.value}}</v-list-item-title>
-                            <v-list-item-subtitle>{{v.title}}</v-list-item-subtitle>
+                            <v-list-item-title :class="statTitleClass">{{v.value}}</v-list-item-title>
+                            <div>{{v.title}}</div>
                         </v-card-text>
                     </v-card>
                 </v-col>
             </v-row>
 
-            <v-layout column>
-                <post v-for="p in post.posts" :post="p" :key="p.id" />
-                <infinite-loading :identifier="infiniteId"  @infinite="infiniteHandler">
-                    <div slot="no-more">{{$t("post.noMoreMessages")}}</div>
-                    <div slot="no-results">{{$t("post.noResults")}}</div>
-                </infinite-loading>
-            </v-layout>
+            <v-row no-gutters class="mt-5">
+                <v-col cols="12" v-for="p in post.posts" :key="p.id" :class="postClass">
+                    <post :post="p"/>
+                </v-col>
+            </v-row>
+
+            <infinite-loading :identifier="infiniteId"  @infinite="infiniteHandler">
+                <div slot="no-more">{{$t("post.noMoreMessages")}}</div>
+                <div slot="no-results">{{$t("post.noResults")}}</div>
+            </infinite-loading>
         </v-container>
     </v-flex>
 </template>
@@ -69,14 +72,18 @@
                 const postCount = (data.totalElements === stat.postCount) ? stat.postCount : `${data.totalElements} / ${stat.postCount}`
                 return [
                     {title: this.$t("post.totalDistanceSum"), value: stat.distanceSum},
-                    {title: this.$t("post.runningCount"), value: stat.runningCount},
+                    {title: this.$t("post.runningCount"), value: stat.runningCount, class: "px-1 px-sm-3"},
                     {title: this.$t("post.postCount"), value: postCount}
                 ]
             },
-            containerConfig() {
-                return {
-                    ["grid-list-" + this.$vuetify.breakpoint.name]: true
-                }
+            isMobileView() {
+                return this.$vuetify.breakpoint.name === "xs"
+            },
+            statTitleClass() {
+                return this.isMobileView ? 'headline' : 'display-1'
+            },
+            postClass() {
+                return this.isMobileView ? 'my-1' : 'my-3'
             }
         },
         created() {
