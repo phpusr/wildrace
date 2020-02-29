@@ -1,8 +1,10 @@
 <template>
     <v-dialog v-model="show" persistent scrollable width="500">
-        <v-btn slot="activator" color="info">
-            {{$t("user.login")}}
-        </v-btn>
+        <template v-slot:activator="{ on }">
+            <v-btn color="info" v-on="on">
+                {{$t("user.login")}}
+            </v-btn>
+        </template>
 
         <v-card>
             <v-card-title class="headline grey lighten-2">{{$t("user.loginTitle")}}</v-card-title>
@@ -12,7 +14,7 @@
                         :value="alertMessage"
                         color="error"
                         icon="warning"
-                        outline
+                        outlined
                 >
                     {{alertMessage}}
                 </v-alert>
@@ -28,7 +30,7 @@
                     <v-text-field
                             name="password"
                             :label="$t('user.password')"
-                            :append-icon="showPassword ? 'visibility_off' : 'visibility'"
+                            :append-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
                             :type="showPassword ? 'text' : 'password'"
                             @click:append="showPassword = !showPassword"
                             @keyup.enter="login"

@@ -43,12 +43,12 @@
 
             <v-card-actions>
                 <v-btn color="error" @click="remove">
-                    <v-icon :left="smAndUp">delete</v-icon>
+                    <v-icon :left="smAndUp">mdi-delete</v-icon>
                     <span v-if="smAndUp">{{$t("default.deleteButton")}}</span>
                 </v-btn>
                 <v-spacer/>
                 <v-btn color="primary" @click="update">
-                    <v-icon :left="smAndUp">save</v-icon>
+                    <v-icon :left="smAndUp">mdi-content-save</v-icon>
                     <span v-if="smAndUp">{{$t("default.saveButton")}}</span>
                 </v-btn>
                 <v-btn @click="goToMainPage">
