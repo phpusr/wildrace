@@ -23,7 +23,7 @@
         <v-flex xs12>
             <v-checkbox
                     :label="$t('post.manualEditing')"
-                    :input-value="$route.query.manualEditing === 'true'"
+                    :input-value="$route.query.me === 'true'"
                     @change="changeQuery('me', $event)"
             />
         </v-flex>
