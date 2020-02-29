@@ -1,9 +1,11 @@
 <template>
     <div>
         <v-tooltip v-if="mobile" top>
-            <v-btn :class="color" icon slot="activator">
-                <v-icon>{{icon}}</v-icon>
-            </v-btn>
+            <template v-slot:activator="{ on }">
+                <v-btn :class="color" icon v-on="on">
+                    <v-icon>{{icon}}</v-icon>
+                </v-btn>
+            </template>
             <span>{{value}}</span>
         </v-tooltip>
         <v-chip v-else :class="color" text-color="white">

@@ -1,30 +1,29 @@
 <template>
-    <v-flex md8>
+    <v-col md="8">
         <router-view />
-        <v-container class="pa-0">
-            <v-row no-gutters>
-                <v-col cols="4" v-for="v in statTitles" :key="v.title" :class="v.class">
-                    <v-card class="text-center">
-                        <v-card-text>
-                            <v-list-item-title :class="statTitleClass">{{v.value}}</v-list-item-title>
-                            <div>{{v.title}}</div>
-                        </v-card-text>
-                    </v-card>
-                </v-col>
-            </v-row>
 
-            <v-row no-gutters class="mt-5">
-                <v-col cols="12" v-for="p in post.posts" :key="p.id" :class="postClass">
-                    <post :post="p"/>
-                </v-col>
-            </v-row>
+        <v-row no-gutters>
+            <v-col cols="4" v-for="v in statTitles" :key="v.title" :class="v.class">
+                <v-card class="text-center">
+                    <v-card-text>
+                        <v-list-item-title :class="statTitleClass">{{v.value}}</v-list-item-title>
+                        <div>{{v.title}}</div>
+                    </v-card-text>
+                </v-card>
+            </v-col>
+        </v-row>
 
-            <infinite-loading :identifier="infiniteId"  @infinite="infiniteHandler">
-                <div slot="no-more">{{$t("post.noMoreMessages")}}</div>
-                <div slot="no-results">{{$t("post.noResults")}}</div>
-            </infinite-loading>
-        </v-container>
-    </v-flex>
+        <v-row no-gutters class="mt-5">
+            <v-col cols="12" v-for="p in post.posts" :key="p.id" :class="postClass">
+                <post :post="p"/>
+            </v-col>
+        </v-row>
+
+        <infinite-loading :identifier="infiniteId"  @infinite="infiniteHandler">
+            <div slot="no-more">{{$t("post.noMoreMessages")}}</div>
+            <div slot="no-results">{{$t("post.noResults")}}</div>
+        </infinite-loading>
+    </v-col>
 </template>
 
 <script>
@@ -77,13 +76,13 @@
                 ]
             },
             isMobileView() {
-                return this.$vuetify.breakpoint.name === "xs"
+                return this.$vuetify.breakpoint.xs
             },
             statTitleClass() {
-                return this.isMobileView ? 'headline' : 'display-1'
+                return this.isMobileView ? "headline" : "display-1"
             },
             postClass() {
-                return this.isMobileView ? 'my-1' : 'my-3'
+                return this.isMobileView ? "my-1" : "my-3"
             }
         },
         created() {

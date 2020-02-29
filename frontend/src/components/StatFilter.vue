@@ -1,57 +1,53 @@
 <template>
-    <v-layout>
-        <v-flex>
-            <v-tabs v-model="activeTabIndex" color="cyan" dark slider-color="yellow">
-                <v-tab ripple>{{ $t("stat.distanceRange") }}</v-tab>
-                <v-tab ripple>{{ $t("stat.dateRange") }}</v-tab>
+    <v-tabs v-model="activeTabIndex" color="cyan" dark slider-color="yellow">
+        <v-tab ripple>{{ $t("stat.distanceRange") }}</v-tab>
+        <v-tab ripple>{{ $t("stat.dateRange") }}</v-tab>
 
-                <v-tab-item>
-                    <v-card flat>
-                        <v-card-text>
-                            <v-row no-gutters>
-                                <v-col cols="12" sm="6" class="d-flex">
-                                    <v-text-field v-model="startDistance" mask="##########" solo @keyup.enter="recount" clearable />
-                                    <div class="mx-3 mt-1 display-1 text-center">-</div>
-                                    <v-text-field v-model="endDistance" mask="##########" solo @keyup.enter="recount" clearable />
-                                    <div class="ml-3 mt-1 headline">{{ $t("default.km") }}</div>
-                                </v-col>
+        <v-tab-item>
+            <v-card flat>
+                <v-card-text class="pa-0 pt-7">
+                    <v-row no-gutters>
+                        <v-col cols="12" sm="6" class="d-flex">
+                            <v-text-field v-model="startDistance" mask="##########" solo @keyup.enter="recount" clearable />
+                            <div class="mx-3 mt-1 display-1 text-center">-</div>
+                            <v-text-field v-model="endDistance" mask="##########" solo @keyup.enter="recount" clearable />
+                            <div class="ml-3 mt-1 headline">{{ $t("default.km") }}</div>
+                        </v-col>
 
-                                <v-col cols="8" sm="4" class="ml-sm-5">
-                                    <v-btn @click="recount" color="info">{{$t("stat.recount")}}</v-btn>
-                                    <v-btn v-if="userIsAdmin" @click="publishPost" color="error"  class="ml-3"
-                                           :title="$t('stat.titlePublishButton')">
-                                        {{$t('stat.textPublishButton')}}
-                                    </v-btn>
-                                </v-col>
-                            </v-row>
-                        </v-card-text>
-                    </v-card>
-                </v-tab-item>
+                        <v-col cols="8" sm="4" class="ml-sm-5">
+                            <v-btn @click="recount" color="info">{{$t("stat.recount")}}</v-btn>
+                            <v-btn v-if="userIsAdmin" @click="publishPost" color="error"  class="ml-3"
+                                   :title="$t('stat.titlePublishButton')">
+                                {{$t('stat.textPublishButton')}}
+                            </v-btn>
+                        </v-col>
+                    </v-row>
+                </v-card-text>
+            </v-card>
+        </v-tab-item>
 
-                <v-tab-item>
-                    <v-card flat>
-                        <v-card-text>
-                            <v-row no-gutters>
-                                <v-col cols="12" sm="6" class="d-flex">
-                                    <date-picker v-model="startDate" />
-                                    <div class="mx-3 mt-2 display-1 text-center">-</div>
-                                    <date-picker v-model="endDate" />
-                                </v-col>
+        <v-tab-item>
+            <v-card flat>
+                <v-card-text class="pa-0 pt-7">
+                    <v-row no-gutters>
+                        <v-col cols="12" sm="6" class="d-flex">
+                            <date-picker v-model="startDate" />
+                            <div class="mx-3 mt-2 display-1 text-center">-</div>
+                            <date-picker v-model="endDate" />
+                        </v-col>
 
-                                <v-col cols="8" sm="4" class="ml-sm-5">
-                                    <v-btn @click="recount" color="info">{{$t("stat.recount")}}</v-btn>
-                                    <v-btn v-if="userIsAdmin" @click="publishPost" color="error" class="ml-3"
-                                           :title="$t('stat.titlePublishButton')">
-                                        {{$t('stat.textPublishButton')}}
-                                    </v-btn>
-                                </v-col>
-                            </v-row>
-                        </v-card-text>
-                    </v-card>
-                </v-tab-item>
-            </v-tabs>
-        </v-flex>
-    </v-layout>
+                        <v-col cols="8" sm="4" class="ml-sm-5">
+                            <v-btn @click="recount" color="info">{{$t("stat.recount")}}</v-btn>
+                            <v-btn v-if="userIsAdmin" @click="publishPost" color="error" class="ml-3"
+                                   :title="$t('stat.titlePublishButton')">
+                                {{$t('stat.textPublishButton')}}
+                            </v-btn>
+                        </v-col>
+                    </v-row>
+                </v-card-text>
+            </v-card>
+        </v-tab-item>
+    </v-tabs>
 </template>
 
 <script>

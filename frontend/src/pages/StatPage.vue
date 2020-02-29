@@ -1,5 +1,5 @@
 <template>
-    <v-flex md10 class="mb-5">
+    <v-col md="10">
         <stat-filter />
 
         <v-row>
@@ -62,7 +62,7 @@
                 </stat-card>
             </v-col>
         </v-row>
-    </v-flex>
+    </v-col>
 </template>
 
 <script>

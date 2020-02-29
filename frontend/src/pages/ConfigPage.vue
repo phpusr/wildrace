@@ -1,5 +1,5 @@
 <template>
-    <v-flex md8 lazy-validation class="pa-2">
+    <v-col md="8" lazy-validation>
         <v-form ref="form" v-model="valid">
             <v-checkbox
                     v-model="config.syncPosts"
@@ -51,7 +51,7 @@
                 </div>
             </div>
         </v-form>
-    </v-flex>
+    </v-col>
 </template>
 
 <script>

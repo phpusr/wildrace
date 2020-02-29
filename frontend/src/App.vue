@@ -4,11 +4,13 @@
             <navigation-drawer v-model="drawer" />
             <toolbar @click="drawer = !drawer" />
             <v-content>
-                <v-container class="pa-1">
-                    <v-flex offset-md2 class="mt-3">
-                        <h1 v-html="title" class="text-center text-md-left"></h1>
-                        <router-view/>
-                    </v-flex>
+                <v-container>
+                    <v-row>
+                        <v-col offset-md="2" class="px-1">
+                            <h1 v-html="title" class="text-center text-md-left"/>
+                            <router-view class="px-0" />
+                        </v-col>
+                    </v-row>
                 </v-container>
             </v-content>
             <app-footer />
