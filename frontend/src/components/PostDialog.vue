@@ -60,7 +60,7 @@
 </template>
 
 <script>
-    import postApi from "../api/post"
+    import {postApi} from "../api"
     import {mapMutations} from "vuex"
 
     export default {

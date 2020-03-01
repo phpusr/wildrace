@@ -52,7 +52,7 @@
 
 <script>
     import DatePicker from "./DatePicker"
-    import statApi from "../api/stat"
+    import {statApi} from "../api"
     import {checkValue, convertStatParams, fetchHandler, stringToInt} from "../util"
     import {mapGetters} from "vuex"
     import {dateTab, distanceTab} from "../util/data"

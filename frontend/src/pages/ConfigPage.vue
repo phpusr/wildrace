@@ -55,7 +55,7 @@
 </template>
 
 <script>
-    import configApi from "../api/config"
+    import {configApi} from "../api"
 
     export default {
         data: () => ({

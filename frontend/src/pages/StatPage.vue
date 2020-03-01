@@ -70,7 +70,7 @@
     import StatCard from "../components/StatCard"
     import ProfileLink from "../components/ProfileLink"
     import RunnerValue from "../components/RunnerValue"
-    import statApi from "../api/stat"
+    import {statApi} from "../api"
     import {convertStatParams, fetchHandler} from "../util"
 
     export default {

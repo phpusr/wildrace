@@ -29,7 +29,7 @@
 <script>
     import Post from "../components/Post"
     import InfiniteLoading from "vue-infinite-loading"
-    import postApi from "../api/post"
+    import {postApi} from "../api"
     import {mapMutations, mapState} from "vuex"
 
     export default {

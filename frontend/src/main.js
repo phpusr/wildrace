@@ -1,6 +1,6 @@
 import Vue from "vue"
-import "./api/resource"
 import App from "./App.vue"
+import "./plugins/resource"
 import vuetify from "./plugins/vuetify"
 import VueRouter from "vue-router"
 import router from "./router"
