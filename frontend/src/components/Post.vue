@@ -1,15 +1,15 @@
 <template>
     <v-card :max-height="maxHeight">
-        <v-card-title class="d-flex">
+        <v-card-title class="flex-nowrap">
             <v-avatar class="elevation-2">
                 <img :src="post.author.photo50" alt="" />
             </v-avatar>
 
             <div class="ml-2">
-                <div>
+                <div class="d-flex flex-wrap">
                     <a :href="post.link" target="_blank">#{{post.number}}</a>
-                    {{post.author.firstName}}
-                    {{post.author.lastName}}
+                    <span class="mx-1">{{post.author.firstName}}</span>
+                    <span>{{post.author.lastName}}</span>
                 </div>
                 <div class="caption grey--text lighten-3">{{date}}</div>
             </div>
