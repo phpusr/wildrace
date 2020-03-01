@@ -3,8 +3,8 @@
         <router-view />
 
         <v-row no-gutters>
-            <v-col cols="4" v-for="v in statTitles" :key="v.title" :class="v.class">
-                <v-card class="text-center">
+            <v-col v-for="v in statTitles" :key="v.title" :class="v.class">
+                <v-card class="text-center" height="100%">
                     <v-card-text>
                         <v-list-item-title :class="statTitleClass">{{v.value}}</v-list-item-title>
                         <div>{{v.title}}</div>
