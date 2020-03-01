@@ -52,10 +52,10 @@
 
             <v-list-item class="mt-2">
                 <v-list-item-action>
-                    <span class="subheading grey--text text--lighten-1">
-                        <span class="font-weight-medium">{{$t("post.lastSyncDate")}}: </span>
-                        <span>{{lastSyncDate}}</span>
-                    </span>
+                    <div class="subheading grey--text text--lighten-1">
+                        <div class="font-weight-medium">{{$t("post.lastSyncDate")}}:</div>
+                        <div>{{lastSyncDate}}</div>
+                    </div>
                 </v-list-item-action>
             </v-list-item>
         </v-list>
