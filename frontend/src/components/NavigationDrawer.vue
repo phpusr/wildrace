@@ -1,30 +1,30 @@
 <template>
     <v-navigation-drawer :value="value" @input="$emit('input', $event)" clipped app dark width="350px">
-        <v-toolbar flat class="transparent">
-            <v-list class="pt-4" :class="mobile ? 'pl-0' : 'pl-4'">
-                <v-list-item>
-                    <v-list-item-avatar>
-                        <img :src="defaultAvatar" alt="Default avatar" />
-                    </v-list-item-avatar>
+        <v-list-item class="mt-7">
+            <v-list-item-avatar>
+                <img :src="defaultAvatar" alt="Default avatar" />
+            </v-list-item-avatar>
 
-                    <v-list-item-content>
-                        <v-list-item-title v-if="user">{{user.username}}</v-list-item-title>
-                        <login-dialog v-else />
-                    </v-list-item-content>
+            <v-list-item-content>
+                <v-list-item-title v-if="user">{{user.username}}</v-list-item-title>
+                <login-dialog v-else />
+            </v-list-item-content>
 
-                    <form id="logout-form" action="/api/auth/logout/">
-                        <input type="hidden" name="next" value="/">
-                        <v-btn v-if="user" icon>
-                            <v-icon @click="logout">mdi-exit-to-app</v-icon>
-                        </v-btn>
-                    </form>
-                </v-list-item>
-            </v-list>
-        </v-toolbar>
-
-        <router-view name="menu" class="mx-5 mt-5" />
+            <form id="logout-form" action="/api/auth/logout/">
+                <input type="hidden" name="next" value="/">
+                <v-btn v-if="user" icon>
+                    <v-icon @click="logout">mdi-exit-to-app</v-icon>
+                </v-btn>
+            </form>
+        </v-list-item>
 
         <v-list class="mt-3">
+            <v-list-item>
+                <v-list-item-content>
+                    <router-view name="menu" />
+                </v-list-item-content>
+            </v-list-item>
+
             <v-list-item v-if="mobile && userIsAdmin" to="/config">
                 <v-list-item-action>
                     <v-icon>mdi-settings</v-icon>
@@ -34,7 +34,7 @@
                 </v-list-item-content>
             </v-list-item>
 
-            <v-list-item v-if="mobile && userIsAdmin" @click="syncPosts" class="mt-2">
+            <v-list-item v-if="mobile && userIsAdmin" @click="syncPosts">
                 <v-list-item-action>
                     <v-icon>mdi-sync</v-icon>
                 </v-list-item-action>
@@ -50,7 +50,7 @@
                 </v-list-item-content>
             </v-list-item>
 
-            <v-list-item class="mt-2">
+            <v-list-item>
                 <v-list-item-action>
                     <div class="subheading grey--text text--lighten-1">
                         <div class="font-weight-medium">{{$t("post.lastSyncDate")}}:</div>
