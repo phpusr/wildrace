@@ -1,11 +1,11 @@
 import Vue from "vue"
 import Vuex from "vuex"
-import {deleteObject, replaceObject} from "../util/collections"
+import {deleteObject, replaceObject} from "./util/collections"
 import dateFormat from "date-format"
-import {postApi} from "../api"
-import {fetchHandler} from "../util"
-import i18n from "../i18n"
-import {postSortDirection} from "../util/data"
+import {postApi} from "./api"
+import {fetchHandler} from "./util"
+import i18n from "./i18n"
+import {postSortDirection} from "./util/data"
 
 Vue.use(Vuex)
 
