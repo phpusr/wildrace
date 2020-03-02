@@ -1,13 +1,21 @@
-language: python
-python: 3.8.1
+matrix:
+  include:
+    - language: python
+      python: 3.8.1
+      install:
+        - cd backend
+        - pip install pipenv
+        - pipenv install --dev
+      script:
+        - coverage run manage.py test && flake8
+      after_script:
+        - bash <(curl -s https://codecov.io/bash)
 
-install:
-  - cd backend
-  - pip install pipenv
-  - pipenv install --dev
-
-script:
-  - coverage run manage.py test && flake8
-
-after_script:
-  - bash <(curl -s https://codecov.io/bash)
+    - language: node_js
+      node_js:
+        - 13
+      install:
+        - cd frontend
+        - yarn install
+      script:
+        - yarn build
