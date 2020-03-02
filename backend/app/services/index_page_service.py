@@ -42,5 +42,5 @@ def get_data(user):
 
 
 def _get_files(dir_name: str, ext: str) -> List[str]:
-    path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'static', dir_name)
-    return [static(f'/{dir_name}/{f}') for f in os.listdir(path) if f.split('.')[-1] == ext]
+    path = os.path.join(settings.BASE_DIR, 'app', 'static', 'front', dir_name)
+    return [static(f'/front/{dir_name}/{f}') for f in os.listdir(path) if f.split('.')[-1] == ext]
