@@ -2,21 +2,8 @@ from unittest.mock import patch
 
 from django.test import TestCase
 
-from app.models import Config
 from app.tasks import sync_posts_task, publish_stat_task
-
-
-def create_config():
-    return Config.objects.create(
-        id=1,
-        sync_posts=False,
-        sync_seconds=300,
-        group_id=88923650,
-        commenting=False,
-        comment_access_token='-',
-        comment_from_group=False,
-        publish_stat=False
-    )
+from app.tests import create_config
 
 
 class TaskTests(TestCase):

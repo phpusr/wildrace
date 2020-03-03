@@ -2,18 +2,12 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser
 from django.test import TestCase, Client, override_settings
 from django.urls import reverse
-from django.utils import timezone
 from rest_framework import status
 
-from app.models import TempData
 from app.services import index_page_service
-from app.tests.test_api import create_config
+from app.tests import create_config, create_temp_data
 
 INDEX_URL = reverse('index')
-
-
-def create_temp_data():
-    return TempData.objects.create(last_sync_date=timezone.now())
 
 
 class PublicTests(TestCase):

@@ -1,75 +1,14 @@
 import os
-from datetime import datetime, timedelta
+from datetime import timedelta
 from unittest.mock import patch
 
-from app.models import StatLog, Profile, Post, TempData, Config
-from app.services import stat_service
-from app.services.stat_service import RunnerDto, StatDto
 from django.test import TestCase
 from django.utils import timezone
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
-
-def create_config():
-    return Config.objects.create(
-        sync_posts=False, sync_seconds=600, group_id=101326589, commenting=False, comment_access_token='token123',
-        comment_from_group=False, publish_stat=False
-    )
-
-
-def create_or_get_profile(profile_id, first_name, last_name, date):
-    profile = Profile.objects.filter(pk=profile_id).first()
-    if profile:
-        return profile
-
-    return Profile.objects.create(pk=profile_id, first_name=first_name, last_name=last_name,
-                                  join_date=date, sex=Profile.Sex.MALE)
-
-
-def create_running(number, profile, distance, sum_distance, date):
-    if not distance:
-        status = Post.Status.ERROR_PARSE
-        number = None
-        sum_distance = None
-    else:
-        status = Post.Status.SUCCESS
-
-    return Post.objects.create(status=status, number=number, author=profile, distance=distance,
-                               sum_distance=sum_distance, date=date)
-
-
-def create_runnings():
-    number = 0
-    sum_distance = 0
-    runnings = []
-
-    with open(os.path.join(BASE_DIR, 'data', 'runnings.txt')) as f:
-        for row in f.readlines():
-            if not row:
-                continue
-
-            props = row.split('|')
-            date = datetime.strptime(props[0].strip(), '%Y-%m-%d %H:%M:%S') \
-                .astimezone(timezone.get_default_timezone())
-            profile_id = int(props[1].strip())
-            first_name = props[2].strip()
-            last_name = props[3].strip()
-            try:
-                distance = int(props[4].strip())
-                sum_distance += distance
-                number += 1
-            except ValueError:
-                distance = None
-
-            profile = create_or_get_profile(profile_id, first_name, last_name, date)
-            running = create_running(number, profile, distance, sum_distance, date)
-            runnings.append(running)
-        return runnings
-
-
-def create_date(year, month, day, hour=0, minute=0, second=0):
-    return datetime(year, month, day, hour, minute, second).astimezone(timezone.get_current_timezone())
+from app.models import StatLog, Profile, Post, TempData
+from app.services import stat_service
+from app.services.stat_service import RunnerDto, StatDto
+from app.tests import TESTS_DIR, create_config, create_runnings, create_date
 
 
 class StatServiceTests(TestCase):
@@ -368,7 +307,7 @@ class StatServiceTests(TestCase):
         stat = stat_service.calc_stat(StatLog.StatType.DISTANCE, 50, 100)
         stat.new_runners_count = 5
         text = stat_service._create_post_text(stat)
-        with open(os.path.join(BASE_DIR, 'data', 'stat_1.txt')) as f:
+        with open(os.path.join(TESTS_DIR, 'data', 'stat_1.txt')) as f:
             self.assertEqual(text, f.read())
 
         """Test that stat text is correct for date segment"""
@@ -376,7 +315,7 @@ class StatServiceTests(TestCase):
 
         stat = stat_service.calc_stat(StatLog.StatType.DATE, None, None)
         text = stat_service._create_post_text(stat)
-        with open(os.path.join(BASE_DIR, 'data', 'stat_2.txt')) as f:
+        with open(os.path.join(TESTS_DIR, 'data', 'stat_2.txt')) as f:
             self.assertEqual(text, f.read())
 
         """Test that stat text is correct without new runners"""
@@ -384,5 +323,5 @@ class StatServiceTests(TestCase):
         self.assertEqual(stat.new_runners_count, 0)
         text = stat_service._create_post_text(stat)
         print(text)
-        with open(os.path.join(BASE_DIR, 'data', 'stat_3.txt')) as f:
+        with open(os.path.join(TESTS_DIR, 'data', 'stat_3.txt')) as f:
             self.assertEqual(text, f.read())

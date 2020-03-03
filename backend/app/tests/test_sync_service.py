@@ -1,32 +1,13 @@
-from datetime import timedelta, datetime
-from hashlib import md5
+from datetime import timedelta
 from unittest.mock import patch
 
-from app.enums import EventType
-from app.models import Config, Post, Profile, TempData
-from app.services import sync_service, message_parser
 from django.test import TestCase
 from django.utils import timezone
 
-
-def create_config():
-    return Config.objects.create(
-        id=1,
-        sync_posts=False,
-        sync_seconds=300,
-        group_id=88923650,
-        commenting=False,
-        comment_access_token='-',
-        comment_from_group=False,
-        publish_stat=False
-    )
-
-
-def create_comment_text(status, profile=None):
-    if not profile:
-        profile = Profile(id=347, first_name='Иван')
-    post = Post(status=status, number=22, author=profile)
-    return sync_service._create_comment_text(post, 10, 20)
+from app.enums import EventType
+from app.models import Config, Post, Profile, TempData
+from app.services import sync_service
+from app.tests import create_config, create_comment_text, create_post, create_vk_post
 
 
 class SyncServiceTests(TestCase):
@@ -36,38 +17,12 @@ class SyncServiceTests(TestCase):
         self.profile = Profile.objects.create(join_date=timezone.now(), first_name='Иван', sex=Profile.Sex.MALE)
         TempData.objects.create(last_sync_date=timezone.now())
 
-    def create_vk_post(self, id, text, timestamp=None):
-        return {
-            'id': id,
-            'from_id': self.profile.id,
-            'text': text,
-            'date': timestamp if timestamp else round(timezone.now().timestamp())
-        }
+    def create_vk_post(self, post_id, text, timestamp=None):
+        return create_vk_post(post_id, self.profile.id, text, timestamp)
 
-    def create_post(self, status, text, number=None, distance=None, sum_distance=None, id=None, date=None,
+    def create_post(self, status, text, number=None, post_id=None, date=None,
                     timestamp=None):
-        out = message_parser.parse(text)
-        if out:
-            distance = distance if distance else out.distance
-            sum_distance = sum_distance if sum_distance else out.end_sum_number
-
-        if not date:
-            if timestamp:
-                date = datetime.utcfromtimestamp(timestamp).astimezone(timezone.get_default_timezone())
-            else:
-                date = timezone.now()
-
-        return Post.objects.create(
-            id=id,
-            author=self.profile,
-            status=status,
-            date=date,
-            text=text,
-            text_hash=md5(text.encode()).hexdigest(),
-            number=number,
-            distance=distance,
-            sum_distance=sum_distance
-        )
+        return create_post(status, self.profile, text, number, post_id, date, timestamp)
 
     def test_transactional_sync_posts(self):
         """Test that sync post runs in transaction"""
@@ -132,10 +87,10 @@ class SyncServiceTests(TestCase):
         ]
         items.reverse()
 
-        self.create_post(Post.Status.SUCCESS, items[-1]['text'], 1, id=items[-1]['id'],
+        self.create_post(Post.Status.SUCCESS, items[-1]['text'], 1, post_id=items[-1]['id'],
                          timestamp=items[-1]['date'])
-        self.create_post(Post.Status.ERROR_SUM, '10+5=16', 2, id=items[-2]['id'], timestamp=items[-2]['date'])
-        self.create_post(Post.Status.ERROR_SUM, 'some', id=3)
+        self.create_post(Post.Status.ERROR_SUM, '10+5=16', 2, post_id=items[-2]['id'], timestamp=items[-2]['date'])
+        self.create_post(Post.Status.ERROR_SUM, 'some', post_id=3)
 
         with patch('app.services.vk_api_service.get_wall_posts') as gi:
             gi.return_value = {
@@ -167,9 +122,9 @@ class SyncServiceTests(TestCase):
 
         vk_posts = [{'id': 123}]
 
-        post1 = self.create_post(Post.Status.SUCCESS, 'text', id=123)
-        post2 = self.create_post(Post.Status.SUCCESS, 'text', id=124)
-        post3 = self.create_post(Post.Status.SUCCESS, 'text', id=125,
+        post1 = self.create_post(Post.Status.SUCCESS, 'text', post_id=123)
+        post2 = self.create_post(Post.Status.SUCCESS, 'text', post_id=124)
+        post3 = self.create_post(Post.Status.SUCCESS, 'text', post_id=125,
                                  date=timezone.now() - timedelta(days=5, milliseconds=1))
 
         posts = [post1, post2, post3]
@@ -352,7 +307,7 @@ class SyncServiceTests(TestCase):
         updated_post = self.create_post(Post.Status.SUCCESS, '10+5=15', 2)
         changed_post1 = self.create_post(Post.Status.SUCCESS, '15+6=21', 3)
         self.create_post(Post.Status.ERROR_PARSE, 'text')
-        changed_post2 = self.create_post(Post.Status.SUCCESS, '21+3=24', 4,)
+        changed_post2 = self.create_post(Post.Status.SUCCESS, '21+3=24', 4)
         self.create_post(Post.Status.SUCCESS, '59+11=70', 5)
 
         updated_post.sum_distance = 50

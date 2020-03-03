@@ -1,8 +1,10 @@
-from app.tests.test_models import create_config, create_profile, create_post, create_stat_log, create_temp_data
 from django.contrib.auth import get_user_model
 from django.test import TestCase, Client
 from django.urls import reverse
 from rest_framework import status
+
+from app.models import Post
+from app.tests import create_config, create_profile, create_stat_log, create_temp_data, create_post
 
 
 class AdminSiteTests(TestCase):
@@ -40,7 +42,8 @@ class AdminSiteTests(TestCase):
 
     def test_post_exists(self):
         """Test that post page exists"""
-        post = create_post()
+        profile = create_profile()
+        post = create_post(Post.Status.SUCCESS, profile, 'Test')
         res = self.client.get(reverse('admin:app_post_change', args=[post.id]))
 
         self.assertEquals(res.status_code, status.HTTP_200_OK)

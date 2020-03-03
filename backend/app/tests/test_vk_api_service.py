@@ -1,22 +1,9 @@
-import os
 from unittest.mock import patch
 
-from app.models import Config
-from app.services import vk_api_service
 from django.test import TestCase
 
-
-def create_config():
-    return Config.objects.create(
-        id=1,
-        sync_posts=False,
-        sync_seconds=300,
-        group_id=88923650,
-        commenting=False,
-        comment_access_token=os.getenv('VK_ACCESS_TOKEN'),
-        comment_from_group=True,
-        publish_stat=False
-    )
+from app.services import vk_api_service
+from app.tests import create_config
 
 
 class VkApiTests(TestCase):

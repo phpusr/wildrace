@@ -1,31 +1,20 @@
+import os
 from unittest.mock import patch
 
-from app.models import Config, StatLog, Post
-from app.serializers import ConfigSerializer, StatSerializer, PostSerializer
-from app.services import vk_api_service, stat_service
-from app.tests.test_stat_service import create_runnings
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
 
+from app.models import StatLog, Post
+from app.serializers import ConfigSerializer, StatSerializer, PostSerializer
+from app.services import vk_api_service, stat_service
+from app.tests import create_config, create_runnings
+
 POSTS_URL = reverse('post-list')
 STAT_URL = reverse('stat')
 CONFIG_URL = reverse('config-detail', args=[1])
-
-
-def create_config():
-    return Config.objects.create(
-        id=1,
-        sync_posts=False,
-        sync_seconds=300,
-        group_id=88923650,
-        commenting=False,
-        comment_access_token='-',
-        comment_from_group=False,
-        publish_stat=False
-    )
 
 
 def post_detail_url(post_id):
@@ -157,10 +146,10 @@ class PrivateApiTests(TestCase):
             'id': 1,
             'authorize_url': vk_api_service.get_authorize_url(),
             'sync_posts': False,
-            'sync_seconds': 300,
+            'sync_seconds': 600,
             'group_id': 88923650,
             'commenting': False,
-            'comment_access_token': '-',
+            'comment_access_token': os.getenv('VK_ACCESS_TOKEN'),
             'comment_from_group': False,
             'publish_stat': False
         })
