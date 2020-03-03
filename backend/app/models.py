@@ -11,9 +11,6 @@ class Config(models.Model):
     sync_posts = models.BooleanField()
     """Post syncing"""
 
-    sync_seconds = models.IntegerField()
-    """Post syncing interval in seconds"""
-
     group_id = models.IntegerField()
     """VK group ID"""
 

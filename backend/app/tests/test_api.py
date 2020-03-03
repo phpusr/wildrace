@@ -146,7 +146,6 @@ class PrivateApiTests(TestCase):
             'id': 1,
             'authorize_url': vk_api_service.get_authorize_url(),
             'sync_posts': False,
-            'sync_seconds': 600,
             'group_id': 88923650,
             'commenting': False,
             'comment_access_token': os.getenv('VK_ACCESS_TOKEN'),
@@ -155,8 +154,8 @@ class PrivateApiTests(TestCase):
         })
 
     def test_update_config(self):
-        payload = {'sync_seconds': 100, 'group_id': 777}
+        payload = {'group_id': 777, 'comment_access_token': 'changed token'}
         res = self.client.patch(CONFIG_URL, payload)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(res.data['sync_seconds'], payload['sync_seconds'])
         self.assertEqual(res.data['group_id'], payload['group_id'])
+        self.assertEqual(res.data['comment_access_token'], payload['comment_access_token'])

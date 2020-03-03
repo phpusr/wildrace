@@ -12,7 +12,6 @@ from app.services import sync_service, message_parser
 def create_config():
     return models.Config.objects.create(
         sync_posts=False,
-        sync_seconds=600,
         group_id=88923650,
         commenting=False,
         comment_access_token=os.getenv('VK_ACCESS_TOKEN'),
