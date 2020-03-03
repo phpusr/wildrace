@@ -1,10 +1,10 @@
 import os
 from typing import List
 
+from django.conf import settings
 from django.templatetags.static import static
 from djangorestframework_camel_case.render import CamelCaseJSONRenderer
 
-from app import settings
 from app.models import TempData
 from app.serializers import FrontendDataSerializer
 from app.services import stat_service, vk_api_service

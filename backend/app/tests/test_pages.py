@@ -1,10 +1,13 @@
-from app.models import TempData
-from app.tests.test_api import create_config
 from django.contrib.auth import get_user_model
-from django.test import TestCase, Client
+from django.contrib.auth.models import AnonymousUser
+from django.test import TestCase, Client, override_settings
 from django.urls import reverse
 from django.utils import timezone
 from rest_framework import status
+
+from app.models import TempData
+from app.services import index_page_service
+from app.tests.test_api import create_config
 
 INDEX_URL = reverse('index')
 
@@ -19,9 +22,20 @@ class PublicTests(TestCase):
         create_temp_data()
         create_config()
 
+    @override_settings(DEBUG=True)
     def test_index_page(self):
         res = self.client.get(INDEX_URL)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertContains(res, 'http://192.168.1.100:8080')
+        self.assertNotContains(res, 'username')
+        self.assertNotContains(res, 'isStaff')
+
+    def test_index_page_prod(self):
+        """Test that prod index page not contains develop urls"""
+        index_page_service.get_data(AnonymousUser())
+        res = self.client.get(INDEX_URL)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertNotContains(res, 'http://192.168.1.100:8080')
         self.assertNotContains(res, 'username')
         self.assertNotContains(res, 'isStaff')
 
