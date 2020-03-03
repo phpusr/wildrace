@@ -15,8 +15,8 @@ app.conf.beat_schedule = {
         'task': 'app.tasks.sync_posts_task',
         'schedule': crontab(minute='*/5')
     },
-    'stat-publish-task': {
-        'task': 'app.tasks.stat_publish_task',
+    'publish-stat-task': {
+        'task': 'app.tasks.publish_stat_task',
         'schedule': crontab(minute=0)
     }
 }

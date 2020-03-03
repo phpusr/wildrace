@@ -9,24 +9,31 @@ logger = logging.getLogger(__name__)
 
 @app.task
 def sync_posts_task():
-    logger.info('-- Sync posts job started --')
+    logger.info('-- Sync posts task started --')
 
     if not Config.objects.get().sync_posts:
-        logger.info('>> Sync posts task is disabled')
-        return
+        msg = 'Sync posts task is disabled'
+        logger.info(f'>> {msg}')
+        return msg
 
     sync_service.sync_posts()
 
-    logger.info('-- Sync posts task finished --')
+    msg = 'Sync posts task successfully finished'
+    logger.info(f'-- {msg} --')
+    return msg
 
 
 @app.task
-def stat_publish_task():
-    logger.info('-- Stat publish task started')
+def publish_stat_task():
+    logger.info('-- Publish stat task started')
 
     if not Config.objects.get().publish_stat:
-        logger.info('>> Publish task is disabled')
+        msg = 'Publish stat task is disabled'
+        logger.info(f'>> {msg}')
+        return msg
 
-    stat_service.publish_stat_post()
+    stat_service.interval_publish_stat_post()
 
-    logger.info('Stat publish task finished')
+    msg = 'Publish stat task successfully finished'
+    logger.info(f'-- {msg} --')
+    return msg
