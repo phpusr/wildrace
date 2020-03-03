@@ -1,4 +1,7 @@
-matrix:
+os: linux
+language: python
+
+jobs:
   include:
     - language: python
       python: 3.8.1
@@ -12,8 +15,7 @@ matrix:
         - bash <(curl -s https://codecov.io/bash)
 
     - language: node_js
-      node_js:
-        - 13
+      node_js: 13
       install:
         - cd frontend
         - yarn install
