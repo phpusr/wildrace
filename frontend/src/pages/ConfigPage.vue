@@ -37,7 +37,7 @@
                     required
                     :readonly="show"
                     :solo="show"
-                    :append-icon="show ? null : 'refresh'"
+                    :append-icon="show ? null : 'mdi-refresh'"
                     @click:append="updateAccessToken"
             />
 
