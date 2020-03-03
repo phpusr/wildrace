@@ -322,6 +322,5 @@ class StatServiceTests(TestCase):
         stat = stat_service.calc_stat(StatLog.StatType.DISTANCE, 90, 100)
         self.assertEqual(stat.new_runners_count, 0)
         text = stat_service._create_post_text(stat)
-        print(text)
         with open(os.path.join(TESTS_DIR, 'data', 'stat_3.txt')) as f:
             self.assertEqual(text, f.read())

@@ -151,7 +151,7 @@ LOGGING = {
     'loggers': {
         'app': {
             'handlers': ['console'],
-            'level': 'DEBUG'
+            'level': os.getenv('APP_LOG_LEVEL', 'ERROR')
         }
     }
 }
