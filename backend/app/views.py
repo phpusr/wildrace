@@ -1,8 +1,6 @@
-from django.db.models import Model
 from django.shortcuts import render
 from rest_framework import viewsets, mixins
 from rest_framework.response import Response
-from rest_framework.serializers import Serializer
 from rest_framework.views import APIView
 
 from app.consumers import main_group_send
@@ -41,23 +39,24 @@ class PostViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.Updat
 
         return queryset
 
-    def perform_update(self, serializer: Serializer):
+    def perform_update(self, serializer: PostSerializer):
         super().perform_update(serializer)
         main_group_send(serializer.data, ObjectType.POST, EventType.UPDATE)
-        self._update_data()
+        self._update_data(self.get_object())
 
-    def perform_destroy(self, instance: Model):
+    def perform_destroy(self, instance: Post):
         object_id = instance.id
         super().perform_destroy(instance)
         main_group_send(object_id, ObjectType.POST, EventType.REMOVE)
-        self._update_data()
+        instance.number = None
+        self._update_data(instance)
 
     def _update_next_posts(self):
         return self.request.query_params.get('update_next_posts') == 'true'
 
-    def _update_data(self):
+    def _update_data(self, post: Post):
         if self._update_next_posts():
-            sync_service.update_next_posts(self.get_object())
+            sync_service.update_next_posts(post)
 
         stat_service.update_stat()
 
