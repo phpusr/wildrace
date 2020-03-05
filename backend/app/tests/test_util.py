@@ -54,3 +54,9 @@ class UtilTests(TestCase):
     def test_encode_json(self):
         json = util.encode_json({'my_var': 'my_value'})
         self.assertTrue(json, '{"myVar": "my_value"')
+
+    def test(self):
+        date = datetime.utcfromtimestamp(0)
+        res = util.date_to_js_unix_time(date)
+        expected = int(date.timestamp() * 1000)
+        self.assertEqual(res, expected)

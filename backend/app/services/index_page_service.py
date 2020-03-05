@@ -7,14 +7,14 @@ from django.templatetags.static import static
 from app.models import TempData
 from app.serializers import FrontendDataSerializer
 from app.services import stat_service, vk_api_service
-from app.util import encode_json
+from app.util import encode_json, date_to_js_unix_time
 
 
 def get_data(user):
     serializer = FrontendDataSerializer({
         'user': user if user.is_authenticated else None,
         'stat': stat_service.get_stat(),
-        'last_sync_date': TempData.objects.get().last_sync_date.timestamp() * 1000,
+        'last_sync_date': date_to_js_unix_time(TempData.objects.get().last_sync_date),
         'config': {
             'project_version': settings.VERSION,
             'group_link': vk_api_service.get_group_url()

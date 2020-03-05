@@ -3,13 +3,15 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Optional, List
 
-from app.models import Profile, StatLog, Post, TempData
-from app.services import vk_api_service
-from app.util import find_all, get_count_days
 from django.conf import settings
 from django.db import transaction
 from django.db.models import Sum, F, Count
 from django.utils import timezone
+
+from app.enums import ObjectType
+from app.models import Profile, StatLog, Post, TempData
+from app.services import vk_api_service
+from app.util import find_all, get_count_days, main_group_send, date_to_js_unix_time, js_unix_time_to_date
 
 logger = logging.getLogger(__name__)
 
@@ -104,10 +106,10 @@ def calc_stat(stat_type: StatLog.StatType, start_range: Optional[int], end_range
 
     if stat_type == StatLog.StatType.DATE:
         if start_range is not None:
-            stat.start_date = _convert_timestamp_to_date(start_range)
+            stat.start_date = js_unix_time_to_date(start_range)
         if end_range is not None:
             # Change time at and of day
-            stat.end_date = _convert_timestamp_to_date(end_range) + timedelta(hours=23, minutes=59, seconds=59)
+            stat.end_date = js_unix_time_to_date(end_range) + timedelta(hours=23, minutes=59, seconds=59)
     elif stat_type == StatLog.StatType.DISTANCE:
         stat.start_distance = start_range
         stat.end_distance = end_range
@@ -146,10 +148,6 @@ def calc_stat(stat_type: StatLog.StatType, start_range: Optional[int], end_range
     stat.max_one_man_training_count = sorted(runners, key=lambda it: it.running_count, reverse=True)[0]
 
     return stat
-
-
-def _convert_timestamp_to_date(timestamp: int) -> datetime:
-    return datetime.utcfromtimestamp(timestamp / 1000).astimezone(timezone.get_default_timezone())
 
 
 def _get_one_running(stat: StatDto = None, direction: str = '') -> Optional[Post]:
@@ -201,6 +199,8 @@ def update_stat():
     temp_data = TempData.objects.get()
     temp_data.last_sync_date = timezone.now()
     temp_data.save()
+    main_group_send(date_to_js_unix_time(temp_data.last_sync_date), ObjectType.LAST_SYNC_DATE)
+    main_group_send(get_stat(), ObjectType.STAT)
 
 
 @transaction.atomic

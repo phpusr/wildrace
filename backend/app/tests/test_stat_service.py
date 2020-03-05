@@ -9,6 +9,7 @@ from app.models import StatLog, Profile, Post, TempData
 from app.services import stat_service
 from app.services.stat_service import RunnerDto, StatDto
 from app.tests import TESTS_DIR, create_config, create_runnings, create_date
+from app.util import date_to_js_unix_time
 
 
 class StatServiceTests(TestCase):
@@ -43,7 +44,8 @@ class StatServiceTests(TestCase):
         """Test without start date"""
         start_date = None
         end_date = create_date(2015, 9, 3)
-        stat = stat_service.calc_stat(StatLog.StatType.DATE, start_date, int(end_date.timestamp() * 1000))
+        end_range = date_to_js_unix_time(end_date)
+        stat = stat_service.calc_stat(StatLog.StatType.DATE, start_date, end_range)
         self.assertEqual(stat.type, StatLog.StatType.DATE)
         self.assertIsNone(stat.start_distance)
         self.assertIsNone(stat.end_distance)
@@ -53,7 +55,8 @@ class StatServiceTests(TestCase):
         """Test without end date"""
         start_date = create_date(2015, 9, 3, 4, 38, 2)
         end_date = None
-        stat = stat_service.calc_stat(StatLog.StatType.DATE, int(start_date.timestamp() * 1000), end_date)
+        start_range = date_to_js_unix_time(start_date)
+        stat = stat_service.calc_stat(StatLog.StatType.DATE, start_range, end_date)
         self.assertEqual(stat.type, StatLog.StatType.DATE)
         self.assertIsNone(stat.start_distance)
         self.assertIsNone(stat.end_distance)
@@ -105,8 +108,8 @@ class StatServiceTests(TestCase):
 
         stat = stat_service.calc_stat(
             StatLog.StatType.DATE,
-            start_range=int(start_date.timestamp() * 1000),
-            end_range=int(end_date.timestamp() * 1000)
+            start_range=date_to_js_unix_time(start_date),
+            end_range=date_to_js_unix_time(end_date)
         )
 
         max_one_man_distance = RunnerDto(Profile.objects.get(pk=117963335), 1, 16)

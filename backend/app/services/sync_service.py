@@ -8,12 +8,12 @@ from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
 
-from app.consumers import main_group_send
 from app.enums import EventType, ObjectType
 from app.models import Post, Profile, Config
 from app.serializers import PostSerializer
 from app.services import vk_api_service, message_parser, stat_service
 from app.util import find, find_all, remove_non_utf8_chars
+from app.util import main_group_send
 
 DOWNLOAD_POST_COUNT = 100
 """

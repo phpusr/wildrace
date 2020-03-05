@@ -3,13 +3,13 @@ from rest_framework import viewsets, mixins
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from app.consumers import main_group_send
 from app.enums import ObjectType, EventType
 from app.forms import StatForm, PostForm
 from app.models import Post, Config
 from app.permissions import IsAdminUserOrReadOnly
 from app.serializers import PostSerializer, StatSerializer, ConfigSerializer
 from app.services import stat_service, index_page_service, sync_service
+from app.util import main_group_send
 
 
 def index(request):
