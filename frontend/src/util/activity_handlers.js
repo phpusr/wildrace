@@ -5,8 +5,8 @@ import {isEmptyObject} from "./collections"
 export const methods = mapMutations(["addPostMutation", "updatePostMutation", "removePostMutation",
     "updatePostStatMutation", "updateLastSyncDateMutation"])
 
-export function activityHandler(component) {
-    addHandler("/topic/activity", data => {
+export function appActivityHandler(component) {
+    addHandler("app.activity", data => {
         const body = data.body
         if (data.objectType === "Post") {
             switch(data.eventType) {

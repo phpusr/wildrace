@@ -22,7 +22,7 @@
     import NavigationDrawer from "./components/NavigationDrawer"
     import Toolbar from "./components/Toolbar"
     import Footer from "./components/Footer"
-    import {activityHandler, methods} from "./util/topicActivityHandler"
+    import {appActivityHandler, methods} from "./util/activity_handlers"
 
     export default {
         name: "app",
@@ -42,7 +42,7 @@
         },
         methods,
         created() {
-            activityHandler(this)
+            appActivityHandler(this)
         }
     }
 </script>

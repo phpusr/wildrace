@@ -12,7 +12,11 @@ export function connectToWS() {
     socket.onmessage = message => {
         const data = JSON.parse(message.data)
         console.log('message', data)
-        handlers.forEach(h => h.handler(data))
+        handlers.forEach(h => {
+            if (data.type ===  h.type) {
+                h.handler(data)
+            }
+        })
     }
 
     socket.onerror = socketFail.bind(null, "Error")
@@ -28,6 +32,6 @@ function socketFail(cause) {
     // }
 }
 
-export function addHandler(id, handler) {
-    handlers.push({ id, handler })
+export function addHandler(type, handler) {
+    handlers.push({ type, handler })
 }
