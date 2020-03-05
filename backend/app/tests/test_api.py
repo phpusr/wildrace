@@ -10,7 +10,7 @@ from rest_framework.test import APIClient
 from app.models import StatLog, Post
 from app.serializers import ConfigSerializer, StatSerializer, PostSerializer
 from app.services import vk_api_service, stat_service
-from app.tests import create_config, create_runnings
+from app.tests import create_config, create_runnings, create_temp_data
 
 POSTS_URL = reverse('post-list')
 STAT_URL = reverse('stat')
@@ -101,6 +101,7 @@ class PrivateApiTests(TestCase):
         self.user = get_user_model().objects.create(username='phpusr', password='pass123', is_staff=True)
         self.client.force_authenticate(self.user)
         self.config = create_config()
+        self.stat = create_temp_data()
 
     def test_post_edit(self):
         """Test that post will be editing"""

@@ -11,4 +11,3 @@ class EventType(Enum):
     CREATE = 'Create'
     UPDATE = 'Update'
     REMOVE = 'Remove'
-
