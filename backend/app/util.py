@@ -1,6 +1,8 @@
 from datetime import datetime
 from typing import Iterable, Optional
 
+from django.conf import settings
+
 
 def find(lst: Iterable, action):
     result = find_all(lst, action)
@@ -27,3 +29,17 @@ def get_count_days(start_date: Optional[datetime], end_date: Optional[datetime])
         raise RuntimeError('start_date > end_date')
 
     return (end_date - start_date).days + 1
+
+
+def get_class(class_name: str) -> type:
+    parts = class_name.split('.')
+    module = '.'.join(parts[:-1])
+    m = __import__(module)
+    for comp in parts[1:]:
+        m = getattr(m, comp)
+    return m
+
+
+def encode_json(content: dict) -> str:
+    cl = get_class(settings.REST_FRAMEWORK['DEFAULT_RENDERER_CLASSES'][0])
+    return cl().render(content).decode('utf-8')

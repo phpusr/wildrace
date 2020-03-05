@@ -1,58 +1,33 @@
-import SockJS from "sockjs-client"
-import {Stomp} from "@stomp/stompjs"
-
-let stompClient = null
 let connected = false
 const handlers = []
-const messages = []
 
 export function connectToWS() {
-    const socket = new SockJS("/wild-race-ws")
-    stompClient = Stomp.over(socket)
-    stompClient.debug = () => {}
-    stompClient.connect({}, () => {
-        connected = true
-        handlers.forEach(h => stompClient.subscribe(h.id, message =>
-            h.handler(JSON.parse(message.body))
-        ))
-        handlers.splice(0, handlers.length)
-        messages.forEach(m => stompClient.send(m.action, m.json))
-        messages.splice(0, messages.length)
+    const socket = new WebSocket("ws://localhost:8000/ws/wild-race/")
 
-        socket.onerror = socketFail.bind(this, "Error")
-        socket.onclose = socketFail.bind(this, "Close")
-    })
+    socket.onopen = event => {
+        connected = true
+        console.log("WebSocket open", event, connected)
+    }
+
+    socket.onmessage = message => {
+        const data = JSON.parse(message.data)
+        console.log('message', data)
+        handlers.forEach(h => h.handler(data))
+    }
+
+    socket.onerror = socketFail.bind(null, "Error")
+    socket.onclose = socketFail.bind(null, "Close")
 }
 
 function socketFail(cause) {
+    console.log('socket', cause)
     connected = false
-    if (confirm(`${cause} connect to ws. Reload page?`)) {
-        location.reload()
-    }
+    //TODO
+    // if (confirm(`${cause} connect to ws. Reload page?`)) {
+    //     location.reload()
+    // }
 }
 
 export function addHandler(id, handler) {
-    if (connected) {
-        stompClient.subscribe(id, message =>
-            handler(JSON.parse(message.body))
-        )
-        return
-    }
-
     handlers.push({ id, handler })
-}
-
-export function disconnect() {
-    if (stompClient !== null && connected) {
-        stompClient.disconnect()
-    }
-}
-
-export function sendData(action, object) {
-    if (connected) {
-        stompClient.send(action, {}, JSON.stringify(object))
-        return
-    }
-
-    messages.push({ action, json: JSON.stringify(object) })
 }

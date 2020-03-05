@@ -16,6 +16,8 @@ djangorestframework-camel-case = "*"
 celery = {extras = ["redis"],version = "*"}
 flower = "*"
 django-celery-beat = "*"
+channels = "*"
+channels-redis = "*"
 
 [requires]
 python_version = "3.8"

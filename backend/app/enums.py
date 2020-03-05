@@ -1,8 +1,14 @@
-from enum import Enum, unique, auto
+from enum import Enum
 
 
-@unique
+class ObjectType(Enum):
+    POST = 'Post'
+    STAT = 'Stat'
+    LAST_SYNC_DATE = 'LastSyncDate'
+
+
 class EventType(Enum):
-    CREATE = auto()
-    UPDATE = auto()
-    REMOVE = auto()
+    CREATE = 'Create'
+    UPDATE = 'Update'
+    REMOVE = 'Remove'
+

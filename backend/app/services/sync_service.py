@@ -4,13 +4,16 @@ from datetime import datetime, timedelta
 from hashlib import md5
 from typing import List, Iterator
 
-from app.enums import EventType
-from app.models import Post, Profile, Config
-from app.services import vk_api_service, message_parser, stat_service
-from app.util import find, find_all, remove_non_utf8_chars
 from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
+
+from app.consumers import main_group_send
+from app.enums import EventType, ObjectType
+from app.models import Post, Profile, Config
+from app.serializers import PostSerializer
+from app.services import vk_api_service, message_parser, stat_service
+from app.util import find, find_all, remove_non_utf8_chars
 
 DOWNLOAD_POST_COUNT = 100
 """
@@ -79,7 +82,7 @@ def _sync_block_posts(vk_post_count: int, download_count: int) -> int:
     vk_posts = list(reversed(response['items']))
 
     last_db_posts = _get_last_posts(LAST_POSTS_COUNT)
-    _remove_deleted_posts(vk_posts, last_db_posts)
+    deleted_posts = _remove_deleted_posts(vk_posts, last_db_posts)
 
     for vk_post in vk_posts:
         post_id = vk_post['id']
@@ -110,7 +113,11 @@ def _sync_block_posts(vk_post_count: int, download_count: int) -> int:
         # Adding a new post into last posts and post sorting by time
         if parser_out:
             last_db_posts.append(new_post)
-            last_db_posts.sort(key=lambda post: post.date, reverse=True)
+            last_db_posts.sort(key=lambda p: p.date, reverse=True)
+
+    # Deleting posts from the client, after sync without exceptions
+    for post in deleted_posts:
+        main_group_send(PostSerializer(post).data, ObjectType.POST, EventType.REMOVE)
 
     return Post.objects.count()
 
@@ -220,6 +227,8 @@ def _analyze_post_text(text: str, text_hash: str, last_sum_distance: int, last_p
         # Adding status comment for post
         comment_text = _create_comment_text(post, last_sum_distance, new_sum_distance)
         _add_status_comment(post.id, comment_text)
+
+        main_group_send(PostSerializer(post).data, ObjectType.POST, event_type)
 
     return parser_out is not None
 

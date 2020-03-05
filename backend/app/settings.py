@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_celery_beat',
     'rest_framework',
+    'channels',
 
     'app'
 ]
@@ -184,6 +185,21 @@ REST_FRAMEWORK = {
 
 }
 
+# Web Sockets
+
+ASGI_APPLICATION = 'app.routing.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [
+                ('127.0.0.1', 6379)
+            ]
+        }
+    }
+}
+
 # Celery
 
 CELERY_BROKER_URL = 'redis://localhost:6379'
@@ -204,3 +220,5 @@ POST_DATE_FORMAT = '%d.%m.%y'
 PUBLISHING_STAT_INTERVAL = 1000
 
 GOOGLE_ANALYTICS_ID = os.getenv('GOOGLE_ANALYTICS_ID', '0')
+
+WS_MAIN_GROUP_NAME = 'main'

@@ -836,11 +836,6 @@
     error-stack-parser "^2.0.0"
     string-width "^2.0.0"
 
-"@stomp/stompjs@^5.4.3":
-  version "5.4.3"
-  resolved "https://registry.yarnpkg.com/@stomp/stompjs/-/stompjs-5.4.3.tgz#ba312f589c5e4c73639aa89a7e4d5cff5a495904"
-  integrity sha512-ZuucwL2mLnBRN6ep/Ic7do3bZHP9HqgZQzBPEkXO6McZcysaJb8N1aQT8Et+JaG9FuQ1wVvtbQvOGvDZyOWQNQ==
-
 "@types/color-name@^1.1.1":
   version "1.1.1"
   resolved "https://registry.npm.taobao.org/@types/color-name/download/@types/color-name-1.1.1.tgz#1c1261bbeaa10a8055bbc5d8ab84b7b2afc846a0"
@@ -7260,7 +7255,7 @@ snapdragon@^0.8.1:
     source-map-resolve "^0.5.0"
     use "^3.1.0"
 
-sockjs-client@1.4.0, sockjs-client@^1.4.0:
+sockjs-client@1.4.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/sockjs-client/-/sockjs-client-1.4.0.tgz#c9f2568e19c8fd8173b4997ea3420e0bb306c7d5"
   integrity sha512-5zaLyO8/nri5cua0VtOrFXBPK1jbL4+1cebT/mmKA1E1ZXOvJrII75bPu0l0k843G/+iAbhEqzyKr0w/eCCj7g==

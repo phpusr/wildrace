@@ -32,7 +32,7 @@ class UtilTests(TestCase):
         self.assertIsNone(result)
 
         result = util.remove_non_utf8_chars('good')
-        self.assertEquals(result, 'good')
+        self.assertEqual(result, 'good')
 
     def test_get_count_days(self):
         now = datetime.now()
@@ -46,3 +46,11 @@ class UtilTests(TestCase):
 
         result = util.get_count_days(now, future)
         self.assertEqual(result, 1)
+
+    def test_get_class(self):
+        dt = util.get_class('datetime.datetime')
+        self.assertEqual(dt, datetime)
+
+    def test_encode_json(self):
+        json = util.encode_json({'my_var': 'my_value'})
+        self.assertTrue(json, '{"myVar": "my_value"')

@@ -3,11 +3,11 @@ from typing import List
 
 from django.conf import settings
 from django.templatetags.static import static
-from djangorestframework_camel_case.render import CamelCaseJSONRenderer
 
 from app.models import TempData
 from app.serializers import FrontendDataSerializer
 from app.services import stat_service, vk_api_service
+from app.util import encode_json
 
 
 def get_data(user):
@@ -24,7 +24,7 @@ def get_data(user):
     data = {
         'debug': settings.DEBUG,
         'google_analytics_id': settings.GOOGLE_ANALYTICS_ID,
-        'frontend_data': CamelCaseJSONRenderer().render(serializer.data).decode('utf-8')
+        'frontend_data': encode_json(serializer.data)
     }
 
     if settings.DEBUG:

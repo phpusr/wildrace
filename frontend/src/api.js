@@ -1,22 +1,26 @@
 import Vue from "vue"
 
-let api = Vue.resource("/api/posts/{id}/")
+let post_res = Vue.resource("/api/posts/{id}/")
 
 export const postApi = {
-    getOne: id => api.get({id}),
+    getOne: id => post_res.get({id}),
     getAll: params => Vue.http.get("/api/posts/", {params}),
-    getStat: () => api.get({id: "getStat"}, {params: {test: 1}}),
-    getLastSyncDate: () => api.get({id: "getLastSyncDate"}),
-    update: (post, updateNextPosts) => Vue.http.put(`/api/posts/${post.id}/`, post, {params: {updateNextPosts}}),
-    remove: (id, updateNextPosts) => Vue.http.delete(`/api/posts/${id}/`, {params: {updateNextPosts}}),
-    sync: () => api.update({id: "sync"}, {})
+    getStat: () => post_res.get({id: "getStat"}, {params: {test: 1}}),
+    getLastSyncDate: () => post_res.get({id: "getLastSyncDate"}),
+    update: (post, updateNextPosts) => Vue.http.put(`/api/posts/${post.id}/`, post, {
+        params: {'update_next_posts': updateNextPosts}
+    }),
+    remove: (id, updateNextPosts) => Vue.http.delete(`/api/posts/${id}/`, {
+        params: {'update_next_posts': updateNextPosts}
+    }),
+    sync: () => post_res.update({id: "sync"}, {})
 }
 
-api = Vue.resource("/api/config/1/")
+const config_res = Vue.resource("/api/config/1/")
 
 export const configApi = {
-    get: () => api.get(),
-    update: (data) => api.update(data)
+    get: () => config_res.get(),
+    update: (data) => config_res.update(data)
 }
 
 export const statApi = {
