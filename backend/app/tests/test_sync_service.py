@@ -55,8 +55,9 @@ class SyncServiceTests(TestCase):
                 sync_service.sync_posts()
 
     @patch('app.services.vk_api_service.get_wall_posts')
+    @patch('app.services.stat_service.update_stat')
     @patch('time.sleep')
-    def test_sync_posts_need_sync(self, ts, gwp):
+    def test_sync_posts_need_sync(self, ts, us, gwp):
         """Test that _sync_block_posts calls 2 times"""
         gwp.return_value = {'count': 1}
         ts.return_value = True
@@ -65,6 +66,7 @@ class SyncServiceTests(TestCase):
             sync_service.sync_posts()
             self.assertEqual(gwp.call_count, 2)
             self.assertEqual(ts.call_count, 1)
+            self.assertEqual(us.call_count, 1)
             self.assertEqual(sbp.call_count, 2)
 
     def test_sync_block_posts_count_changed(self):
