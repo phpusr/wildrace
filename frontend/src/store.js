@@ -15,7 +15,17 @@ function formatDate(date) {
 
 function sortPosts(posts) {
     const direction = postSortDirection === "desc" ? -1 : 1
-    posts.sort((a, b) => (a.date - b.date) * direction)
+    posts.sort((a, b) => {
+        if (a.date > b.date) {
+            return direction
+        }
+
+        if (a.date < b.date) {
+            return -1 * direction
+        }
+
+        return 0
+    })
 }
 
 const {user, stat, lastSyncDate, config} = document.frontendData
