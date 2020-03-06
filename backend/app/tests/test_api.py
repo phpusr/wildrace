@@ -114,19 +114,25 @@ class PrivateApiTests(TestCase):
         """Test that post will be editing"""
         create_runnings()
         post = Post.objects.first()
-        res = self.client.patch(post_detail_url(post.id), {'distance': 777})
+        with patch('app.services.sync_service.update_next_posts') as update_next_posts:
+            res = self.client.patch(post_detail_url(post.id) + f'?update_next_posts=false', {'distance': 777})
+            self.assertEqual(res.status_code, status.HTTP_200_OK)
+            self.assertEqual(update_next_posts.call_count, 0)
+
         post.refresh_from_db()
-        self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(post.distance, 777)
 
     def test_post_delete(self):
         """Test that post will be deleted"""
         create_runnings()
         post = Post.objects.first()
-        res = self.client.delete(post_detail_url(post.id))
-        with self.assertRaises(Post.DoesNotExist):
+        with patch('app.services.sync_service.update_next_posts') as update_next_posts:
+            res = self.client.delete(post_detail_url(post.id) + f'?update_next_posts=true')
+            self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
+            self.assertEqual(update_next_posts.call_count, 1)
+
+        with self.assertRaises(Post.DoesNotExist):  # noqa
             post.refresh_from_db()
-        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_post_sync(self):
         """Test that post syncing is work"""
