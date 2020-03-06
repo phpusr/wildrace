@@ -13,7 +13,9 @@ from app.services import vk_api_service, stat_service
 from app.tests import create_config, create_runnings, create_temp_data
 
 POSTS_URL = reverse('post-list')
-STAT_URL = reverse('stat')
+POST_SYNC_URL = reverse('post-sync')
+STAT_URL = reverse('stat-list')
+PUBLISH_STAT_URL = reverse('stat-publish')
 CONFIG_URL = reverse('config-detail', args=[1])
 
 
@@ -58,6 +60,11 @@ class PublicApiTests(TestCase):
     def test_post_delete(self):
         """Test that post deleting required authentication"""
         res = self.client.delete(post_detail_url(1))
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_post_sync(self):
+        """Test that post syncing required authentication"""
+        res = self.client.put(POST_SYNC_URL)
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_stat_without_type(self):
@@ -121,9 +128,16 @@ class PrivateApiTests(TestCase):
             post.refresh_from_db()
         self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
 
-    def test_publish_without_type(self):
+    def test_post_sync(self):
+        """Test that post syncing is work"""
+        with patch('app.services.sync_service.sync_posts') as sync_posts:
+            res = self.client.put(POST_SYNC_URL)
+            self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
+            self.assertEqual(sync_posts.call_count, 1)
+
+    def test_publish_stat_without_type(self):
         """Test that stat will return errors without type"""
-        res = self.client.post(STAT_URL)
+        res = self.client.post(PUBLISH_STAT_URL)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, {'type': ['This field is required.']})
 
@@ -133,7 +147,7 @@ class PrivateApiTests(TestCase):
         stat = stat_service.calc_stat(StatLog.StatType.DISTANCE, None, None)
         with patch('app.services.stat_service.publish_stat_post') as psp:
             psp.return_value = 123
-            res = self.client.post(STAT_URL, {'type': 'distance'})
+            res = self.client.post(PUBLISH_STAT_URL, {'type': 'distance'})
             self.assertEqual(psp.call_count, 1)
             self.assertEqual(psp.call_args.args[0], stat)
             self.assertEqual(res.data, 123)
