@@ -17,10 +17,10 @@ export const postApi = {
     getStat: () => post_res.get({id: "getStat"}, {params: {test: 1}}),
     getLastSyncDate: () => post_res.get({id: "getLastSyncDate"}),
     update: (post, updateNextPosts) => Vue.http.put(`/api/posts/${post.id}/`, post, {
-        params: {'update_next_posts': updateNextPosts}
+        params: {"update_next_posts": updateNextPosts}
     }),
     remove: (id, updateNextPosts) => Vue.http.delete(`/api/posts/${id}/`, {
-        params: {'update_next_posts': updateNextPosts}
+        params: {"update_next_posts": updateNextPosts}
     }),
     sync: () => post_res.update({id: "sync"}, {})
 }

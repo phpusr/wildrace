@@ -11,7 +11,7 @@ export function connectToWS() {
 
     socket.onmessage = message => {
         const data = JSON.parse(message.data)
-        console.log('message', data)
+        console.log("message", data)
         handlers.forEach(h => {
             if (data.type ===  h.type) {
                 h.handler(data)
@@ -24,7 +24,7 @@ export function connectToWS() {
 }
 
 function socketFail(cause) {
-    console.log('socket', cause)
+    console.log("socket", cause)
     connected = false
     //TODO
     // if (confirm(`${cause} connect to ws. Reload page?`)) {
