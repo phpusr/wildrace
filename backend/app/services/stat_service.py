@@ -8,10 +8,10 @@ from django.db import transaction
 from django.db.models import Sum, F, Count
 from django.utils import timezone
 
-from app.enums import ObjectType
 from app.models import Profile, StatLog, Post, TempData
-from app.services import vk_api_service
-from app.util import find_all, get_count_days, main_group_send, date_to_js_unix_time, js_unix_time_to_date
+from app.services import vk_api_service, ws_service
+from app.services.ws_service import ObjectType
+from app.util import find_all, get_count_days, date_to_js_unix_time, js_unix_time_to_date
 
 logger = logging.getLogger(__name__)
 
@@ -199,8 +199,8 @@ def update_stat():
     temp_data = TempData.objects.get()
     temp_data.last_sync_date = timezone.now()
     temp_data.save()
-    main_group_send(date_to_js_unix_time(temp_data.last_sync_date), ObjectType.LAST_SYNC_DATE)
-    main_group_send(get_stat(), ObjectType.STAT)
+    ws_service.main_group_send(date_to_js_unix_time(temp_data.last_sync_date), ObjectType.LAST_SYNC_DATE)
+    ws_service.main_group_send(get_stat(), ObjectType.STAT)
 
 
 @transaction.atomic

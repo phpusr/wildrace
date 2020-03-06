@@ -3,13 +3,12 @@ from rest_framework import viewsets, mixins
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from app.enums import ObjectType, EventType
 from app.forms import StatForm, PostForm
 from app.models import Post, Config
 from app.permissions import IsAdminUserOrReadOnly
 from app.serializers import PostSerializer, StatSerializer, ConfigSerializer
-from app.services import stat_service, index_page_service, sync_service
-from app.util import main_group_send
+from app.services import stat_service, index_page_service, sync_service, ws_service
+from app.services.ws_service import ObjectType, EventType
 
 
 def index(request):
@@ -41,13 +40,13 @@ class PostViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.Updat
 
     def perform_update(self, serializer: PostSerializer):
         super().perform_update(serializer)
-        main_group_send(serializer.data, ObjectType.POST, EventType.UPDATE)
+        ws_service.main_group_send(serializer.data, ObjectType.POST, EventType.UPDATE)
         self._update_data(self.get_object())
 
     def perform_destroy(self, instance: Post):
         object_id = instance.id
         super().perform_destroy(instance)
-        main_group_send(object_id, ObjectType.POST, EventType.REMOVE)
+        ws_service.main_group_send(object_id, ObjectType.POST, EventType.REMOVE)
         instance.number = None
         self._update_data(instance)
 
