@@ -15,7 +15,7 @@
 
         <v-row no-gutters class="mt-5">
             <v-col cols="12" v-for="p in post.posts" :key="p.id" :class="postClass">
-                <post :post="p"/>
+                <post-card :post="p"/>
             </v-col>
         </v-row>
 
@@ -27,13 +27,13 @@
 </template>
 
 <script>
-    import Post from "../components/Post"
+    import PostCard from "../components/PostCard"
     import InfiniteLoading from "vue-infinite-loading"
     import {postApi} from "../api"
     import {mapMutations, mapState} from "vuex"
 
     export default {
-        components: {Post, InfiniteLoading},
+        components: {PostCard, InfiniteLoading},
         data: () => ({
             page: 0,
             infiniteId: +new Date()
