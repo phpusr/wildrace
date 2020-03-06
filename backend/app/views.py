@@ -97,6 +97,7 @@ class StatViewSet(viewsets.GenericViewSet):
         return Response(form.errors)
 
 
-class ConfigViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, mixins.UpdateModelMixin, viewsets.GenericViewSet):
+class ConfigViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, mixins.UpdateModelMixin,
+                    viewsets.GenericViewSet):
     queryset = Config.objects.filter(id=1)
     serializer_class = ConfigSerializer
