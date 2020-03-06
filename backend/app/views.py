@@ -2,7 +2,6 @@ from django.shortcuts import render
 from rest_framework import viewsets, mixins, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.views import APIView
 
 from app.forms import StatForm, PostForm
 from app.models import Post, Config
@@ -67,11 +66,11 @@ class PostViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.Updat
         stat_service.update_stat()
 
 
-class StatView(APIView):
+class StatViewSet(viewsets.GenericViewSet):
     permission_classes = [IsAdminUserOrReadOnly]
+    serializer_class = StatSerializer
 
-    @staticmethod
-    def get(request, format=None):
+    def list(self, request):
         form = StatForm(request.query_params)
         if form.is_valid():
             stat = stat_service.calc_stat(
@@ -79,13 +78,13 @@ class StatView(APIView):
                 start_range=form.cleaned_data['start_range'],
                 end_range=form.cleaned_data['end_range']
             )
-            serializer = StatSerializer(stat)
+            serializer = self.get_serializer(stat)
             return Response(serializer.data)
         else:
             return Response(form.errors)
 
-    @staticmethod
-    def post(request, format=None):
+    @action(detail=False, methods=['post'])
+    def publish(self, request):
         form = StatForm(request.data)
         if form.is_valid():
             stat = stat_service.calc_stat(
@@ -98,6 +97,6 @@ class StatView(APIView):
         return Response(form.errors)
 
 
-class ConfigViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, viewsets.GenericViewSet):
-    queryset = Config.objects.all()
+class ConfigViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, mixins.UpdateModelMixin, viewsets.GenericViewSet):
+    queryset = Config.objects.filter(id=1)
     serializer_class = ConfigSerializer

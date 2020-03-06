@@ -34,6 +34,6 @@ export const configApi = {
 
 export const statApi = {
     get: (params) => Vue.http.get("/api/stat/", {params}),
-    publishPost: (params) => Vue.http.post("/api/stat/", params)
+    publishPost: (params) => Vue.http.post("/api/stat/publish/", params)
 }
 
