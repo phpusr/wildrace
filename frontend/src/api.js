@@ -2,6 +2,15 @@ import Vue from "vue"
 
 let post_res = Vue.resource("/api/posts/{id}/")
 
+Vue.config.errorHandler = (error, vm, info) => {
+    if (error.status && error.statusText && error.url) {
+        alert(`${error.status}: ${error.statusText} on "${error.url}"`)
+        return
+    }
+
+    alert(`Error: ${error}, ${info}`)
+}
+
 export const postApi = {
     getOne: id => post_res.get({id}),
     getAll: params => Vue.http.get("/api/posts/", {params}),

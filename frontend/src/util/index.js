@@ -1,10 +1,6 @@
 import dateFormat from "date-format"
 import {dateTab, distanceTab} from "../util/data"
 
-export function fetchHandler(e) {
-    alert(`${e.status}: ${e.body.error} on "${e.url}"`)
-}
-
 export function stringToInt(str) {
     if (!checkValue(str)) {
         return null

@@ -53,7 +53,7 @@
 <script>
     import DatePicker from "./DatePicker"
     import {statApi} from "../api"
-    import {checkValue, convertStatParams, fetchHandler, stringToInt} from "../util"
+    import {checkValue, convertStatParams, stringToInt} from "../util"
     import {mapGetters} from "vuex"
     import {dateTab, distanceTab} from "../util/data"
 
@@ -94,7 +94,7 @@
 
                 this.$router.push({name: "stat", params: this.params})
             },
-            publishPost() {
+            async publishPost() {
                 if (!confirm(this.$t("stat.confirmPublish"))) {
                     return
                 }
@@ -105,9 +105,8 @@
 
                 const params = convertStatParams(this.params)
 
-                statApi.publishPost(params)
-                    .then(({body}) => alert(this.$t("stat.successPublishPost", {id: body})))
-                    .catch(fetchHandler)
+                const {body} = await statApi.publishPost(params)
+                alert(this.$t("stat.successPublishPost", {id: body}))
             },
             checkRange() {
                 const {startRange, endRange} = this.params

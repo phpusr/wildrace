@@ -3,7 +3,6 @@ import Vuex from "vuex"
 import {deleteObject, replaceObject} from "./util/collections"
 import dateFormat from "date-format"
 import {postApi} from "./api"
-import {fetchHandler} from "./util"
 import i18n from "./i18n"
 import {postSortDirection} from "./util/data"
 
@@ -90,11 +89,10 @@ export default new Vuex.Store({
         }
     },
     actions: {
-        syncPosts() {
+        async syncPosts() {
             if (confirm(i18n.tc("sync.confirm"))) {
-                postApi.sync()
-                    .then(() => alert(i18n.tc("sync.success")))
-                    .catch(fetchHandler)
+                await postApi.sync()
+                alert(i18n.tc("sync.success"))
             }
         }
     }
