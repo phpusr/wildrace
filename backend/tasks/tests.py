@@ -2,8 +2,8 @@ from unittest.mock import patch
 
 from django.test import TestCase
 
-from app.tasks import sync_posts_task, publish_stat_task
 from app.tests import create_config
+from tasks.tasks import sync_posts_task, publish_stat_task
 
 
 class TaskTests(TestCase):

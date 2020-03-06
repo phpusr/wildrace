@@ -1,8 +1,8 @@
 import logging
 
-from app.celery import app
 from app.models import Config
 from app.services import sync_service, stat_service
+from .celery import app
 
 logger = logging.getLogger(__name__)
 
