@@ -10,9 +10,10 @@ from django.utils import timezone
 
 from app.models import Post, Profile, Config
 from app.serializers import PostSerializer
-from app.services import vk_api_service, message_parser, stat_service, ws_service
-from app.services.ws_service import EventType, ObjectType
+from app.services import vk_api_service, message_parser, stat_service
 from app.util import find, find_all, remove_non_utf8_chars
+from ws import ws_service
+from ws.ws_service import EventType, ObjectType
 
 DOWNLOAD_POST_COUNT = 100
 """

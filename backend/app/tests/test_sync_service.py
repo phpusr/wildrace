@@ -6,8 +6,8 @@ from django.utils import timezone
 
 from app.models import Config, Post, Profile, TempData
 from app.services import sync_service
-from app.services.ws_service import EventType
 from app.tests import create_config, create_comment_text, create_post, create_vk_post
+from ws.ws_service import EventType
 
 
 class SyncServiceTests(TestCase):

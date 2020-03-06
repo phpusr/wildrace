@@ -187,7 +187,7 @@ REST_FRAMEWORK = {
 
 # Web Sockets
 
-ASGI_APPLICATION = 'app.routing.application'
+ASGI_APPLICATION = 'ws.routing.application'
 
 CHANNEL_LAYERS = {
     'default': {
