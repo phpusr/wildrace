@@ -1,7 +1,10 @@
 from channels.testing import ChannelsLiveServerTestCase
+from django.contrib.auth import get_user_model
 from selenium import webdriver
 from selenium.webdriver import ActionChains
 from selenium.webdriver.support.wait import WebDriverWait
+
+from app.tests import create_config, create_temp_data, create_runnings
 
 TIMEOUT = 2
 
@@ -12,10 +15,17 @@ class WSTests(ChannelsLiveServerTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+
+        cls.user = get_user_model().objects.create(username='phpusr', password='pass123', is_staff=True)
+        create_config()
+        create_temp_data()
+        create_runnings()
+
         try:
             cls.driver = webdriver.Chrome()
         except:  # noqa
             super().tearDownClass()
+            raise
 
     @classmethod
     def tearDownClass(cls):
@@ -65,4 +75,6 @@ class WSTests(ChannelsLiveServerTestCase):
 
     @property
     def _post_distance_value(self):
-        return self.driver.find_element_by_css_selector('.v-card__text > div').get_property('value')
+        selector = self.driver.find_element_by_css_selector('.v-card__text > div')
+        print('text', selector.text)
+        return self.driver.find_element_by_css_selector('.v-card__text > div').text
