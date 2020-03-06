@@ -1,5 +1,6 @@
 from django.shortcuts import render
-from rest_framework import viewsets, mixins
+from rest_framework import viewsets, mixins, status
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -21,6 +22,11 @@ class PostViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.Updat
                   viewsets.GenericViewSet):
     permission_classes = [IsAdminUserOrReadOnly]
     serializer_class = PostSerializer
+
+    @action(detail=False, methods=['put'])
+    def sync(self, request):
+        sync_service.sync_posts()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     def get_queryset(self):
         form = PostForm(self.request.query_params)
