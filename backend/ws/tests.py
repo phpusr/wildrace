@@ -1,3 +1,5 @@
+import unittest
+
 from channels.testing import ChannelsLiveServerTestCase
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
@@ -16,17 +18,20 @@ class WSTests(ChannelsLiveServerTestCase):
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.user = {'username': 'phpusr', 'password': '123', 'is_staff': True}
-        User.objects.create_user(**cls.user)
-        create_config()
-        create_temp_data()
-        create_runnings()
-
         try:
             cls.driver = webdriver.Chrome()
         except:  # noqa
             super().tearDownClass()
             raise
+
+        if not hasattr(cls, 'driver'):
+            return unittest.skip(f'{cls.__class__.__name__} doesn\'t have driver')
+
+        cls.user = {'username': 'phpusr', 'password': '123', 'is_staff': True}
+        User.objects.create_user(**cls.user)
+        create_config()
+        create_temp_data()
+        create_runnings()
 
     @classmethod
     def tearDownClass(cls):
