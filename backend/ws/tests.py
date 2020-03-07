@@ -2,6 +2,7 @@ import unittest
 
 from channels.testing import ChannelsLiveServerTestCase
 from selenium import webdriver
+from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.wait import WebDriverWait
 
@@ -20,9 +21,11 @@ class WSTests(ChannelsLiveServerTestCase):
 
         try:
             cls.driver = webdriver.Chrome()
+        except WebDriverException:
+            return unittest.skip(f'{cls.__class__.__name__} doesn\'t have driver')
         except:  # noqa
             super().tearDownClass()
-            return unittest.skip(f'{cls.__class__.__name__} doesn\'t have driver')
+            raise
 
         cls.user = {'username': 'phpusr', 'password': '123', 'is_staff': True}
         User.objects.create_user(**cls.user)
