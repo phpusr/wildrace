@@ -1,17 +1,16 @@
 let connected = false
 const handlers = []
 
-export function connectToWS() {
+export function connectToWS(store) {
     const socket = new WebSocket(`ws://${window.location.host}/ws/wild-race/`)
 
-    socket.onopen = event => {
+    socket.onopen = () => {
         connected = true
-        console.log("WebSocket open", event, connected)
+        store.commit("setWebSocketStatusMutation", {connected})
     }
 
     socket.onmessage = message => {
         const data = JSON.parse(message.data)
-        console.log("message", data)
         handlers.forEach(h => {
             if (data.type ===  h.type) {
                 h.handler(data)
@@ -19,17 +18,14 @@ export function connectToWS() {
         })
     }
 
-    socket.onerror = socketFail.bind(null, "Error")
-    socket.onclose = socketFail.bind(null, "Close")
+    socket.onerror = socketFail.bind(null, store, "error")
+    socket.onclose = socketFail.bind(null, store, "close")
 }
 
-function socketFail(cause) {
-    console.log("socket", cause)
+function socketFail(store, cause) {
+    console.error("Web Socket", cause)
     connected = false
-    //TODO
-    // if (confirm(`${cause} connect to ws. Reload page?`)) {
-    //     location.reload()
-    // }
+    store.commit("setWebSocketStatusMutation", {connected})
 }
 
 export function addHandler(type, handler) {

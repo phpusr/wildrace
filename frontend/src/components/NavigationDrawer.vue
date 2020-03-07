@@ -54,7 +54,12 @@
                 <v-list-item-action>
                     <div class="subheading grey--text text--lighten-1">
                         <div class="font-weight-medium">{{$t("post.lastSyncDate")}}:</div>
-                        <div>{{lastSyncDate}}</div>
+                        <div class="d-flex">
+                            <div>{{lastSyncDate}}</div>
+                            <div class="ml-2 mt-n1">
+                                <v-badge dot :color="wsStatusColor" />
+                            </div>
+                        </div>
                     </div>
                 </v-list-item-action>
             </v-list-item>
@@ -76,10 +81,13 @@
                 "3106088905fa5bfbadc41532fbaa28237209b1aa976fc9.png"
         }),
         computed: {
-            ...mapState(["user", "lastSyncDate", "config"]),
+            ...mapState(["user", "lastSyncDate", "config", "webSocketStatus"]),
             ...mapGetters(["userIsAdmin"]),
             mobile() {
                 return this.$vuetify.breakpoint.smAndDown
+            },
+            wsStatusColor() {
+                return this.webSocketStatus.connected ? "green" : "red"
             }
         },
         methods: {

@@ -38,7 +38,10 @@ export default new Vuex.Store({
             stat
         },
         lastSyncDate: formatDate(lastSyncDate),
-        config
+        config,
+        webSocketStatus: {
+            connected: false
+        }
     },
     getters: {
         userIsAdmin: state => {
@@ -86,6 +89,9 @@ export default new Vuex.Store({
         },
         updateLastSyncDateMutation(state, date) {
             state.lastSyncDate = formatDate(date)
+        },
+        setWebSocketStatusMutation(state, status) {
+            state.webSocketStatus = status
         }
     },
     actions: {

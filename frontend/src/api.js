@@ -8,6 +8,7 @@ Vue.config.errorHandler = (error, vm, info) => {
         return
     }
 
+    console.error(error)
     alert(`Error: ${error}, ${info}`)
 }
 

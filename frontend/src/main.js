@@ -9,7 +9,7 @@ import {connectToWS} from "./util/ws"
 import store from "./store"
 import {getCsrfToken} from "./util"
 
-connectToWS()
+connectToWS(store)
 
 Vue.config.productionTip = false
 
