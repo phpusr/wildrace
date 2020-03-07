@@ -22,9 +22,6 @@ class WSTests(ChannelsLiveServerTestCase):
             cls.driver = webdriver.Chrome()
         except:  # noqa
             super().tearDownClass()
-            raise
-
-        if not hasattr(cls, 'driver'):
             return unittest.skip(f'{cls.__class__.__name__} doesn\'t have driver')
 
         cls.user = {'username': 'phpusr', 'password': '123', 'is_staff': True}
