@@ -104,7 +104,8 @@ def create_running(number, profile, distance, sum_distance, date):
         author=profile,
         distance=distance,
         sum_distance=sum_distance,
-        date=date
+        date=date,
+        text=f'+{distance}={sum_distance}'
     )
 
 

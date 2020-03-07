@@ -1,9 +1,9 @@
 from channels.testing import ChannelsLiveServerTestCase
-from django.contrib.auth import get_user_model
 from selenium import webdriver
-from selenium.webdriver import ActionChains
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.wait import WebDriverWait
 
+from app.models import User
 from app.tests import create_config, create_temp_data, create_runnings
 
 TIMEOUT = 2
@@ -16,7 +16,8 @@ class WSTests(ChannelsLiveServerTestCase):
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.user = get_user_model().objects.create(username='phpusr', password='pass123', is_staff=True)
+        cls.user = {'username': 'phpusr', 'password': '123', 'is_staff': True}
+        User.objects.create_user(**cls.user)
         create_config()
         create_temp_data()
         create_runnings()
@@ -34,27 +35,36 @@ class WSTests(ChannelsLiveServerTestCase):
 
     def test_when_post_edited_then_seen_by_everyone(self):
         try:
-            self._enter_index_page()
+            self._enter_index_page(self.user)
 
             self._open_new_window()
             self._enter_index_page()
 
             self._switch_to_window(0)
-            self._edit_post()
+            new_post = {'distance': '123'}
+            self._edit_post(new_post)
+            WebDriverWait(self.driver, TIMEOUT).until(lambda _:
+                                                      new_post['distance'] in self._post_distance_value,
+                                                      'Message was not received by window 1 from window 1')
 
             self._switch_to_window(1)
             WebDriverWait(self.driver, TIMEOUT).until(lambda _:
-                                                      '123' in self._post_distance_value,
+                                                      new_post['distance'] in self._post_distance_value,
                                                       'Message was not received by window 2 from window 1')
         finally:
             self._close_all_new_windows()
 
     # === Utility ===
 
-    def _enter_index_page(self):
+    def _enter_index_page(self, user=None):
         self.driver.get(self.live_server_url + '/')
-        WebDriverWait(self.driver, TIMEOUT).until(lambda _:
-                                                  '/' in self.driver.current_url)
+
+        if user:
+            self._find_by_css('.v-navigation-drawer__content button').click()
+            self.driver.find_element_by_name('username').send_keys(user['username'])
+            self.driver.find_element_by_name('password').send_keys(user['password'], Keys.RETURN)
+
+        WebDriverWait(self.driver, TIMEOUT).until(lambda _: '/' in self.driver.current_url)
 
     def _open_new_window(self):
         self.driver.execute_script('window.open("about:blank", "_blank")')
@@ -70,11 +80,16 @@ class WSTests(ChannelsLiveServerTestCase):
     def _switch_to_window(self, window_index):
         self.driver.switch_to.window(self.driver.window_handles[window_index])
 
-    def _edit_post(self):
-        ActionChains(self.driver).send_keys('test').perform()
+    def _edit_post(self, post: dict):
+        self._find_by_css('.v-card__title > button').click()
+        number_input = self._find_by_css('.v-dialog .v-card__text .v-input:nth-child(3) input')
+        number_input.send_keys(Keys.CONTROL + 'a', Keys.DELETE)
+        number_input.send_keys(post['distance'])
+        self._find_by_css('.v-dialog .v-card__actions button.primary').click()
 
     @property
     def _post_distance_value(self):
-        selector = self.driver.find_element_by_css_selector('.v-card__text > div')
-        print('text', selector.text)
-        return self.driver.find_element_by_css_selector('.v-card__text > div').text
+        return self._find_by_css('.v-card__text > .blue--text').text
+
+    def _find_by_css(self, selector):
+        return self.driver.find_element_by_css_selector(selector)
