@@ -33,7 +33,8 @@ class WSTests(ChannelsLiveServerTestCase):
 
     @classmethod
     def tearDownClass(cls):
-        cls.driver.quit()
+        if hasattr(cls, 'driver'):
+            cls.driver.quit()
         super().tearDownClass()
 
     def test_when_post_edited_then_seen_by_everyone(self):
