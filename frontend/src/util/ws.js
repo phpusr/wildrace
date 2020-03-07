@@ -2,7 +2,7 @@ let connected = false
 const handlers = []
 
 export function connectToWS() {
-    const socket = new WebSocket("ws://localhost:8000/ws/wild-race/")
+    const socket = new WebSocket(`ws://${window.location.host}/ws/wild-race/`)
 
     socket.onopen = event => {
         connected = true
