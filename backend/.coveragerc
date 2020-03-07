@@ -1,11 +1,19 @@
 [run]
-source =
-    .
+command_line = manage.py test
+source = .
+data_file = ../.coverage
+
 omit =
     manage.py
-    */__init__.py
+
     app/migrations/*
     app/tests/*
     app/asgi.py
     app/wsgi.py
     app/settings.py
+
+    ws/consumers.py
+    ws/tests.py
+
+[html]
+directory = ../.coverage_html

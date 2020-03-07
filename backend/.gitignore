@@ -1,8 +1,2 @@
 __pycache__/
-
 /static/
-
-# coverage
-/htmlcov/
-/.coverage
-/coverage.xml
