@@ -1,12 +1,12 @@
-let connected = false
+import ReconnectingWebSocket from "ReconnectingWebSocket"
+
 const handlers = []
 
 export function connectToWS(store) {
-    const socket = new WebSocket(`ws://${window.location.host}/ws/wild-race/`)
+    const socket = new ReconnectingWebSocket(`ws://${window.location.host}/ws/wild-race/`)
 
     socket.onopen = () => {
-        connected = true
-        store.commit("setWebSocketStatusMutation", {connected})
+        store.commit("setWebSocketStatusMutation", {connected: true})
     }
 
     socket.onmessage = message => {
@@ -18,14 +18,9 @@ export function connectToWS(store) {
         })
     }
 
-    socket.onerror = socketFail.bind(null, store, "error")
-    socket.onclose = socketFail.bind(null, store, "close")
-}
-
-function socketFail(store, cause) {
-    console.error("Web Socket", cause)
-    connected = false
-    store.commit("setWebSocketStatusMutation", {connected})
+    socket.onclose = () => {
+        store.commit("setWebSocketStatusMutation", {connected: false})
+    }
 }
 
 export function addHandler(type, handler) {
