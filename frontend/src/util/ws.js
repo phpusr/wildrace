@@ -2,7 +2,7 @@ import ReconnectingWebSocket from "ReconnectingWebSocket"
 
 const handlers = []
 
-export function connectToWS(store) {
+export function connectToWebSocket(store) {
     const socket = new ReconnectingWebSocket(`ws://${window.location.host}/ws/wild-race/`)
 
     socket.onopen = () => {

@@ -5,11 +5,11 @@ import vuetify from "./plugins/vuetify"
 import VueRouter from "vue-router"
 import router from "./router"
 import i18n from "./i18n"
-import {connectToWS} from "./util/ws"
+import {connectToWebSocket} from "./util/ws"
 import store from "./store"
 import {getCsrfToken} from "./util"
 
-connectToWS(store)
+connectToWebSocket(store)
 
 Vue.config.productionTip = false
 
