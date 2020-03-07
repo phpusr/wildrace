@@ -1,5 +1,3 @@
-import unittest
-
 from channels.testing import ChannelsLiveServerTestCase
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException
@@ -22,7 +20,7 @@ class WSTests(ChannelsLiveServerTestCase):
         try:
             cls.driver = webdriver.Chrome()
         except WebDriverException:
-            return unittest.skip(f'{cls.__class__.__name__} doesn\'t have driver')
+            return
         except:  # noqa
             super().tearDownClass()
             raise
@@ -39,6 +37,9 @@ class WSTests(ChannelsLiveServerTestCase):
         super().tearDownClass()
 
     def test_when_post_edited_then_seen_by_everyone(self):
+        if not hasattr(self, 'driver'):
+            self.skipTest(f'{self.__class__.__name__} doesn\'t have driver')
+
         try:
             self._enter_index_page(self.user)
 
