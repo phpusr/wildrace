@@ -16,7 +16,7 @@ COPY backend /app
 WORKDIR /app
 
 RUN mkdir -p /vol/web/static
-RUN adduser --no-create-home user
+RUN adduser --disabled-password --no-create-home user
 RUN chown -R user:user /vol
 RUN chmod -R 700 /vol/web
 USER user

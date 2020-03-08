@@ -19,6 +19,7 @@ flower = "*"
 django-celery-beat = "*"
 channels = "*"
 channels-redis = "*"
+whitenoise = "*"
 
 [requires]
 python_version = "3.8"
