@@ -2,8 +2,7 @@ from enum import Enum
 
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
-
-from app import settings
+from django.conf import settings
 
 
 class ObjectType(Enum):
