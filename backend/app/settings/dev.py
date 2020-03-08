@@ -194,20 +194,20 @@ REST_FRAMEWORK = {
 
 ASGI_APPLICATION = 'ws.routing.application'
 
+REDIS_URL = os.getenv('REDIS_URL', 'redis://localhost:6379')
+
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            'hosts': [
-                ('127.0.0.1', 6379)
-            ]
+            'hosts': [REDIS_URL]
         }
     }
 }
 
 # Celery
 
-CELERY_BROKER_URL = 'redis://localhost:6379'
+CELERY_BROKER_URL = REDIS_URL
 
 #####################################
 

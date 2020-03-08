@@ -2,9 +2,17 @@ version: "3"
 
 services:
   web:
-    container_name: wildrace
+    container_name: wildrace-web
     build: .
     ports:
-      - 8000:8000
+      - 8010:8000
     environment:
+      - DJANGO_SETTINGS_MODULE=app.settings.prod
       - PORT=8000
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - redis
+
+  redis:
+    container_name: wildrace-redis
+    image: redis:5.0

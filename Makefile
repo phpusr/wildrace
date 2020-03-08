@@ -29,6 +29,8 @@ build-backend:
 heroku-logs:
 	heroku logs -t -a $(APP_NAME)
 
+heroku: heroku-push heroku-release
+
 # builds, then pushes Docker images to deploy your Heroku app
 heroku-push:
 	heroku container:push $(APP_SERVICE) -a $(APP_NAME)
