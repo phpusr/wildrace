@@ -3,7 +3,8 @@ import ReconnectingWebSocket from "ReconnectingWebSocket"
 const handlers = []
 
 export function connectToWebSocket(store) {
-    const socket = new ReconnectingWebSocket(`ws://${window.location.host}/ws/wild-race/`)
+    const protocol = window.location.protocol === "https:" ? "wss" : "ws"
+    const socket = new ReconnectingWebSocket(`${protocol}://${window.location.host}/ws/wild-race/`)
 
     socket.onopen = () => {
         store.commit("setWebSocketStatusMutation", {connected: true})
