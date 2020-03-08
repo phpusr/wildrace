@@ -1,0 +1,10 @@
+version: "3"
+
+services:
+  web:
+    container_name: wildrace
+    build: .
+    ports:
+      - 8000:8000
+    environment:
+      - PORT=8000
