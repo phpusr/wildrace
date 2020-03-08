@@ -52,3 +52,27 @@ def date_to_js_unix_time(date: datetime) -> int:
 
 def js_unix_time_to_date(timestamp: int) -> datetime:
     return datetime.utcfromtimestamp(timestamp / 1000).astimezone(timezone.get_default_timezone())
+
+
+def split_url(url: str) -> dict:
+    s = url.split(':')
+
+    if len(s) == 4:
+        s2 = s[2].split('@')
+        username = s[1][2:]
+        password = s2[0]
+        host = s2[1]
+    elif len(s) == 3:
+        username = ''
+        password = ''
+        host = s[1][2:]
+    else:
+        raise ValueError('Not support this url type')
+
+    return {
+        'protocol': s[0],
+        'username': username,
+        'password': password,
+        'host': host,
+        'port': int(s[-1])
+    }

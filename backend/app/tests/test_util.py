@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
-from unittest import TestCase
+
+from django.test import TestCase
 
 from app import util
 
@@ -55,8 +56,38 @@ class UtilTests(TestCase):
         json = util.encode_json({'my_var': 'my_value'})
         self.assertTrue(json, '{"myVar": "my_value"')
 
-    def test(self):
+    def test_date_to_js_unix_time(self):
         date = datetime.utcfromtimestamp(0)
         res = util.date_to_js_unix_time(date)
         expected = int(date.timestamp() * 1000)
         self.assertEqual(res, expected)
+
+    def test_simple_url(self):
+        url = 'redis://localhost:6379'
+        res = util.split_url(url)
+        expected = {
+            'protocol': 'redis',
+            'username': '',
+            'password': '',
+            'host': 'localhost',
+            'port': 6379
+        }
+        self.assertEqual(res, expected)
+
+    def test_split_amazon_redis_url(self):
+        url = 'redis://h:p548d87ab98d6c5688858f7e06271986ad20b2c35216705f74598ef04b53b4933' \
+              '@ec2-52-212-215-87.eu-west-1.compute.amazonaws.com:13519'
+        res = util.split_url(url)
+        expected = {
+            'protocol': 'redis',
+            'username': 'h',
+            'password': 'p548d87ab98d6c5688858f7e06271986ad20b2c35216705f74598ef04b53b4933',
+            'host': 'ec2-52-212-215-87.eu-west-1.compute.amazonaws.com',
+            'port': 13519
+        }
+        self.assertEqual(res, expected)
+
+    def test_not_support_url(self):
+        url = 'redis://localhost'
+        with self.assertRaises(ValueError):
+            util.split_url(url)
