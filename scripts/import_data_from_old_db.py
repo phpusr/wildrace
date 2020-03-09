@@ -28,17 +28,22 @@ def get_date(value):
     return value.astimezone(pytz.UTC) if value else None
 
 
+def create_user():
+    if not models.User.objects.filter(username='phpusr').exists():
+        models.User.objects.create_superuser('phpusr', password='mysuperpassword')
+
+
 def import_config():
     results = execute('config')
     for row in results:
         models.Config.objects.create(
             id=row['id'],
-            sync_posts=row['sync_posts'],
-            group_id=row['group_id'],
-            commenting=row['commenting'],
-            comment_access_token=row['comment_access_token'],
-            comment_from_group=row['comment_from_group'],
-            publish_stat=row['publish_stat'],
+            sync_posts=False,
+            group_id='88923650',
+            commenting=False,
+            comment_access_token='',
+            comment_from_group=False,
+            publish_stat=False,
         )
 
 
@@ -118,6 +123,7 @@ if __name__ == '__main__':
             delete_all_objects(models.TempData)
 
         cursor = conn.cursor()
+        create_user()
         import_config()
         import_profiles()
         import_posts()

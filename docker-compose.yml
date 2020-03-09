@@ -9,9 +9,19 @@ services:
     environment:
       - DJANGO_SETTINGS_MODULE=app.settings.prod
       - PORT=8000
+      - DATABASE_URL=postgres://postgres:mysuperpassword@db:5432/app
       - REDIS_URL=redis://redis:6379
     depends_on:
+      - db
       - redis
+
+  db:
+    container_name: wildrace-db
+    image: postgres:12-alpine
+    environment:
+      - POSTGRES_DB=app
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=mysuperpassword
 
   redis:
     container_name: wildrace-redis

@@ -26,4 +26,4 @@ RUN chown -R user:user /vol
 RUN chmod -R 700 /vol/web
 USER user
 
-CMD /bin/wildrace.sh $PORT
+CMD ./manage.py migrate && /bin/wildrace.sh $PORT
