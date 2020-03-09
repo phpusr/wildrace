@@ -82,7 +82,7 @@ def _sync_block_posts(vk_post_count: int, download_count: int) -> int:
     vk_posts = list(reversed(response['items']))
 
     last_db_posts = _get_last_posts(LAST_POSTS_COUNT)
-    deleted_posts = _remove_deleted_posts(vk_posts, last_db_posts)
+    deleted_post_ids = _remove_deleted_posts(vk_posts, last_db_posts)
 
     for vk_post in vk_posts:
         post_id = vk_post['id']
@@ -116,8 +116,8 @@ def _sync_block_posts(vk_post_count: int, download_count: int) -> int:
             last_db_posts.sort(key=lambda p: p.date, reverse=True)
 
     # Deleting posts from the client, after sync without exceptions
-    for post in deleted_posts:
-        ws_service.main_group_send(PostSerializer(post).data, ObjectType.POST, EventType.REMOVE)
+    for post_id in deleted_post_ids:
+        ws_service.main_group_send(post_id, ObjectType.POST, EventType.REMOVE)
 
     return Post.objects.count()
 
@@ -131,23 +131,25 @@ def _remove_deleted_posts(vk_posts: Iterator[dict], last_db_posts: List[Post]) -
     # Searching posts for last {number_of_last_days}
     number_of_last_days = 5
     start_date = timezone.now() - timedelta(days=number_of_last_days)
-    last_day_posts = [post for post in last_db_posts if post.date >= start_date]
+    recent_posts = [post for post in last_db_posts if post.date >= start_date]
 
     def not_find_in_vk(post):
         return find(vk_posts, lambda it: it['id'] == post.id) is None
 
-    deleted_posts = find_all(last_day_posts, not_find_in_vk)
+    deleted_posts = find_all(recent_posts, not_find_in_vk)
 
     if not deleted_posts:
-        return deleted_posts
+        return []
 
     logger.debug(f'>> Delete vk_posts, number: {len(deleted_posts)}')
+    deleted_post_ids = []
     for post in deleted_posts:
         logger.debug(f' -- Delete {post}')
+        deleted_post_ids.append(post.id)
         post.delete()
         last_db_posts.remove(post)
 
-    return deleted_posts
+    return deleted_post_ids
 
 
 def _get_last_post(posts, post_id, post_date):
