@@ -29,11 +29,16 @@ def get_date(value):
 
 
 def create_user():
-    if not models.User.objects.filter(username='phpusr').exists():
-        models.User.objects.create_superuser('phpusr', password='mysuperpassword')
+    username = 'phpusr'
+    if not models.User.objects.filter(username=username).exists():
+        models.User.objects.create_superuser(username, password='mysuperpassword')
+        print(f'Created user: {username}')
 
 
 def import_config():
+    if models.Config.objects.exists():
+        return
+
     results = execute('config')
     for row in results:
         models.Config.objects.create(
@@ -116,7 +121,6 @@ if __name__ == '__main__':
     with psycopg2.connect(host='127.0.0.1', user='phpusr', dbname='wildrace_v2', cursor_factory=RealDictCursor) as conn:
         if True:
             print('Clean DB')
-            delete_all_objects(models.Config)
             delete_all_objects(models.Post)
             delete_all_objects(models.Profile)
             delete_all_objects(models.StatLog)
