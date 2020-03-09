@@ -118,7 +118,8 @@ if __name__ == '__main__':
     django.setup()
     from app import models  # noqa: E402
 
-    with psycopg2.connect(host='127.0.0.1', user='phpusr', dbname='wildrace_v2', cursor_factory=RealDictCursor) as conn:
+    with psycopg2.connect(host='127.0.0.1', user='phpusr', dbname='wildrace_v2',
+                          cursor_factory=RealDictCursor) as conn:
         if True:
             print('Clean DB')
             delete_all_objects(models.Post)
