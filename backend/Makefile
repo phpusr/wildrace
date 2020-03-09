@@ -29,7 +29,12 @@ build-backend:
 heroku-logs:
 	heroku logs -t -a $(APP_NAME)
 
-heroku: heroku-push heroku-release
+heroku-build-push: heroku-push heroku-release
+
+heroku-push-local:
+	docker tag phpusr/wildrace registry.heroku.com/wildrace/web
+	docker push registry.heroku.com/wildrace/web
+	$(MAKE) heroku-release
 
 # builds, then pushes Docker images to deploy your Heroku app
 heroku-push:
