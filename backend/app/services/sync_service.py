@@ -71,8 +71,6 @@ def _sync_block_posts(vk_post_count: int, download_count: int) -> int:
     else:
         offset = 0
 
-    db_profiles = list(Profile.objects.all())
-
     response = vk_api_service.get_wall_posts(offset, download_count)
 
     if response['count'] != vk_post_count:
@@ -81,6 +79,7 @@ def _sync_block_posts(vk_post_count: int, download_count: int) -> int:
 
     vk_posts = list(reversed(response['items']))
 
+    db_profiles = list(Profile.objects.all())
     last_db_posts = _get_last_posts(LAST_POSTS_COUNT)
     deleted_post_ids = _remove_deleted_posts(vk_posts, last_db_posts)
 
