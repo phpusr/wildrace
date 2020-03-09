@@ -82,14 +82,14 @@ WSGI_APPLICATION = 'app.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-DB_URL = os.getenv('DATABASE_URL', 'postgres://127.0.0.1:5432/wildrace')
-DB_DEFAULT = dj_database_url.parse(DB_URL)
-DB_DEFAULT['TEST'] = {
-    'ENGINE': 'django.db.backends.sqlite3',
-    'NAME': os.path.join(BASE_DIR, 'db', 'test_db.sqlite3')
-}
 DATABASES = {
-    'default': DB_DEFAULT
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db', 'dev_db.sqlite3'),
+        'TEST': {
+            'NAME': os.path.join(BASE_DIR, 'db', 'test_db.sqlite3')
+        }
+    }
 }
 
 # Password validation
