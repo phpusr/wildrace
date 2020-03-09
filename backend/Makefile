@@ -7,12 +7,9 @@ export DJANGO_SETTINGS_MODULE=app.settings.prod
 main:
 	@echo "This is Makefile for wildrace app"
 
-shell:
-	cd backend && pipenv shell
-
 run-prod:
 	@echo "=== Run Production version"
-	cd backend && pipenv run daphne app.asgi:application -b 0.0.0.0 -p 8000
+	pipenv run daphne app.asgi:application -b 0.0.0.0 -p 8000
 
 ### Build ###
 
@@ -21,11 +18,11 @@ build: build-frontend build-backend
 
 build-frontend:
 	@echo "=== Build frontent ==="
-	cd frontend && yarn build
+	cd ../frontend && yarn build
 
 build-backend:
 	@echo "=== Build backend ==="
-	cd backend && pipenv run ./manage.py collectstatic --clear --no-input
+	pipenv run ./manage.py collectstatic --clear --no-input
 
 ### Heroku ###
 

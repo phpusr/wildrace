@@ -8,15 +8,15 @@ COPY ./scripts/docker_run.sh /bin/wildrace.sh
 RUN chmod +rx /bin/wildrace.sh
 
 # Install dependencies
-COPY ./backend/Pipfile /app/Pipfile
-COPY ./backend/Pipfile.lock /app/Pipfile.lock
+COPY ./Pipfile /app/Pipfile
+COPY ./Pipfile.lock /app/Pipfile.lock
 RUN cd /app \
     && pip install --upgrade pipenv \
     && pipenv lock --requirements > requirements.txt \
     && pip install -r requirements.txt
 
 # Copy source files
-COPY backend /app
+COPY . /app
 WORKDIR /app
 
 # Add user
