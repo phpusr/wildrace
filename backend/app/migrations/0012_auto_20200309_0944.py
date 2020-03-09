@@ -6,8 +6,9 @@ from django.utils import timezone
 
 def create_required_data(apps, schema_editor):
     User = get_user_model()
-    if not User.objects.filter(username='phpusr').exists:
-        User.objects.create_superuser('phpusr', password='mysuperpassword')
+    username = 'phpusr'
+    if not User.objects.filter(username=username).exists():
+        User.objects.create_superuser(username, password='mysuperpassword')
 
     Config = apps.get_model('app', 'Config')
     if not Config.objects.exists():
