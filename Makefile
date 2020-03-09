@@ -7,6 +7,9 @@ export DJANGO_SETTINGS_MODULE=app.settings.prod
 main:
 	@echo "This is Makefile for wildrace app"
 
+shell:
+	cd backend && pipenv shell
+
 run-prod:
 	@echo "=== Run Production version"
 	cd backend && pipenv run daphne app.asgi:application -b 0.0.0.0 -p 8000

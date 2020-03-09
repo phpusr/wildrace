@@ -20,6 +20,7 @@ django-celery-beat = "*"
 channels = "*"
 channels-redis = "*"
 whitenoise = "*"
+dj-database-url = "*"
 
 [requires]
 python_version = "3.8"
