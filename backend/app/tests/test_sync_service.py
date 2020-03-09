@@ -14,8 +14,7 @@ class SyncServiceTests(TestCase):
 
     def setUp(self):
         self.config = create_config()
-        self.profile = Profile.objects.create(join_date=timezone.now(), first_name='Иван', sex=Profile.Sex.MALE)
-        TempData.objects.create(last_sync_date=timezone.now())
+        self.profile = Profile.objects.create(join_date=timezone.now(), first_name='Ivan', sex=Profile.Sex.MALE)
 
     def create_vk_post(self, post_id, text, timestamp=None):
         return create_vk_post(post_id, self.profile.id, text, timestamp)
@@ -133,7 +132,7 @@ class SyncServiceTests(TestCase):
         result = sync_service._remove_deleted_posts(vk_posts, posts)
 
         self.assertEqual(len(result), 1)
-        self.assertEqual(id(result[0]), id(post2))
+        self.assertEqual(result, [124])
         self.assertEqual(len(posts), 2)
         self.assertEqual(posts, [post1, post3])
 

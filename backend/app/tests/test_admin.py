@@ -1,17 +1,15 @@
-from django.contrib.auth import get_user_model
 from django.test import TestCase, Client
 from django.urls import reverse
 from rest_framework import status
 
 from app.models import Post
-from app.tests import create_config, create_profile, create_stat_log, create_temp_data, create_post
+from app.tests import create_config, create_profile, create_stat_log, create_temp_data, create_post, create_admin
 
 
 class AdminSiteTests(TestCase):
     def setUp(self):
         self.client = Client()
-        self.admin_user = get_user_model().objects.create(username='phpusr', password='123', is_staff=True,
-                                                          is_superuser=True)
+        self.admin_user = create_admin()
         self.client.force_login(self.admin_user)
 
     def test_users_listed(self):

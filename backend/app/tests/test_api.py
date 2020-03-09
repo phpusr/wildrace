@@ -10,7 +10,7 @@ from rest_framework.test import APIClient
 from app.models import StatLog, Post
 from app.serializers import ConfigSerializer, StatSerializer, PostSerializer
 from app.services import vk_api_service, stat_service
-from app.tests import create_config, create_runnings, create_temp_data
+from app.tests import create_config, create_runnings, create_temp_data, create_admin
 
 POSTS_URL = reverse('post-list')
 POST_SYNC_URL = reverse('post-sync')
@@ -105,7 +105,7 @@ class PublicApiTests(TestCase):
 class PrivateApiTests(TestCase):
     def setUp(self):
         self.client = APIClient()
-        self.user = get_user_model().objects.create(username='phpusr', password='pass123', is_staff=True)
+        self.user = create_admin()
         self.client.force_authenticate(self.user)
         self.config = create_config()
         self.stat = create_temp_data()

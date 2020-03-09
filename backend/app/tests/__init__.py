@@ -9,8 +9,12 @@ from app.models import Profile, Post
 from app.services import sync_service, message_parser
 
 
+def create_admin():
+    return models.User.objects.get(username='phpusr')
+
+
 def create_config():
-    return models.Config.objects.create(
+    models.Config.objects.all().update(
         sync_posts=False,
         group_id=88923650,
         commenting=False,
@@ -18,6 +22,7 @@ def create_config():
         comment_from_group=False,
         publish_stat=False
     )
+    return models.Config.objects.get()
 
 
 def create_profile():
@@ -73,7 +78,7 @@ def create_stat_log():
 
 
 def create_temp_data():
-    return models.TempData.objects.create(last_sync_date=timezone.now())
+    return models.TempData.objects.get()
 
 
 def create_or_get_profile(profile_id, first_name, last_name, date):

@@ -8,9 +8,9 @@ from app.tests import create_config, create_stat_log, create_temp_data, create_p
 
 class ModelTests(TestCase):
     def test_user_str(self):
-        user = get_user_model().objects.create(username='phpusr')
+        user = get_user_model().objects.create(username='test')
 
-        self.assertEquals(str(user), 'phpusr')
+        self.assertEquals(str(user), 'test')
         self.assertEqual(user._meta.label, 'app.User')
 
 

@@ -5,7 +5,7 @@ from django.urls import reverse
 from rest_framework import status
 
 from app.services import index_page_service
-from app.tests import create_config, create_temp_data
+from app.tests import create_config, create_temp_data, create_admin
 
 INDEX_URL = reverse('index')
 
@@ -37,7 +37,7 @@ class PublicTests(TestCase):
 class PrivateTests(TestCase):
     def setUp(self):
         self.client = Client()
-        self.user = get_user_model().objects.create(username='phpusr', password='123pas')
+        self.user = create_admin()
         self.client.force_login(self.user)
         create_temp_data()
         create_config()

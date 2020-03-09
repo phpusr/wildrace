@@ -25,7 +25,7 @@ class WSTests(ChannelsLiveServerTestCase):
             super().tearDownClass()
             raise
 
-        cls.user = {'username': 'phpusr', 'password': '123', 'is_staff': True}
+        cls.user = {'username': 'test', 'password': '123', 'is_staff': True}
         User.objects.create_user(**cls.user)
         create_config()
         create_temp_data()

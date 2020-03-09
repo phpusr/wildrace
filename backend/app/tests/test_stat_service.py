@@ -241,9 +241,8 @@ class StatServiceTests(TestCase):
 
     def test_update_stat(self):
         """Test that update stat correct update last_sync_date"""
-        temp_data = TempData.objects.create(
-            last_sync_date=timezone.now() - timedelta(days=100)
-        )
+        temp_data = TempData.objects.get()
+        temp_data.last_sync_date = timezone.now() - timedelta(days=100)
 
         before_date = timezone.now()
         stat_service.update_stat()
