@@ -12,7 +12,7 @@ jobs:
         - pip install pipenv
         - pipenv install --dev
       script:
-        - coverage run manage.py test && flake8
+        - coverage run && flake8
       after_script:
         - bash <(curl -s https://codecov.io/bash)
 

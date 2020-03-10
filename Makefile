@@ -6,7 +6,7 @@ main:
 	@echo "This is Makefile for wildrace app"
 
 daphne:
-	@echo "=== Run Production version"
+	@echo "=== Run daphne ==="
 	cd backend && pipenv run daphne app.asgi:application -b 0.0.0.0 -p 8000
 
 ### Build ###
@@ -18,17 +18,24 @@ build-frontend:
 	@echo "=== Build frontent ==="
 	cd frontend && yarn build
 
-build-backend:
+build-backend: flake8
 	@echo "=== Build backend ==="
 	pipenv run ./manage.py collectstatic --clear --no-input
 
 ### Test ###
 
 test:
-	./manage.py test
+	@echo "=== Test backend ==="
+	pipenv run ./manage.py test
 
 coverage:
-	cd backend && pipenv run coverage run; pipenv run coverage report && pipenv run coverage html && chromium ../.coverage_html/index.html
+	cd backend && pipenv run coverage run; \
+	pipenv run coverage report && pipenv run coverage html \
+	&& chromium ../.coverage_html/index.html
+
+flake8:
+	@echo "=== flake8 ==="
+	cd backend && pipenv run flake8
 
 ### Docker ###
 
