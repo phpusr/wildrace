@@ -54,8 +54,9 @@ def import_config():
 
 def import_profiles():
     results = execute('profile')
+    objects = []
     for row in results:
-        models.Profile.objects.create(
+        objects.append(models.Profile(
             id=row['id'],
             join_date=get_date(row['join_date']),
             last_sync=get_date(row['last_sync']),
@@ -74,13 +75,15 @@ def import_profiles():
             photo_max=get_value_or_empty_string(row['photo_max']),
             photo_max_orig=get_value_or_empty_string(row['photo_max_orig']),
             domain=get_value_or_empty_string(row['domain'])
-        )
+        ))
+    models.Profile.objects.bulk_create(objects)
 
 
 def import_posts():
     results = execute('post')
+    objects = []
     for row in results:
-        models.Post.objects.create(
+        objects.append(models.Post(
             status=row['status'],
             author_id=row['from_id'],
             date=get_date(row['date']),
@@ -91,20 +94,23 @@ def import_posts():
             sum_distance=row['sum_distance'],
             edit_reason=row['edit_reason'],
             last_update=get_date(row['last_update']),
-        )
+        ))
+    models.Post.objects.bulk_create(objects)
 
 
 def import_stat_logs():
     results = execute('stat_log')
+    objects = []
     for row in results:
-        models.StatLog.objects.create(
+        objects.append(models.StatLog(
             id=row['id'],
             publish_date=get_date(row['publish_date']),
             stat_type=row['stat_type'],
             start_value=row['start_value'],
             end_value=row['end_value'],
             post_id=row['post_id']
-        )
+        ))
+    models.StatLog.objects.bulk_create(objects)
 
 
 def import_temp_data():
@@ -116,7 +122,15 @@ def import_temp_data():
 if __name__ == '__main__':
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'app.settings')
     django.setup()
+    from django.conf import settings
     from app import models  # noqa: E402
+
+    if settings.DB_URL:
+        db_name = settings.DB_URL
+    else:
+        db_name = settings.DATABASES['default']['NAME']
+
+    print(f'>> Import into "{db_name}"\n')
 
     with psycopg2.connect(host='127.0.0.1', user='phpusr', dbname='wildrace_v2',
                           cursor_factory=RealDictCursor) as conn:
@@ -130,7 +144,7 @@ if __name__ == '__main__':
         cursor = conn.cursor()
         create_user()
         import_config()
+        import_temp_data()
         import_profiles()
         import_posts()
         import_stat_logs()
-        import_temp_data()
