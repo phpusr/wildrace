@@ -1,8 +1,12 @@
+import logging
+
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import JsonWebsocketConsumer
 from django.conf import settings
 
 from app.services.index_page_service import encode_json
+
+logger = logging.getLogger(__name__)
 
 
 class AppConsumer(JsonWebsocketConsumer):
@@ -15,7 +19,7 @@ class AppConsumer(JsonWebsocketConsumer):
         self.accept()
 
     def disconnect(self, close_code: int):
-        print('>> Socket disconnect with code', close_code)
+        logger.debug('Socket disconnect with code', close_code)
 
     def app_activity(self, event: dict):
         self.send_json(event)
