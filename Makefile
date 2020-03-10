@@ -5,13 +5,13 @@ APP_SERVICE=web
 main:
 	@echo "This is Makefile for wildrace app"
 
-run-prod:
+daphne:
 	@echo "=== Run Production version"
 	cd backend && pipenv run daphne app.asgi:application -b 0.0.0.0 -p 8000
 
 ### Build ###
 
-build: build-frontend build-backend
+build: build-frontend build-backend test docker-build
 	@echo "=== Build finished ==="
 
 build-frontend:
@@ -24,8 +24,16 @@ build-backend:
 
 ### Test ###
 
+test:
+	./manage.py test
+
 coverage:
 	cd backend && pipenv run coverage run; pipenv run coverage report && pipenv run coverage html && chromium ../.coverage_html/index.html
+
+### Docker ###
+
+docker-build:
+	docker-compose build
 
 ### Heroku ###
 
