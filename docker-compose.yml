@@ -8,7 +8,7 @@ services:
     ports:
       - 8010:8000
     environment:
-      - DJANGO_SETTINGS_MODULE=app.settings.prod
+#      - DEBUG=True
       - PORT=8000
       - DATABASE_URL=postgres://postgres:mysuperpassword@db:5432/app
       - REDIS_URL=redis://redis:6379

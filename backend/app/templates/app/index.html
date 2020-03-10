@@ -41,7 +41,10 @@
 
 {% csrf_token %}
 
-<div id="app"></div>
+<div id="app">
+    <h1>WildRace</h1>
+    <p>Scripts didn't load</p>
+</div>
 
 {% for js_file in js_files %}
     <script src="{{ js_file }}"></script>
