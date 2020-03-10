@@ -4,14 +4,11 @@ MAINTAINER phpusr
 ENV PYTHONBUFFERED 1
 ENV PORT 8000
 
-# Copy run script
-COPY ./scripts/docker_run.sh /usr/local/bin/wildrace
-RUN chmod +x /usr/local/bin/wildrace
+WORKDIR /app/
 
 # Install dependencies
-COPY Pipfile Pipfile.lock /app/
-RUN cd /app \
-    && pip install --upgrade pipenv \
+COPY Pipfile Pipfile.lock ./
+RUN pip install --upgrade pipenv \
     && pipenv lock --requirements > requirements.txt \
     && pip install -r requirements.txt \
     && pipenv --rm \
@@ -23,7 +20,8 @@ RUN useradd user
 USER user
 
 # Copy source files
-COPY backend /app
-WORKDIR /app
+COPY scripts/docker_run.sh /usr/local/bin/wildrace
+COPY manage.py .
+COPY backend .
 
 CMD ./manage.py migrate && wildrace $PORT

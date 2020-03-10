@@ -7,8 +7,9 @@ import sys
 def change_app_directory(directory):
     cur_path = os.path.dirname(os.path.abspath(__file__))
     app_path = os.path.join(cur_path, directory)
-    sys.path.append(app_path)
-    os.chdir(app_path)
+    if os.path.exists(app_path):
+        sys.path.append(app_path)
+        os.chdir(app_path)
 
 
 def main():
