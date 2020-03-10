@@ -167,7 +167,7 @@ class Post(models.Model):
             return self.sum_distance - self.distance
 
     def __str__(self):
-        return f'Post(id: {self.id}, number: {self.number}, text: {self.text})'
+        return f'Post(id: {self.id}, number: {self.number}, text: {self.text[:50]})'
 
 
 class StatLog(models.Model):

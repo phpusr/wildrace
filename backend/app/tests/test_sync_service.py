@@ -37,6 +37,22 @@ class SyncServiceTests(TestCase):
                 pass
             self.assertEqual(Post.objects.count(), 0)
 
+    def test_sync_posts_many_blocks(self):
+        sync_service.DOWNLOAD_POST_COUNT = 1
+        items = [
+            self.create_vk_post(2, '18+4=22'),
+            self.create_vk_post(1, '18+4=22'),
+        ]
+        with patch('app.services.vk_api_service.get_wall_posts') as get_wall_posts:
+            get_wall_posts.side_effect = [
+                {'count': len(items), 'items': items[1:2]},
+                {'count': len(items), 'items': items[1:2]},
+                {'count': len(items), 'items': items},
+                {'count': len(items), 'items': items}
+            ]
+            sync_service.sync_posts()
+            self.assertEqual(get_wall_posts.call_count, 2*2)
+
     def test_sync_posts(self):
         """Test that sync_posts call get_wall_posts 2 times"""
         with patch('app.services.vk_api_service.get_wall_posts') as gi:
