@@ -13,6 +13,10 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+import dj_database_url
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
@@ -23,7 +27,14 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__fil
 SECRET_KEY = 'y2vzv!u!1k_zgc@u&s)59x(3(q(ek#w@4q86^quf545gq-qi$='
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', True)
+
+if not DEBUG:
+    sentry_sdk.init(
+        dsn=os.getenv('SENTRY_BACKEND_DSN', ''),
+        integrations=[DjangoIntegration()],
+        send_default_pii=True
+    )
 
 ALLOWED_HOSTS = ['*']
 
@@ -80,15 +91,22 @@ WSGI_APPLICATION = 'app.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db', 'dev_db.sqlite3'),
-        'TEST': {
-            'NAME': os.path.join(BASE_DIR, 'db', 'test_db.sqlite3')
+DB_URL = os.getenv('DATABASE_URL')
+
+if DB_URL:
+    DATABASES = {
+        'default': dj_database_url.parse(DB_URL)
+    }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db', 'dev_db.sqlite3'),
+            'TEST': {
+                'NAME': os.path.join(BASE_DIR, 'db', 'test_db.sqlite3')
+            }
         }
     }
-}
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
