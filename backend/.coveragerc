@@ -1,5 +1,5 @@
 [run]
-command_line = manage.py test
+command_line = ../manage.py test
 source = .
 data_file = ../.coverage
 

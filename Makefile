@@ -7,7 +7,7 @@ main:
 
 run-prod:
 	@echo "=== Run Production version"
-	pipenv run daphne app.asgi:application -b 0.0.0.0 -p 8000
+	cd backend && pipenv run daphne app.asgi:application -b 0.0.0.0 -p 8000
 
 ### Build ###
 
@@ -16,7 +16,7 @@ build: build-frontend build-backend
 
 build-frontend:
 	@echo "=== Build frontent ==="
-	cd ../frontend && yarn build
+	cd frontend && yarn build
 
 build-backend:
 	@echo "=== Build backend ==="
@@ -25,7 +25,7 @@ build-backend:
 ### Test ###
 
 coverage:
-	pipenv run coverage run; pipenv run coverage report && pipenv run coverage html && chromium ../.coverage_html/index.html
+	cd backend && pipenv run coverage run; pipenv run coverage report && pipenv run coverage html && chromium ../.coverage_html/index.html
 
 ### Heroku ###
 
