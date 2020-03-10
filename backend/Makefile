@@ -2,8 +2,6 @@
 APP_NAME=wildrace
 APP_SERVICE=web
 
-export DJANGO_SETTINGS_MODULE=app.settings.prod
-
 main:
 	@echo "This is Makefile for wildrace app"
 
@@ -23,6 +21,11 @@ build-frontend:
 build-backend:
 	@echo "=== Build backend ==="
 	pipenv run ./manage.py collectstatic --clear --no-input
+
+### Test ###
+
+coverage:
+	pipenv run coverage run; pipenv run coverage report && pipenv run coverage html && chromium ../.coverage_html/index.html
 
 ### Heroku ###
 
