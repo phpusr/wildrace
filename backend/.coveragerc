@@ -10,7 +10,7 @@ omit =
     app/tests/*
     app/asgi.py
     app/wsgi.py
-    app/settings/*
+    app/settings.py
 
     ws/consumers.py
     ws/tests.py
