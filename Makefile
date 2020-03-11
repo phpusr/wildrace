@@ -70,12 +70,12 @@ heroku-push-local: ## Push a local docker image to your Heroku app and release i
 	docker push registry.heroku.com/wildrace/web
 	$(MAKE) heroku-release
 
-heroku-build-push: heroku-push heroku-release ## Does 'heroku-push' then 'heroku-release'
+heroku-build-push: heroku-push heroku-release ## Does 'heroku-push', then 'heroku-release'
 
-heroku-push: ## Build, then push Docker images to deploy your Heroku app
+heroku-push: ## Build, then push Docker image to deploy your Heroku app
 	heroku container:push $(APP_SERVICE) -a $(APP_NAME)
 
-heroku-release: ## Release previously pushed Docker images to your Heroku app
+heroku-release: ## Release previously pushed Docker image to your Heroku app
 	heroku container:release $(APP_SERVICE) -a $(APP_NAME)
 
 heroku-rm: ## Remove the process type from your app
