@@ -11,7 +11,7 @@ run:
 	@echo "=== Run frontend ==="
 	cd frontend && yarn serve &
 	@echo "=== Run backend ==="
-	pipenv run ./manage.py runserver
+	pipenv run ./manage.py migrate && pipenv run ./manage.py runserver
 
 daphne:
 	@echo "=== Run daphne ==="
