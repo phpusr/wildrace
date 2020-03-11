@@ -27,6 +27,9 @@ install:
 build: build-frontend build-backend test docker-build
 	@echo "=== Build finished ==="
 
+build-no-test: build-frontend build-backend docker-build
+	@echo "=== Build finished ==="
+
 build-frontend:
 	@echo "=== Build frontent ==="
 	cd frontend && yarn build
