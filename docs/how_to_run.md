@@ -40,6 +40,12 @@ Start docker containers
 docker-compose up
 ```
 
+Open browser
+
+```
+chromium http://localhost:8010/
+```
+
 ## Makefile commands
 
 ### Run
