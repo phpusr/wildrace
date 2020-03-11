@@ -17,7 +17,7 @@ How to run
 Install dependencies
 
 ```
-make install build-frontend build-backend
+make install
 ```
 
 And run in developed mode
