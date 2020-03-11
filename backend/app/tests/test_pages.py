@@ -6,6 +6,8 @@ from rest_framework import status
 from app.services import index_page_service
 from app.tests import create_config, create_temp_data, create_admin
 
+HOST = 'http://localhost:8080'
+
 INDEX_URL = reverse('index')
 
 
@@ -19,7 +21,7 @@ class PublicTests(TestCase):
     def test_index_page(self):
         res = self.client.get(INDEX_URL)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertContains(res, 'http://localhost:8080')
+        self.assertContains(res, HOST)
         self.assertNotContains(res, 'username')
         self.assertNotContains(res, 'isStaff')
 
@@ -28,7 +30,7 @@ class PublicTests(TestCase):
         index_page_service.get_data(AnonymousUser())
         res = self.client.get(INDEX_URL)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertNotContains(res, 'http://192.168.1.100:8080')
+        self.assertNotContains(res, HOST)
         self.assertNotContains(res, 'username')
         self.assertNotContains(res, 'isStaff')
 
