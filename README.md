@@ -1,9 +1,15 @@
-# wildrace
+wildrace
+========
 
 [![Build Status](https://travis-ci.org/phpusr/wildrace.svg?branch=master)](https://travis-ci.org/phpusr/wildrace)
 [![codecov](https://codecov.io/gh/phpusr/wildrace/branch/master/graph/badge.svg)](https://codecov.io/gh/phpusr/wildrace)
 
 Service for analyze posts from vk.com
+
+## Doc
+
+- [How to run](docs/how_to_run.md)
+- [Get VK access token](docs/get_vk_access_token.md)
 
 ## Used technologies
 

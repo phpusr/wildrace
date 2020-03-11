@@ -1,4 +1,5 @@
-# How to run
+How to run
+==========
 
 ## You need to install
 
@@ -27,7 +28,7 @@ make run
 
 ## Run project in production mode (needs Docker)
 
-Set environment variable `VK_ACCESS_TOKEN` ([how to get](#))
+Set environment variable `VK_ACCESS_TOKEN` ([how to get](get_vk_access_token.md))
 
 ```
 export VK_ACCESS_TOKEN='...'
