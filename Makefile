@@ -70,11 +70,11 @@ heroku-push-local:
 
 heroku-build-push: heroku-push heroku-release
 
-# Builds, then pushes Docker images to deploy your Heroku app
+# Build, then push Docker images to deploy your Heroku app
 heroku-push:
 	heroku container:push $(APP_SERVICE) -a $(APP_NAME)
 
-# Releases previously pushed Docker images to your Heroku app
+# Release previously pushed Docker images to your Heroku app
 heroku-release:
 	heroku container:release $(APP_SERVICE) -a $(APP_NAME)
 
@@ -82,6 +82,6 @@ heroku-release:
 heroku-rm:
 	heroku container:rm $(APP_SERVICE) -a $(APP_NAME)
 
-# Builds, then runs the docker image locally
+# Build, then run the docker image locally
 heroku-run:
 	heroku container:run $(APP_SERVICE) -a $(APP_NAME)
