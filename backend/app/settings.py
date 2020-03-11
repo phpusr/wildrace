@@ -228,7 +228,7 @@ CELERY_BROKER_URL = REDIS_URL
 
 #####################################
 
-VERSION = '3.0.1'
+VERSION = '3.0'
 
 VK_LINK = 'https://vk.com'
 
