@@ -19,7 +19,7 @@ class PublicTests(TestCase):
     def test_index_page(self):
         res = self.client.get(INDEX_URL)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertContains(res, 'http://192.168.1.100:8080')
+        self.assertContains(res, 'http://localhost:8080')
         self.assertNotContains(res, 'username')
         self.assertNotContains(res, 'isStaff')
 
