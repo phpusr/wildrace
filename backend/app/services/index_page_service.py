@@ -28,7 +28,7 @@ def get_data(user):
     }
 
     if settings.DEBUG:
-        host = 'http://192.168.1.100:8080'
+        host = 'http://localhost:8080'
         data['js_files'] = [
             f'{host}/js/app.js',
             f'{host}/js/chunk-vendors.js'

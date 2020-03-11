@@ -8,7 +8,7 @@ services:
     ports:
       - 8010:8000
     environment:
-      - DEBUG=True
+      - DEBUG=False
       - APP_LOG_LEVEL=DEBUG
       - PORT=8000
       - DATABASE_URL=postgres://postgres:mysuperpassword@db:5432/app
