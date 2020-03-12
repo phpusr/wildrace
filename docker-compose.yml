@@ -5,6 +5,7 @@ services:
     container_name: wildrace-web
     build: .
     image: phpusr/wildrace
+    restart: unless-stopped
     ports:
       - 8010:8000
     environment:
@@ -20,6 +21,7 @@ services:
   db:
     container_name: wildrace-db
     image: postgres:12-alpine
+    restart: unless-stopped
     environment:
       - POSTGRES_DB=app
       - POSTGRES_USER=postgres
@@ -28,6 +30,7 @@ services:
   redis:
     container_name: wildrace-redis
     image: redis:5.0
+    restart: unless-stopped
 
 networks:
   default:
