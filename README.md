@@ -4,7 +4,17 @@ wildrace
 [![Build Status](https://travis-ci.org/phpusr/wildrace.svg?branch=master)](https://travis-ci.org/phpusr/wildrace)
 [![codecov](https://codecov.io/gh/phpusr/wildrace/branch/master/graph/badge.svg)](https://codecov.io/gh/phpusr/wildrace)
 
-Service for analyze posts from vk.com
+There is a group at [vk.com](https://vk.com/club101326589). 
+In it, participants share the results of their runs, they add up their distance from the previous one, for example: "1000 + 5 = 1005".
+The goal of the group is to unite the runners and to run 1,000,000 km together.
+
+Sometimes participants make mistakes during addition, some statistics are also needed. 
+In order for the results to be correct, a bot was created that analyzes the participants' messages and writes them a comment on the processing status. 
+In addition, once every 1000 km, he publishes statistics.
+
+The bot is written in Django, uses the Django REST Framework for the web interface API, Django Channels sends data via WebSockets to the web interface, Celery to run periodic tasks.
+
+[The web interface](https://wildrace.herokuapp.com/) is written in Vue.js and updates data automatically through WebSockets.
 
 ## Doc
 
