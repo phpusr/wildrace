@@ -22,6 +22,7 @@ channels-redis = ">=2.4.2,<2.5"
 whitenoise = ">=5.0.1,<5.1"
 dj-database-url = ">=0.5.0,<0.6"
 sentry-sdk = ">=0.14.2,<0.15"
+google-api-python-client = ">=1.7.12,<1.8"
 
 [requires]
 python_version = "3.8"
