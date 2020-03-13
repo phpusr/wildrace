@@ -40,9 +40,11 @@ class BackupServiceTests(TestCase):
         self.assertEqual(delete_old_files.call_count, 1)
 
     def test_backup_db(self):
-        result = backup_service.backup_db()
-        self.assertIsInstance(result['id'], str)
-        self.assertEquals(len(result['id']), 33)
+        with self.settings(BACKUP_DB_FILE_NUMBER=100):
+            res = backup_service.backup_db()
+            self.assertIsInstance(res['id'], str)
+            self.assertEquals(len(res['id']), 33)
+            backup_service.service.files().delete(fileId=res['id']).execute()
 
     def test_delete_old_files(self):
         backup_service._delete_old_files()
