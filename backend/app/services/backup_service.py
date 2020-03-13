@@ -20,7 +20,7 @@ service = build('drive', 'v3', credentials=credentials)
 
 
 def backup_db():
-    gdrive_dir_id = getattr(settings, 'GDRIVE_DIR_ID')
+    gdrive_dir_id = getattr(settings, 'GDRIVE_DIR_ID', None)
     if not gdrive_dir_id:
         logger.warning('Backup DB is disabled because "GDRIVE_DIR_ID" is not set')
         return
