@@ -1,3 +1,4 @@
+import logging
 import os
 import tempfile
 from datetime import datetime
@@ -11,6 +12,7 @@ from googleapiclient.http import MediaFileUpload
 
 BACKUP_DB_FORMAT = getattr(settings, 'BACKUP_DB_FORMAT', 'json')
 
+logger = logging.getLogger(__name__)
 service_account_file = os.path.join(settings.BASE_DIR, 'gdrive_account.json')
 scopes = ['https://www.googleapis.com/auth/drive']
 credentials = Credentials.from_service_account_file(service_account_file, scopes=scopes)
@@ -18,6 +20,11 @@ service = build('drive', 'v3', credentials=credentials)
 
 
 def backup_db():
+    gdrive_dir_id = getattr(settings, 'GDRIVE_DIR_ID')
+    if not gdrive_dir_id:
+        logger.warning('Backup DB is disabled because "GDRIVE_DIR_ID" is not set')
+        return
+
     with tempfile.NamedTemporaryFile() as tmp_file:
         management.call_command('dumpdata', indent=2, format=BACKUP_DB_FORMAT, output=tmp_file.name)
         result = _upload_file_to_gdrive(tmp_file.name)
