@@ -18,5 +18,9 @@ app.conf.beat_schedule = {
     'publish-stat-task': {
         'task': 'tasks.tasks.publish_stat_task',
         'schedule': crontab(minute=0)
+    },
+    'backup-db-task': {
+        'task': 'tasks.tasks.backup_db_task',
+        'schedule': crontab(hour=0, minute=0)
     }
 }

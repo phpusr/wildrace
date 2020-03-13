@@ -18,7 +18,7 @@ def create_config():
         sync_posts=False,
         group_id=88923650,
         commenting=False,
-        comment_access_token=os.getenv('VK_ACCESS_TOKEN'),
+        comment_access_token=os.getenv('VK_ACCESS_TOKEN', '-'),
         comment_from_group=False,
         publish_stat=False
     )

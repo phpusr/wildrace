@@ -14,7 +14,8 @@ class BackupServiceTests(TestCase):
     @patch('app.services.backup_service._delete_old_files')
     def test_backup_db_without_gdrive_dir_id(self, delete_old_files, upload_file_to_gdrive, call_command):
         with self.settings(GDRIVE_DIR_ID=None):
-            backup_service.backup_db()
+            result = backup_service.backup_db()
+            self.assertIsNone(result)
             self.assertEquals(call_command.call_count, 0)
             self.assertEqual(upload_file_to_gdrive.call_count, 0)
             self.assertEqual(delete_old_files.call_count, 0)
