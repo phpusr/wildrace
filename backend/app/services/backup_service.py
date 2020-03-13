@@ -13,10 +13,12 @@ from googleapiclient.http import MediaFileUpload
 BACKUP_DB_FORMAT = getattr(settings, 'BACKUP_DB_FORMAT', 'json')
 
 logger = logging.getLogger(__name__)
-service_account_file = os.path.join(settings.BASE_DIR, 'gdrive_account.json')
-scopes = ['https://www.googleapis.com/auth/drive']
-credentials = Credentials.from_service_account_file(service_account_file, scopes=scopes)
-service = build('drive', 'v3', credentials=credentials)
+service_account_file_path = os.path.join(settings.BASE_DIR, 'gdrive_account.json')
+
+if os.path.exists(service_account_file_path):
+    scopes = ['https://www.googleapis.com/auth/drive']
+    credentials = Credentials.from_service_account_file(service_account_file_path, scopes=scopes)
+    service = build('drive', 'v3', credentials=credentials)
 
 
 def backup_db():

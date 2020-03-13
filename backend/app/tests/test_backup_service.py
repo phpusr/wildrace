@@ -40,6 +40,9 @@ class BackupServiceTests(TestCase):
         self.assertEqual(delete_old_files.call_count, 1)
 
     def test_backup_db(self):
+        if not os.path.exists(backup_service.service_account_file_path):
+            self.skipTest(f'Google Drive service account file not found: "{backup_service.service_account_file_path}"')
+
         with self.settings(BACKUP_DB_FILE_NUMBER=100):
             res = backup_service.backup_db()
             self.assertIsInstance(res['id'], str)
@@ -47,4 +50,7 @@ class BackupServiceTests(TestCase):
             backup_service.service.files().delete(fileId=res['id']).execute()
 
     def test_delete_old_files(self):
+        if not os.path.exists(backup_service.service_account_file_path):
+            self.skipTest(f'Google Drive service account file not found: "{backup_service.service_account_file_path}"')
+
         backup_service._delete_old_files()
