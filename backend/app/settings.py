@@ -29,9 +29,10 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'change_it')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
-if not DEBUG:
+SENTRY_BACKEND_DSN = os.getenv('SENTRY_BACKEND_DSN')
+if SENTRY_BACKEND_DSN:
     sentry_sdk.init(
-        dsn=os.getenv('SENTRY_BACKEND_DSN', ''),
+        dsn=SENTRY_BACKEND_DSN,
         integrations=[DjangoIntegration()],
         send_default_pii=True
     )
