@@ -36,7 +36,7 @@ class TaskTests(TestCase):
             self.assertEqual(res, 'Publish stat task successfully finished')
 
     def test_backup_db_is_disabled(self):
-        with self.settings(GDRIVE_DIR_ID=None):
+        with self.settings(GDRIVE_FOLDER_ID=None):
             res = tasks.backup_db_task()
             self.assertEqual(res, 'Backup DB task fail or disabled, see logs')
 

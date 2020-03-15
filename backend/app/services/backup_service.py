@@ -31,9 +31,9 @@ service = build('drive', 'v3', credentials=credentials)
 
 
 def backup_db():
-    gdrive_dir_id = getattr(settings, 'GDRIVE_DIR_ID', None)
-    if not gdrive_dir_id:
-        logger.warning('Backup DB is disabled because "GDRIVE_DIR_ID" is not set')
+    gdrive_folder_id = getattr(settings, 'GDRIVE_FOLDER_ID', None)
+    if not gdrive_folder_id:
+        logger.warning('Backup DB is disabled because "GDRIVE_FOLDER_ID" is not set')
         return
 
     with tempfile.NamedTemporaryFile() as tmp_file:
@@ -50,7 +50,7 @@ def _upload_file_to_gdrive(file_path: str) -> Dict[str, str]:
     file_name = f'db_{now_str}.{BACKUP_DB_FORMAT}'
     file_metadata = {
         'name': file_name,
-        'parents': [settings.GDRIVE_DIR_ID]
+        'parents': [settings.GDRIVE_FOLDER_ID]
     }
 
     media = MediaFileUpload(file_path, resumable=True)
@@ -63,7 +63,7 @@ def _delete_old_files():
         fields='files(id, name)',
         orderBy='name desc',
         pageSize=1000,
-        q=f'"{settings.GDRIVE_DIR_ID}" in parents'
+        q=f'"{settings.GDRIVE_FOLDER_ID}" in parents'
     ).execute()
 
     backup_db_file_number = getattr(settings, 'BACKUP_DB_FILE_NUMBER', 30)
