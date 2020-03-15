@@ -7,6 +7,7 @@ How to run
     - [Pipenv](https://pipenv.readthedocs.io/en/latest/)
 - [Node.js](https://nodejs.org/en/)
     - [yarn](https://yarnpkg.com/)
+- [Redis](https://redis.io/)
 - [Make](http://www.man7.org/linux/man-pages/man1/make.1.html)
 - [Docker](https://www.docker.com/) (optional)
     - [Docker Compose](https://docs.docker.com/compose/) (optional)
