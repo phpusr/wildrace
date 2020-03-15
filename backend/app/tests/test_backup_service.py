@@ -6,6 +6,8 @@ from django.test import TestCase
 
 from app.services import backup_service
 
+GDRIVE_TEST_DIR_ID = '1G8cwWl1RyordtvcWqUR3Xn0ap0FTsVZx'
+
 
 class BackupServiceTests(TestCase):
 
@@ -40,17 +42,7 @@ class BackupServiceTests(TestCase):
         self.assertEqual(delete_old_files.call_count, 1)
 
     def test_backup_db(self):
-        if not os.path.exists(backup_service.service_account_file_path):
-            self.skipTest(f'Google Drive service account file not found: "{backup_service.service_account_file_path}"')
-
-        with self.settings(BACKUP_DB_FILE_NUMBER=100):
+        with self.settings(GDRIVE_DIR_ID=GDRIVE_TEST_DIR_ID, BACKUP_DB_FILE_NUMBER=0):
             res = backup_service.backup_db()
             self.assertIsInstance(res['id'], str)
             self.assertEquals(len(res['id']), 33)
-            backup_service.service.files().delete(fileId=res['id']).execute()
-
-    def test_delete_old_files(self):
-        if not os.path.exists(backup_service.service_account_file_path):
-            self.skipTest(f'Google Drive service account file not found: "{backup_service.service_account_file_path}"')
-
-        backup_service._delete_old_files()
