@@ -175,6 +175,10 @@ LOGGING = {
         'app': {
             'handlers': ['console'],
             'level': os.getenv('APP_LOG_LEVEL', 'ERROR')
+        },
+        'tasks': {
+            'handlers': ['console'],
+            'level': os.getenv('APP_LOG_LEVEL', 'ERROR')
         }
     }
 }
