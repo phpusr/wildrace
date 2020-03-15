@@ -20,6 +20,7 @@ The bot is written in Django, uses the Django REST Framework for the web interfa
 
 - [How to run](docs/how_to_run.md)
 - [Get VK access token](docs/get_vk_access_token.md)
+- [Environment variables](docs/env.md)
 
 ## Used technologies
 
