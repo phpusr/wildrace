@@ -27,7 +27,7 @@ with open(service_account_file_path, 'w') as service_account_file:
 # Creating GDrive service
 scopes = ['https://www.googleapis.com/auth/drive']
 credentials = Credentials.from_service_account_file(service_account_file_path, scopes=scopes)
-service = build('drive', 'v3', credentials=credentials)
+service = build('drive', 'v3', credentials=credentials, cache_discovery=False)
 
 
 def backup_db():
