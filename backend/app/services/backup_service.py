@@ -3,7 +3,6 @@ import logging
 import os
 import tempfile
 from datetime import datetime
-from pprint import pprint
 from typing import Dict
 
 from django.conf import settings
@@ -68,8 +67,6 @@ def _delete_old_files():
     ).execute()
 
     backup_db_file_number = getattr(settings, 'BACKUP_DB_FILE_NUMBER', 30)
-    print(f'{backup_db_file_number=}')
-    pprint(result['files'])
     old_files = result['files'][backup_db_file_number:]
     for file in old_files:
         service.files().delete(fileId=file['id']).execute()
