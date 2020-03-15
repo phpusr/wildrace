@@ -69,5 +69,5 @@ def _delete_old_files():
     backup_db_file_number = getattr(settings, 'BACKUP_DB_FILE_NUMBER', 30)
     old_files = result['files'][backup_db_file_number:]
     for file in old_files:
-        print(file)
+        logger.debug('Deleting file:', file)
         service.files().delete(fileId=file['id']).execute()
