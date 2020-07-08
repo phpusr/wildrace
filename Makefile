@@ -32,7 +32,7 @@ build-no-test: build-frontend build-backend docker-build ## Build without test
 	@echo "=== Build finished ==="
 
 build-frontend: ## Build a frontend project
-	@echo "=== Build frontent ==="
+	@echo "=== Build frontend ==="
 	cd frontend && yarn build
 
 build-backend: ## Build a backend project
