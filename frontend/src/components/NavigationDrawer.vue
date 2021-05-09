@@ -68,17 +68,16 @@
 </template>
 
 <script>
-    import {mapActions, mapGetters, mapState} from "vuex"
-    import LoginDialog from "./LoginDialog"
+import {mapActions, mapGetters, mapState} from "vuex"
+import LoginDialog from "./LoginDialog"
 
-    export default {
+export default {
         components: {LoginDialog},
         props: {
             value: Boolean
         },
         data: () => ({
-            defaultAvatar: "https://www.yourfirstpatient.com/assets/default-user-avatar-thumbnail@2x-ad6390912469759cda" +
-                "3106088905fa5bfbadc41532fbaa28237209b1aa976fc9.png"
+            defaultAvatar: "https://pics.freeicons.io/uploads/icons/png/9055969781537356155-128.png"
         }),
         computed: {
             ...mapState(["user", "lastSyncDate", "config", "webSocketStatus"]),
