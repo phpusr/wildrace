@@ -71,6 +71,7 @@ heroku-push-local: ## Push a local docker image to your Heroku app and release i
 
 heroku-build-push: heroku-push heroku-release ## Does 'heroku-push', then 'heroku-release'
 
+# required "heroku container:login"
 heroku-push: ## Build, then push Docker image to deploy your Heroku app
 	heroku container:push $(APP_SERVICE) -a $(APP_NAME)
 
