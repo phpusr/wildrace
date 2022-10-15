@@ -24,7 +24,7 @@ services:
 
   db:
     container_name: wildrace-db
-    image: postgres:12-alpine
+    image: postgres:14-alpine
     restart: unless-stopped
     environment:
       - POSTGRES_DB=app
