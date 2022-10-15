@@ -17,7 +17,7 @@ class Config(models.Model):
     commenting = models.BooleanField()
     """Commenting of posts status processing"""
 
-    comment_access_token = models.TextField(max_length=100)
+    comment_access_token = models.TextField(max_length=255)
     """Access token for comments"""
 
     comment_from_group = models.BooleanField()
