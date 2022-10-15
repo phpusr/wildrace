@@ -1,5 +1,7 @@
 /.idea/
 /*.iml
 
+/data/
 /.coverage_html/
 /.coverage
+/.env

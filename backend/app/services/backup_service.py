@@ -20,7 +20,7 @@ enc_service_account_file_path = os.path.join(settings.BASE_DIR, 'gdrive_account.
 with open(enc_service_account_file_path) as enc_file:
     gdrive_account_data = signing.loads(enc_file.read())
 
-service_account_file_path = os.path.join(settings.BASE_DIR, 'gdrive_account.json')
+service_account_file_path = os.path.join('/tmp', 'gdrive_account.json')
 with open(service_account_file_path, 'w') as service_account_file:
     json.dump(gdrive_account_data, service_account_file)
 

@@ -1,5 +1,4 @@
 FROM python:3.8
-MAINTAINER phpusr
 
 ENV PYTHONBUFFERED 1
 ENV PORT 8000
@@ -8,13 +7,12 @@ ENV DEBUG False
 WORKDIR /app/
 
 # Install dependencies
-COPY Pipfile Pipfile.lock ./
+COPY Pipfile.lock ./
 RUN pip install --upgrade pipenv \
-    && pipenv lock --requirements > requirements.txt \
+    && pipenv requirements > requirements.txt \
     && pip install -r requirements.txt \
-    && pipenv --rm \
     && pip uninstall -y pipenv \
-    && rm Pipfile Pipfile.lock requirements.txt
+    && rm Pipfile.lock requirements.txt
 
 # Add user
 RUN useradd user
