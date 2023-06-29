@@ -18,7 +18,6 @@ services:
       - SENTRY_BACKEND_DSN=${SENTRY_BACKEND_DSN}
     volumes:
       - ./data/db:/app/data
-      - ./data/backup:/app/backup
     depends_on:
       - db
       - redis
