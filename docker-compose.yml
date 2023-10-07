@@ -7,13 +7,15 @@ services:
     image: phpusr/wildrace
     restart: unless-stopped
     ports:
-      - ${PORT:-8010}:8000
+      - ${APP_PORT:-8010}:8000
     environment:
-      - DEBUG=False
+      - DJANGO_DEBUG=${DJANGO_DEBUG:-FALSE}
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+      - DJANGO_ALLOWED_HOSTS=${DJANGO_ALLOWED_HOSTS}
+      - DJANGO_CSRF_TRUSTED_ORIGINS=${DJANGO_CSRF_TRUSTED_ORIGINS}
       - APP_LOG_LEVEL=DEBUG
       - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/app
       - REDIS_URL=redis://redis:6379
-      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
       - GOOGLE_ANALYTICS_ID=${GOOGLE_ANALYTICS_ID}
       - SENTRY_BACKEND_DSN=${SENTRY_BACKEND_DSN}
     volumes:

@@ -1,8 +1,7 @@
 FROM python:3.8
 
 ENV PYTHONBUFFERED 1
-ENV PORT 8000
-ENV DEBUG False
+ENV DJANGO_DEBUG False
 
 WORKDIR /app/
 
@@ -23,4 +22,4 @@ COPY scripts/docker_run.sh /usr/local/bin/wildrace
 COPY manage.py .
 COPY backend .
 
-CMD ./manage.py migrate && wildrace $PORT
+CMD ./manage.py migrate && wildrace 8000
