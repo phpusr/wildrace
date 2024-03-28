@@ -17,7 +17,7 @@ from ws.ws_service import ObjectType
 logger = logging.getLogger(__name__)
 
 MAX_NEW_RUNNERS_COUNT = 25
-TOP_RUNNERS_COUNT = 5
+TOP_RUNNERS_COUNT = 10
 
 
 @dataclass
