@@ -27,7 +27,6 @@ with open(service_account_file_path, 'w') as service_account_file:
 # Creating GDrive service
 scopes = ['https://www.googleapis.com/auth/drive']
 credentials = Credentials.from_service_account_file(service_account_file_path, scopes=scopes)
-service = build('drive', 'v3', credentials=credentials, cache_discovery=False)
 
 
 def backup_db():
@@ -54,11 +53,12 @@ def _upload_file_to_gdrive(file_path: str) -> Dict[str, str]:
     }
 
     media = MediaFileUpload(file_path, resumable=True)
-    result = service.files().create(body=file_metadata, media_body=media, fields='id').execute()
+    result = _get_service().files().create(body=file_metadata, media_body=media, fields='id').execute()
     return result
 
 
 def _delete_old_files():
+    service = _get_service()
     result = service.files().list(
         fields='files(id, name)',
         orderBy='name desc',
@@ -71,3 +71,7 @@ def _delete_old_files():
     for file in old_files:
         logger.debug('Deleting file:', file)
         service.files().delete(fileId=file['id']).execute()
+
+
+def _get_service():
+    return build('drive', 'v3', credentials=credentials, cache_discovery=False)
