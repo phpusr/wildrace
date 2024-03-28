@@ -288,9 +288,9 @@ def _create_post_text(stat: StatDto) -> str:
     s += f'- Всего отметилось - {stat.all_runners_count} чел.\n'
     s += f'- Отметилось на отрезке {segment} - {stat.interval_runners_count} чел.\n'
     s += f'- Новых на отрезке {segment} - {stat.new_runners_count} чел.\n'
-    s += '5. Топ 5 бегунов на отрезке:\n'
+    s += f'5. Топ {TOP_RUNNERS_COUNT} бегунов на отрезке:\n'
     s += '\n'.join(top_int_runner_urls) + '\n'
-    s += '6. Топ 5 бегунов за все время:'
+    s += f'6. Топ {TOP_RUNNERS_COUNT} бегунов за все время:\n'
     s += '\n'.join(top_all_runner_urls) + '\n\n'
 
     # Adding url to previous stat post
