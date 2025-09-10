@@ -84,12 +84,12 @@ def _sync_block_posts(vk_post_count: int, download_count: int) -> int:
     deleted_post_ids = _remove_deleted_posts(vk_posts, last_db_posts)
 
     for vk_post in vk_posts:
-        post_id = vk_post['id']
+        post_vk_id = vk_post['id']
         post_text = remove_non_utf8_chars(vk_post['text'])
         post_date = datetime.utcfromtimestamp(vk_post['date']).astimezone(timezone.get_default_timezone())
         text_hash = md5(post_text.encode()).hexdigest()
-        db_post = find(last_db_posts, lambda it: it.id == post_id)
-        last_post = _get_last_post(last_db_posts, post_id, post_date)
+        db_post = find(last_db_posts, lambda it: it.vk_id == post_vk_id)
+        last_post = _get_last_post(last_db_posts, post_vk_id, post_date)
         last_sum_distance = last_post.sum_distance if last_post else 0
         last_post_number = last_post.number if last_post else 0
 
@@ -104,7 +104,7 @@ def _sync_block_posts(vk_post_count: int, download_count: int) -> int:
 
         # Searching and creating a new profile
         profile = _find_or_create_profile(vk_post, post_date, db_profiles)
-        new_post = Post(id=post_id, status=Post.Status.SUCCESS, author=profile, date=post_date)
+        new_post = Post(vk_id=post_vk_id, status=Post.Status.SUCCESS, author=profile, date=post_date)
 
         parser_out = _analyze_post_text(post_text, text_hash, last_sum_distance, last_post_number, new_post,
                                         EventType.CREATE)
@@ -133,7 +133,7 @@ def _remove_deleted_posts(vk_posts: Iterator[dict], last_db_posts: List[Post]) -
     recent_posts = [post for post in last_db_posts if post.date >= start_date]
 
     def not_find_in_vk(post):
-        return find(vk_posts, lambda it: it['id'] == post.id) is None
+        return find(vk_posts, lambda it: it['id'] == post.vk_id) is None
 
     deleted_posts = find_all(recent_posts, not_find_in_vk)
 
@@ -151,8 +151,8 @@ def _remove_deleted_posts(vk_posts: Iterator[dict], last_db_posts: List[Post]) -
     return deleted_post_ids
 
 
-def _get_last_post(posts, post_id, post_date):
-    return find(posts, lambda it: it.number is not None and it.id != post_id and it.date <= post_date)
+def _get_last_post(posts, post_vk_id, post_date):
+    return find(posts, lambda it: it.number is not None and it.vk_id != post_vk_id and it.date <= post_date)
 
 
 def _find_or_create_profile(vk_post: dict, post_date: datetime, db_profiles: List[Profile]) -> Profile:
@@ -227,7 +227,7 @@ def _analyze_post_text(text: str, text_hash: str, last_sum_distance: int, last_p
 
         # Adding status comment for post
         comment_text = _create_comment_text(post, last_sum_distance, new_sum_distance)
-        _add_status_comment(post.id, comment_text)
+        _add_status_comment(post.vk_id, comment_text)
 
         ws_service.main_group_send(PostSerializer(post).data, ObjectType.POST, event_type)
 
@@ -258,12 +258,12 @@ def _create_comment_text(post: Post, start_sum_distance: int, end_sum_distance: 
     return comment_text
 
 
-def _add_status_comment(post_id: int, comment_text: str):
+def _add_status_comment(post_vk_id: int, comment_text: str):
     if not Config.objects.get().commenting:
         return
 
     time.sleep(PUBLISHING_COMMENT_INTERVAL)
-    vk_api_service.add_comment_to_post(post_id, comment_text)
+    vk_api_service.add_comment_to_post(post_vk_id, comment_text)
 
 
 @transaction.atomic

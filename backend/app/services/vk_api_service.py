@@ -1,6 +1,7 @@
-from app.models import Config
 from django.conf import settings
 from vk_api.vk_api import VkApiMethod, VkApi
+
+from app.models import Config
 
 
 def get_authorize_url() -> str:
@@ -56,10 +57,10 @@ def create_post(message: str) -> dict:
     )
 
 
-def add_comment_to_post(post_id: int, message: str) -> dict:
+def add_comment_to_post(post_vk_id: int, message: str) -> dict:
     config = Config.objects.get()
     return _get_api().wall.create_comment(
-        post_id=post_id,
+        post_id=post_vk_id,
         owner_id=config.negative_group_id,
         message=message,
         from_group=config.group_id if config.comment_from_group else 0

@@ -1,6 +1,7 @@
+from rest_framework import serializers
+
 from app.models import Post, Profile, Config, User
 from app.services import vk_api_service
-from rest_framework import serializers
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -39,9 +40,9 @@ class PostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ['id', 'number', 'status', 'author', 'distance', 'sum_distance', 'text', 'date', 'last_update',
+        fields = ['id', 'vk_id', 'number', 'status', 'author', 'distance', 'sum_distance', 'text', 'date', 'last_update',
                   'edit_reason']
-        read_only_fields = ['id', 'date']
+        read_only_fields = ['id', 'vk_id', 'date']
 
 
 class ConfigSerializer(serializers.ModelSerializer):
