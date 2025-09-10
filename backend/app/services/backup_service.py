@@ -1,4 +1,3 @@
-import json
 import logging
 import os
 import tempfile
@@ -6,7 +5,7 @@ from datetime import datetime
 from typing import Dict
 
 from django.conf import settings
-from django.core import management, signing
+from django.core import management
 from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
@@ -15,14 +14,7 @@ BACKUP_DB_FORMAT = getattr(settings, 'BACKUP_DB_FORMAT', 'json')
 
 logger = logging.getLogger(__name__)
 
-# Decoding GDrive service account file
-enc_service_account_file_path = os.path.join(settings.BASE_DIR, 'gdrive_account.enc')
-with open(enc_service_account_file_path) as enc_file:
-    gdrive_account_data = signing.loads(enc_file.read())
-
-service_account_file_path = os.path.join('/tmp', 'gdrive_account.json')
-with open(service_account_file_path, 'w') as service_account_file:
-    json.dump(gdrive_account_data, service_account_file)
+service_account_file_path = os.path.join(settings.BASE_DIR, 'gdrive_account.json')
 
 # Creating GDrive service
 scopes = ['https://www.googleapis.com/auth/drive']
