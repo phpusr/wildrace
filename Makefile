@@ -58,28 +58,3 @@ flake8: ## Test with Flake8
 
 docker-build: ## Build a docker container
 	docker-compose build
-
-##@ Heroku
-
-heroku-logs: ## Show heroku logs
-	heroku logs -t -a $(APP_NAME)
-
-heroku-push-local: ## Push a local docker image to your Heroku app and release it
-	docker tag phpusr/wildrace registry.heroku.com/wildrace/web
-	docker push registry.heroku.com/wildrace/web
-	$(MAKE) heroku-release
-
-heroku-build-push: heroku-push heroku-release ## Does 'heroku-push', then 'heroku-release'
-
-# required "heroku container:login"
-heroku-push: ## Build, then push Docker image to deploy your Heroku app
-	heroku container:push $(APP_SERVICE) -a $(APP_NAME)
-
-heroku-release: ## Release previously pushed Docker image to your Heroku app
-	heroku container:release $(APP_SERVICE) -a $(APP_NAME)
-
-heroku-rm: ## Remove the process type from your app
-	heroku container:rm $(APP_SERVICE) -a $(APP_NAME)
-
-heroku-run: ## Build, then run the docker image locally
-	heroku container:run $(APP_SERVICE) -a $(APP_NAME)
