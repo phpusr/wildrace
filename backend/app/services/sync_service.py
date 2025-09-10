@@ -86,7 +86,8 @@ def _sync_block_posts(vk_post_count: int, download_count: int) -> int:
     for vk_post in vk_posts:
         post_vk_id = vk_post['id']
         post_text = remove_non_utf8_chars(vk_post['text'])
-        post_date = datetime.fromtimestamp(vk_post['date'], tz=dt_timezone.utc).astimezone(timezone.get_default_timezone())
+        post_date = (datetime.fromtimestamp(vk_post['date'], tz=dt_timezone.utc)
+                     .astimezone(timezone.get_default_timezone()))
         text_hash = md5(post_text.encode()).hexdigest()
         db_post = find(last_db_posts, lambda it: it.vk_id == post_vk_id)
         last_post = _get_last_post(last_db_posts, post_vk_id, post_date)
@@ -251,7 +252,7 @@ def _create_comment_text(post: Post, start_sum_distance: int, end_sum_distance: 
     comment_text += {
         Post.Status.SUCCESS: 'Пост успешно обработан',
         Post.Status.ERROR_SUM: f'Ошибка при сложении, должно быть: {end_sum_distance}',
-        Post.Status.ERROR_PARSE: f'Ошибка в формате записи, пост не распознан',
+        Post.Status.ERROR_PARSE: 'Ошибка в формате записи, пост не распознан',
         Post.Status.ERROR_START_SUM: f'Ошибка в стартовой сумме, должна быть: {start_sum_distance}'
     }.get(post.status, 'Ошибка: Не предусмотренный статус, напишите администратору')
 

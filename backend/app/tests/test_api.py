@@ -114,7 +114,7 @@ class PrivateApiTests(TestCase):
         create_runnings()
         post = Post.objects.first()
         with patch('app.services.sync_service.update_next_posts') as update_next_posts:
-            res = self.client.patch(post_detail_url(post.id) + f'?update_next_posts=false', {'distance': 777})
+            res = self.client.patch(post_detail_url(post.id) + '?update_next_posts=false', {'distance': 777})
             self.assertEqual(res.status_code, status.HTTP_200_OK)
             self.assertEqual(update_next_posts.call_count, 0)
 
@@ -126,7 +126,7 @@ class PrivateApiTests(TestCase):
         create_runnings()
         post = Post.objects.first()
         with patch('app.services.sync_service.update_next_posts') as update_next_posts:
-            res = self.client.delete(post_detail_url(post.id) + f'?update_next_posts=true')
+            res = self.client.delete(post_detail_url(post.id) + '?update_next_posts=true')
             self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
             self.assertEqual(update_next_posts.call_count, 1)
 

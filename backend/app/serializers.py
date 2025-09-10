@@ -40,8 +40,8 @@ class PostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ['id', 'vk_id', 'number', 'status', 'author', 'distance', 'sum_distance', 'text', 'date', 'last_update',
-                  'edit_reason']
+        fields = ['id', 'vk_id', 'number', 'status', 'author', 'distance', 'sum_distance', 'text', 'date',
+                  'last_update', 'edit_reason']
         read_only_fields = ['id', 'vk_id', 'date']
 
 

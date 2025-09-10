@@ -272,7 +272,7 @@ def _create_post_text(stat: StatDto) -> str:
         s += f'Статистика за {segment}\n\n'
 
     s += f'{new_runners_str}\n\n'
-    s += f'Наши итоги в цифрах:\n'
+    s += 'Наши итоги в цифрах:\n'
     s += '1. Количество дней бега:\n'
     s += f'- Всего - {stat.all_days_count} дн.\n'
     s += f'- Отрезок {segment} - {stat.interval_days_count} дн.\n'
