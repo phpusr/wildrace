@@ -137,6 +137,8 @@ class Post(models.Model):
         ERROR_PARSE = 3
         ERROR_START_SUM = 4
 
+    vk_id = models.PositiveIntegerField()
+
     status = models.IntegerField(choices=Status.choices)
     """Post processing status"""
 
