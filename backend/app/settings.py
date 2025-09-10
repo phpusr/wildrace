@@ -41,6 +41,8 @@ if SENTRY_BACKEND_DSN:
         send_default_pii=True
     )
 
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
 # Application definition
 
 INSTALLED_APPS = [
