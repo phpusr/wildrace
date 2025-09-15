@@ -36,7 +36,7 @@ services:
     depends_on:
       - db
       - redis
-    command: ["celery", "--app", "tasks", "worker", "--beat", "--scheduler", "django", "--loglevel=info"]
+    command: ["sh", "-c", "./manage.py wait_for_db && celery --app tasks worker --beat --scheduler django --loglevel=info"]
 
   db:
     container_name: wildrace-db
