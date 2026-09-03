@@ -7,7 +7,7 @@ verify_ssl = true
 flake8 = ">=7.3.0,<7.4"
 coverage = ">=7.10.6,<7.11"
 flower = ">=2.0.1,<2.1"
-selenium = ">=4.35.0,<4.36"
+selenium = ">=4.36"
 
 [packages]
 django = ">=5.2.6,<5.3"

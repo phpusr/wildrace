@@ -238,7 +238,7 @@ CELERY_BROKER_URL = REDIS_URL
 
 VERSION = '3.1.5'
 
-VK_LINK = 'https://vk.com'
+VK_LINK = 'https://vk.ru'
 
 VK_APP_ID = 5344865
 
